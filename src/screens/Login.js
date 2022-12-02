@@ -3,11 +3,45 @@ import {ScrollView, View, Text, TextInput, StyleSheet, Pressable, Linking } from
 import {Logo,Button,Link} from '../components';
 import AppStyle from '../../AppStyle'; 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { gql, useMutation } from '@apollo/client';
 
-const Login = (props) => {
+const Login = () => {
+
+    const [email, setEmail] = useState();
+    const [passwd, setPasswd] = useState();
    
+    const [isPasswordSecure, setIsPasswordSecure] = useState(true);
 
-  const [isPasswordSecure, setIsPasswordSecure] = useState(false);
+    const query = gql`
+        mutation Login(
+            $email: String!,
+            $password: String!
+        ) {
+            Login(
+            email: $email,
+            password: $password
+            )
+        }`;
+
+    const [Login, { loading, error }] = useMutation(query, {
+        onCompleted: data => {
+            console.log(data.Login);
+        }
+    });
+    
+    const onSignIn = (e) => {
+
+        const params = {
+            email: email,
+            password: passwd
+        };
+
+        //console.log(params);
+
+        Login(params);
+
+    };
+
     return <ScrollView>
         <View style={AppStyle.container}>
             <View style={loginStyle.section1}>
@@ -16,15 +50,15 @@ const Login = (props) => {
             </View>  
             <View style={loginStyle.section2}>
                 <Text style={AppStyle.label}>Email</Text>
-                <TextInput textContentType="text" placeholder='default@email.com' style={AppStyle.input} />
+                <TextInput textContentType="text" onChangeText={setEmail} placeholder='default@email.com' style={AppStyle.input} />
                 <Text style={AppStyle.label}>Password</Text>
                 <View style={{...AppStyle.input, flexDirection:"row"}}>
-                    <TextInput secureTextEntry={isPasswordSecure} placeholder='Enter your password here' style={{margin:0, padding:0, width: "93%"}} />
+                    <TextInput secureTextEntry={isPasswordSecure} onChangeText={setPasswd} placeholder='Enter your password here' style={{margin:0, padding:0, width: "93%"}} />
                     <Pressable onPress={() => setIsPasswordSecure(!isPasswordSecure)} style={{justifyContent: "center"}}>
                         <MaterialCommunityIcons name={isPasswordSecure ? "eye-off" : "eye"} size={22} color="#232323" />
                     </Pressable>
                 </View>
-                <Button title="Sign In" onPress={() => {window.alert("Under development")}} />
+                <Button title="Sign In" onPress={onSignIn} />
                 <Link title="Forgot Password?" onPress={() => Linking.openURL('https://google.com')} />
             </View>      
         </View>
