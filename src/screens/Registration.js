@@ -64,7 +64,7 @@ const loginStyle = StyleSheet.create({
     },
 
     title: {
-        fontFamily: "Poppins",
+        fontFamily: "Poppins_400Regular",
         fontWeight: "700",
         fontSize: 24,
         lineHeight: 36,
@@ -74,7 +74,7 @@ const loginStyle = StyleSheet.create({
     },
 
     subtitle:{
-        fontFamily: "Poppins",
+        fontFamily: "Poppins_400Regular",
         fontSize: 16,
         lineHeight: 24,
         textAlign: "center",
@@ -83,7 +83,7 @@ const loginStyle = StyleSheet.create({
 
     link: {
         textAlign: "center",
-        fontFamily: "Poppins",
+        fontFamily: "Poppins_400Regular",
         fontWeight: "700",
         color: '#3B1FA3',
         paddingTop: 25

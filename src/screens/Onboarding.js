@@ -4,6 +4,8 @@ import {Logo,Button,Link} from '../components';
 import AppStyle from '../../AppStyle';
 
 const Onboarding = (props) => {
+
+
     return <View style={AppStyle.container}>
         <View style={obStyle.section1}>
             <Logo />
@@ -42,7 +44,6 @@ const obStyle = StyleSheet.create({
     },
 
     title: {
-        fontFamily: "Poppins",
         fontWeight: "700",
         fontSize: 24,
         lineHeight: 36,
@@ -52,7 +53,6 @@ const obStyle = StyleSheet.create({
     },
 
     subtitle:{
-        fontFamily: "Poppins",
         fontSize: 16,
         lineHeight: 24,
         textAlign: "center",
@@ -61,7 +61,6 @@ const obStyle = StyleSheet.create({
 
     link: {
         textAlign: "center",
-        fontFamily: "Poppins",
         fontWeight: "700",
         color: '#3B1FA3',
         paddingTop: 25

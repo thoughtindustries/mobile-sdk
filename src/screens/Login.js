@@ -2,12 +2,12 @@ import React,{useState} from 'react';
 import {ScrollView, View, Text, TextInput, StyleSheet, Pressable, Linking } from 'react-native';
 import {Logo,Button,Link} from '../components';
 import AppStyle from '../../AppStyle'; 
-
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Login = (props) => {
-   const [isPasswordSecure, setIsPasswordSecure] = useState(false);
+   
 
+  const [isPasswordSecure, setIsPasswordSecure] = useState(false);
     return <ScrollView>
         <View style={AppStyle.container}>
             <View style={loginStyle.section1}>
@@ -57,7 +57,6 @@ const loginStyle = StyleSheet.create({
     },
 
     title: {
-        fontFamily: "Poppins",
         fontWeight: "700",
         fontSize: 24,
         lineHeight: 36,
@@ -67,7 +66,6 @@ const loginStyle = StyleSheet.create({
     },
 
     subtitle:{
-        fontFamily: "Poppins",
         fontSize: 16,
         lineHeight: 24,
         textAlign: "center",
@@ -76,7 +74,6 @@ const loginStyle = StyleSheet.create({
 
     link: {
         textAlign: "center",
-        fontFamily: "Poppins",
         fontWeight: "700",
         color: '#3B1FA3',
         paddingTop: 25

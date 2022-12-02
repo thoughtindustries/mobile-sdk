@@ -15,7 +15,6 @@ export default StyleSheet.create({
     },
 
     label:{
-       fontFamily: "Poppins",
        fontWeight:"700",
        color: "#000",
        marginTop: 20,
@@ -23,7 +22,6 @@ export default StyleSheet.create({
     },
 
     input:{
-        fontFamily: "Poppins",
         padding:5,
         paddingLeft:10,
         paddingRight:10,

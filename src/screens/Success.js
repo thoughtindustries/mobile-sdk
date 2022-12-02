@@ -61,7 +61,6 @@ const successStyle = StyleSheet.create({
     },
 
     title: {
-        fontFamily: "Poppins",
         fontSize: 24,
         lineHeight: 36,
         textAlign: "center",
