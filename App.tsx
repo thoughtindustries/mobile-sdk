@@ -7,7 +7,7 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   const [fontsLoaded] = useFonts({
-    'Poppins': require('./assets/fonts/Poppins-Light.ttf'),
+    'Poppins': require('./assets/fonts/Poppins-Light.otf'),
   });
 
   const MyTheme = {
