@@ -3,7 +3,7 @@ import {ScrollView, View, Text, TextInput, StyleSheet, Pressable, Linking } from
 import {Logo,Button,Link} from '../components';
 import AppStyle from '../../AppStyle'; 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { gql, useMutation } from '@apollo/client';
+//import { gql, useMutation } from '@apollo/client';
 
 const Login = () => {
 
@@ -11,7 +11,7 @@ const Login = () => {
     const [passwd, setPasswd] = useState();
    
     const [isPasswordSecure, setIsPasswordSecure] = useState(true);
-
+/*
     const query = gql`
         mutation Login(
             $email: String!,
@@ -28,7 +28,7 @@ const Login = () => {
             console.log(data.Login);
         }
     });
-    
+  */  
     const onSignIn = (e) => {
 
         const params = {
@@ -38,7 +38,7 @@ const Login = () => {
 
         //console.log(params);
 
-        Login(params);
+        //Login(params);
 
     };
 

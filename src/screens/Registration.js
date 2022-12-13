@@ -1,15 +1,44 @@
 import React,{useState} from 'react';
 import {ScrollView, View, Text, TextInput, StyleSheet, Pressable} from 'react-native';
-import {Logo,Button} from '../components';
+import {Logo,Button, Message} from '../components';
 import AppStyle from '../../AppStyle'; 
-
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import tiApiObj from '../helpers/TIApi';
+import _ from 'lodash';
 
 const Registration = (props) => {
-   const [isPasswordSecure, setIsPasswordSecure] = useState(true);
-   const [isPasswordSecure2, setIsPasswordSecure2] = useState(true);
+   
+   const [email, setEmail] = useState("");
+   const [fname, setFName] = useState("");
+   const [lname, setLName] = useState("");
+   const [processing, setProcessing] = useState(false);
+   const [message, setMessage] = useState({error: "", info: ""});
+
+
+   const goRegistration = () => {
+    
+    const udata = {
+        firstName:fname,
+        lastName:lname,
+        email:email
+    };
+
+    setProcessing(true);
+
+    tiApiObj.createUser(udata)
+    .then(res => setMessage({error:"", info:`Congratulations, please check your email ${res.email} to login!`}))
+    .catch(err => setMessage({info:"", error: _.get(err,'message',err)}))
+    .finally(() => setProcessing(false));
+    //props.navigation.navigate('Success')
+
+   };
 
     return <ScrollView>
+        {processing && <Message message="Registration going on, Please wait.. " />}
+        {message.info!="" && <Message type="success" canClose={true} message={message.info} onHide={() => {
+            setMessage({...message, "info": ""});
+            props.navigation.navigate("Login");
+         }} />}
+        {message.error!="" && <Message type="error" canClose={true} message={message.error} onHide={() => setMessage({...message, "error": ""})} />}
         <View style={AppStyle.container}>
             <View style={loginStyle.section1}>
                 <Logo />
@@ -17,22 +46,12 @@ const Registration = (props) => {
             </View>  
             <View style={loginStyle.section2}>
                 <Text style={AppStyle.label}>Email</Text>
-                <TextInput textContentType="text" placeholder='default@email.com' style={AppStyle.input} />
-                <Text style={AppStyle.label}>Password</Text>
-                <View style={{...AppStyle.input, flexDirection:"row"}}>
-                    <TextInput secureTextEntry={isPasswordSecure} placeholder='Enter your password here' style={{margin:0, padding:0, width: "93%"}} />
-                    <Pressable onPress={() => setIsPasswordSecure(!isPasswordSecure)} style={{justifyContent: "center"}}>
-                        <MaterialCommunityIcons name={isPasswordSecure ? "eye-off" : "eye"} size={22} color="#232323" />
-                    </Pressable>
-                </View>
-                <Text style={AppStyle.label}>Confirm Password</Text>
-                <View style={{...AppStyle.input, flexDirection:"row"}}>
-                    <TextInput secureTextEntry={isPasswordSecure2} placeholder='Enter your password here' style={{margin:0, padding:0, width: "93%"}} />
-                    <Pressable onPress={() => setIsPasswordSecure2(!isPasswordSecure2)} style={{justifyContent: "center"}}>
-                        <MaterialCommunityIcons name={isPasswordSecure2 ? "eye-off" : "eye"} size={22} color="#232323" />
-                    </Pressable>
-                </View>
-                <Button title="Sign up" onPress={() => props.navigation.navigate('Success')} />
+                <TextInput textContentType="text" placeholder='default@email.com' onChangeText={setEmail} style={AppStyle.input} />
+                <Text style={AppStyle.label}>First Name</Text>
+                <TextInput textContentType="text" placeholder='First Name' onChangeText={setFName} style={AppStyle.input} />
+                <Text style={AppStyle.label}>Last Name</Text>
+                <TextInput textContentType="text" placeholder='Last Name' onChangeText={setLName} style={AppStyle.input} />
+                <Button title="Sign up" onPress={goRegistration} />
             </View>      
         </View>
     </ScrollView>;

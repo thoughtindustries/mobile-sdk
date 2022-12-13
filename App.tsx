@@ -4,9 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Onboarding, Login, Registration, Success} from './src/screens';
 import { useFonts, Poppins_400Regular } from '@expo-google-fonts/poppins';
 import { StyleSheet, View } from 'react-native';
-import {createHttpLink} from 'apollo-link-http';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-
 
 
 const Stack = createNativeStackNavigator();
@@ -20,21 +17,7 @@ const App = () => {
   if (!fontsLoaded) {
     return null;
   }
-  const LOCAL_SYSTEM_IP_ADDRESS = '127.0.0.1';
-  const PORT = '3000';
-  // Initialize Apollo Client
-/*  const appclient = new ApolloClient({
-    uri: 'http://127.0.0.1:3000/graphiql',
-    cache: new InMemoryCache()
-  });*/
-  const appclient = new ApolloClient({
-    //note: this is the local IP address of the system
-    link: createHttpLink({
-      uri: `http://${LOCAL_SYSTEM_IP_ADDRESS}:${PORT}/graphql`,
-    }),
-    cache: new InMemoryCache(),
-  });
-
+  
   const MyTheme = {
     ...DefaultTheme,
     colors: {
@@ -65,9 +48,7 @@ const App = () => {
 </NavigationContainer>;
 
   return <View style={wrapperStyle.container}>
-    <ApolloProvider client={appclient}>
-        <RouterContainer />
-    </ApolloProvider>
+    <RouterContainer />
   </View>;
 };
 
