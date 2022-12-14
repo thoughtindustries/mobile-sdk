@@ -17,7 +17,6 @@ const style = StyleSheet.create({
     },
 
     linkText:{
-        fontFamily: "Poppins",
         fontWeight: "700",
         fontSize: 16,
         color: "#3B1FA3"

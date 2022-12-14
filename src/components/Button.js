@@ -22,7 +22,7 @@ const style = StyleSheet.create({
     },
 
     buttonText:{
-        fontFamily: "Poppins",
+        fontFamily: "Poppins_400Regular",
         fontWeight: "700",
         color: "#ffffff"
     }

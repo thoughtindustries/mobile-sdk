@@ -1,20 +1,22 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState} from 'react';
 import {View, Text, StyleSheet,Image} from 'react-native';
-import AppStyle from '../../AppStyle'; 
+import {Loader} from '../components'; 
+import _ from 'lodash';
 
 const Success = (props) => {
-
+    
    const [loading, setLoading] = useState(false);
    
     return <View style={successStyle.container}>
         <View style={successStyle.section1}>
             <Image source={require("../../assets/logo-white.png")}  style={successStyle.logo} />
-            <Text style={successStyle.title}>Welcome</Text>
+            {_.get(props,'title','')!=='' && <Text style={successStyle.title}>{props.title}</Text>}
+            {props.message.split("\n").map((msg,idx) => <Text key={idx} style={successStyle.message}>{msg}</Text>)}           
         </View>
         <View style={successStyle.section2}>
-            <Text style={successStyle.circle}></Text>
+        <Loader size={50} />
         </View>
-        <View style={successStyle.section1}></View>
+        
     </View>;
 };
 
@@ -22,24 +24,23 @@ const successStyle = StyleSheet.create({
 
     container: {
         flex: 1,
-        padding: 20,
         flexDirection: "column",
         backgroundColor: "#3B1FA3"
     },
     
     section1:{
-        flex:1,
+        flex:2,
         justifyContent: "center",
         alignItems: "center",
         marginLeft: "auto",
         marginRight: "auto",
-        marginTop:100
-       
+        marginTop:100,
+        marginBottom: 100
     },
 
     section2:{
-        flex:6,
-        justifyContent: "center",
+        flex:3,
+        justifyContent: "flex-start",
         alignItems: "center",
         marginLeft:22,
         marginRight:22
@@ -51,21 +52,21 @@ const successStyle = StyleSheet.create({
         marginBottom:20 
     },
 
-    circle:{
-        backgroundColor: "#ffffff",
-        height:50,
-        width:50,
-        borderRadius: 25,
-        alignSelf:"center",
-        fontSize: 32
-    },
-
     title: {
-        fontFamily: "Poppins",
         fontSize: 24,
         lineHeight: 36,
         textAlign: "center",
         color: "#ffffff",
+        marginBottom: 10
+    },
+    
+    message: {
+        textAlign: "center",
+        fontSize: 16,
+        lineHeight: 24,
+        color: "#ffffff",
+        margin: 60,
+        marginTop: 10,
         marginBottom: 10
     }
 
