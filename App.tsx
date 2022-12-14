@@ -29,7 +29,6 @@ const App = () => {
   const wrapperStyle = StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
       flexDirection: "column",
       backgroundColor: "#F3F4F6",
       fontFamily: "Poppins_400Regular"
@@ -43,7 +42,6 @@ const App = () => {
     <Stack.Screen name="Onboarding" component={Onboarding} />
     <Stack.Screen name="Login" component={Login} />
     <Stack.Screen name="Registration" component={Registration} />
-    <Stack.Screen name="Success" component={Success} />
   </Stack.Navigator>
 </NavigationContainer>;
 
