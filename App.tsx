@@ -1,7 +1,7 @@
 import { NavigationContainer, DefaultTheme  } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import {Onboarding, Login, Registration, Success} from './src/screens';
+import {Onboarding, Offline,Login, Registration, Success} from './src/screens';
 import { useFonts, Poppins_400Regular } from '@expo-google-fonts/poppins';
 import { StyleSheet, View } from 'react-native';
 
@@ -38,7 +38,8 @@ const App = () => {
   const opts={headerShown: false};
 
   const RouterContainer = () => <NavigationContainer theme={MyTheme}>
-  <Stack.Navigator initialRouteName="Onboarding" screenOptions={opts}>
+  <Stack.Navigator initialRouteName="Offline" screenOptions={opts}>
+    <Stack.Screen name="Offline" component={Offline} />
     <Stack.Screen name="Onboarding" component={Onboarding} />
     <Stack.Screen name="Login" component={Login} />
     <Stack.Screen name="Registration" component={Registration} />
