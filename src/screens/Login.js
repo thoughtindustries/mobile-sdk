@@ -3,9 +3,10 @@ import {ScrollView, View, Text, TextInput, StyleSheet, Pressable, Linking } from
 import {Logo,Button,Link} from '../components';
 import AppStyle from '../../AppStyle'; 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {TI_API_INSTANCE} from '@env';
 //import { gql, useMutation } from '@apollo/client';
 
-const Login = () => {
+const Login = (props) => {
 
     const [email, setEmail] = useState();
     const [passwd, setPasswd] = useState();
@@ -36,6 +37,8 @@ const Login = () => {
             password: passwd
         };
 
+        props.navigation.navigate('Home');
+
         //console.log(params);
 
         //Login(params);
@@ -59,7 +62,7 @@ const Login = () => {
                     </Pressable>
                 </View>
                 <Button title="Sign In" onPress={onSignIn} />
-                <Link title="Forgot Password?" onPress={() => Linking.openURL('https://google.com')} />
+                <Link title="Forgot Password?" onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)} />
             </View>      
         </View>
     </ScrollView>;

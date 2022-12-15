@@ -3,6 +3,7 @@ import {useNetInfo} from "@react-native-community/netinfo";
 import {View, Text,Image,StyleSheet} from 'react-native';
 import {Button} from '../components';
 import AppStyle from '../../AppStyle';
+import _ from 'lodash';
 
 const Offline = () => {
 
@@ -11,8 +12,6 @@ const Offline = () => {
     return <View style={AppStyle.container}>
         <View style={offStyle.section1}>
             <Image source={require("../../assets/wifix.png")}  style={offStyle.networkOff} />
-            <Text>Type: {netInfo.type}</Text>
-            <Text>Is Connected? {netInfo.isConnected.toString()}</Text>
             <Text style={offStyle.title}>You are currently offline</Text>
             <Text style={offStyle.subtitle}>Get all your offline files here.</Text>
         </View>

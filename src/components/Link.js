@@ -9,8 +9,6 @@ const Link = (props) => {
 
 const style = StyleSheet.create({    
     link: {
-        marginTop:10,
-        marginBottom: 10,
         justifyContent: "center",
         alignItems: "center",
         padding: 16
