@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Screens from './src/screens';
 import { useFonts, Poppins_400Regular } from '@expo-google-fonts/poppins';
 import { StyleSheet, View } from 'react-native';
-import {FooterMenu} from './src/components';
+import FooterMenu from './src/components/FooterMenu';
 
 const Stack = createNativeStackNavigator();
 

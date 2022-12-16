@@ -15,12 +15,30 @@ class TIApi{
         return TI_API_INSTANCE + url;
     }
 
+    userDetails(email){
+
+        return new Promise((resolve,reject) => {
+            axios.get(this.apiUrl(`/incoming/v2/users/${email}`), this.headers())
+            .then((res) => {
+                if(_.get(res, 'data.errors.length', 0) > 0){
+                    reject(res.data.errors[0].message);
+                }else{
+                resolve(res.data);
+                }
+            })
+            .catch(reject);
+
+        });
+
+    }
+
+
     createUser(userDetail){
 
         const uData = {
-          ..._.pick(userDetail,['firstName','lastName','email']),
-          "externalCustomerId": userDetail.email,
-          "sendInvite": true
+            ..._.pick(userDetail,['firstName','lastName','email']),
+            "externalCustomerId": userDetail.email,
+            "sendInvite": true
         };
         
         return new Promise((resolve,reject) => {
@@ -35,8 +53,8 @@ class TIApi{
             .catch(reject);
 
         });
-    
-      }
+
+    }
 }
 
 export default (new TIApi());
