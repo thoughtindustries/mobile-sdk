@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text, TextInput, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+} from "react-native";
 import { Logo, Button, Message } from "../components";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
@@ -58,7 +64,7 @@ const Registration = (props) => {
       )}
 
       {!processing && message.info === "" && (
-        <ScrollView>
+        <View style={AppStyle.container}>
           {message.error !== "" && (
             <Message
               type="error"
@@ -70,18 +76,25 @@ const Registration = (props) => {
             />
           )}
 
-          <View style={AppStyle.container}>
-            <View style={loginStyle.section1}>
+          <KeyboardAvoidingView
+            style={styles.keyboardOffset}
+            keyboardVerticalOffset={5}
+            behavior={"position"}
+          >
+            <View style={styles.prompt}>
               <Logo />
-              <Text style={loginStyle.title}>Create New Account</Text>
+              <Text style={styles.title}>Create New Account</Text>
             </View>
-            <View style={loginStyle.section2}>
+            <View>
               <Text style={AppStyle.label}>Email</Text>
               <TextInput
                 textContentType="text"
                 placeholder="default@email.com"
+                keyboardType="email-address"
                 onChangeText={setEmail}
                 style={AppStyle.input}
+                autoCapitalize={false}
+                autoCorrect={false}
               />
               <Text style={AppStyle.label}>First Name</Text>
               <TextInput
@@ -99,59 +112,31 @@ const Registration = (props) => {
               />
               <Button title="Sign up" onPress={goRegistration} />
             </View>
-          </View>
-        </ScrollView>
+          </KeyboardAvoidingView>
+        </View>
       )}
     </>
   );
 };
 
-const loginStyle = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column",
-  },
-
-  section1: {
-    flex: 2,
+const styles = StyleSheet.create({
+  prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
     marginTop: 100,
   },
 
-  section2: {
-    flex: 2,
-    justifyContent: "flex-start",
-    marginLeft: 22,
-    marginRight: 22,
+  keyboardOffset: {
+    width: "100%",
   },
 
   title: {
-    fontFamily: "Poppins-Light",
-    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
     fontSize: 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
-  },
-
-  subtitle: {
-    fontFamily: "Poppins-Light",
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    color: "#6B7280",
-  },
-
-  link: {
-    textAlign: "center",
-    fontFamily: "Poppins-Light",
-    fontWeight: "700",
-    color: "#3B1FA3",
-    paddingTop: 25,
   },
 });
 

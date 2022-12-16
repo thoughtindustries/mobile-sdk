@@ -16,7 +16,7 @@ const Button = ({ title, onPress }: ButtonProps) => {
 
 const styles = StyleSheet.create({
   button: {
-    marginTop: 20,
+    marginTop: 40,
     marginBottom: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -26,8 +26,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    fontFamily: "Poppins-Light",
-    fontWeight: "700",
+    fontFamily: "Inter_700Bold",
     color: "#ffffff",
   },
 });

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import {
-  ScrollView,
   View,
   Text,
   TextInput,
   StyleSheet,
   Pressable,
   Linking,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Logo, Button, Link } from "../components";
 import AppStyle from "../../AppStyle";
@@ -51,19 +51,26 @@ const Login = (props) => {
   };
 
   return (
-    <ScrollView>
-      <View style={AppStyle.container}>
-        <View style={loginStyle.section1}>
+    <View style={AppStyle.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardOffset}
+        keyboardVerticalOffset={5}
+        behavior={"position"}
+      >
+        <View style={styles.prompt}>
           <Logo />
-          <Text style={loginStyle.title}>Sign In</Text>
+          <Text style={styles.title}>Sign In</Text>
         </View>
-        <View style={loginStyle.section2}>
+        <View>
           <Text style={AppStyle.label}>Email</Text>
           <TextInput
             textContentType="text"
             onChangeText={setEmail}
             placeholder="default@email.com"
             style={AppStyle.input}
+            keyboardType="email-address"
+            autoCapitalize={false}
+            autoCorrect={false}
           />
           <Text style={AppStyle.label}>Password</Text>
           <View style={{ ...AppStyle.input, flexDirection: "row" }}>
@@ -90,55 +97,26 @@ const Login = (props) => {
             onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}
           />
         </View>
-      </View>
-    </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
-const loginStyle = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    flexDirection: "column",
-  },
-
-  section1: {
-    flex: 2,
+const styles = StyleSheet.create({
+  prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
     marginTop: 100,
-  },
-
-  section2: {
-    flex: 2,
-    justifyContent: "flex-start",
-    marginLeft: 22,
-    marginRight: 22,
+    marginBottom: 60,
   },
 
   title: {
-    fontWeight: "700",
     fontSize: 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
-  },
-
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    color: "#6B7280",
-  },
-
-  link: {
-    textAlign: "center",
-    fontWeight: "700",
-    color: "#3B1FA3",
-    paddingTop: 25,
+    fontFamily: "Poppins_700Bold",
   },
 });
 

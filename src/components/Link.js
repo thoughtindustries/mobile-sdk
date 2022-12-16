@@ -3,13 +3,13 @@ import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 const Link = (props) => {
   return (
-    <TouchableOpacity style={style.link} onPress={props.onPress}>
-      <Text style={style.linkText}>{props.title}</Text>
+    <TouchableOpacity style={styles.link} onPress={props.onPress}>
+      <Text style={styles.linkText}>{props.title}</Text>
     </TouchableOpacity>
   );
 };
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   link: {
     justifyContent: "center",
     alignItems: "center",
@@ -17,7 +17,7 @@ const style = StyleSheet.create({
   },
 
   linkText: {
-    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
     fontSize: 16,
     color: "#3B1FA3",
   },

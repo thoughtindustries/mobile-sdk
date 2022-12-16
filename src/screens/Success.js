@@ -4,8 +4,6 @@ import { Loader } from "../components";
 import _ from "lodash";
 
 const Success = (props) => {
-  const [loading, setLoading] = useState(false);
-
   return (
     <View style={successStyle.container}>
       <View style={successStyle.section1}>

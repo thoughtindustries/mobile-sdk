@@ -13,7 +13,7 @@ const Onboarding = (props) => {
           Sign In or Create a new account to get started.
         </Text>
       </View>
-      <View style={styles.signin}>
+      <View style={styles.form}>
         <Button
           title="Sign In"
           onPress={() => props.navigation.navigate("Login")}
@@ -28,34 +28,24 @@ const Onboarding = (props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    flexDirection: "column",
-  },
-
   prompt: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
+    marginTop: 100,
+    marginBottom: 60,
   },
 
-  signin: {
-    flex: 1,
-    justifyContent: "flex-start",
-    marginLeft: 22,
-    marginRight: 22,
+  form: {
+    width: "100%",
   },
 
   title: {
-    fontWeight: "700",
     fontSize: 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
+    fontFamily: "Poppins_700Bold",
   },
 
   subtitle: {
@@ -63,13 +53,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: "center",
     color: "#6B7280",
-  },
-
-  link: {
-    textAlign: "center",
-    fontWeight: "700",
-    color: "#3B1FA3",
-    paddingTop: 25,
+    fontFamily: "Poppins_400Regular",
   },
 });
 
