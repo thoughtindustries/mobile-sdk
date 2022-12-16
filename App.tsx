@@ -1,16 +1,23 @@
 import { NavigationContainer, DefaultTheme  } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Screens from './src/screens';
-import { useFonts, Poppins_400Regular } from '@expo-google-fonts/poppins';
-import { StyleSheet, View } from 'react-native';
 import FooterMenu from './src/components/FooterMenu';
+import { StyleSheet, View } from "react-native";
+import {
+  useFonts,
+  Poppins_400Regular,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
+import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-
-  const [fontsLoaded] = useFonts({
+  let [fontsLoaded] = useFonts({
     Poppins_400Regular,
+    Poppins_700Bold,
+    Inter_400Regular,
+    Inter_700Bold,
   });
 
   if (!fontsLoaded) {
@@ -30,8 +37,8 @@ const App = () => {
       flex: 1,
       flexDirection: "column",
       backgroundColor: "#F3F4F6",
-      fontFamily: "Poppins_400Regular"
-    }
+      fontFamily: "Poppins_400Regular",
+    },
   });
 
   const opts={headerShown: false};

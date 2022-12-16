@@ -1,12 +1,18 @@
-import React,{useState, useEffect} from 'react';
-import {ScrollView, View, Text, TextInput, StyleSheet} from 'react-native';
-import {Logo,Button, Message} from '../components';
-import AppStyle from '../../AppStyle'; 
-import tiApiObj from '../helpers/TIApi';
-import _ from 'lodash';
-import validator from 'validator';
-import Success from './Success';
-import {TI_INSTANCE_NAME} from '@env';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+} from "react-native";
+import { Logo, Button, Message } from "../components";
+import AppStyle from "../../AppStyle";
+import tiApiObj from "../helpers/TIApi";
+import _ from "lodash";
+import validator from "validator";
+import Success from "./Success";
+import { TI_INSTANCE_NAME } from "@env";
 
 const Registration = (props) => {
    
@@ -48,86 +54,81 @@ const Registration = (props) => {
 
    };
 
-    return <>
-        {processing && <Success message="Registration going on, Please wait.. " />}
+      {!processing && message.info === "" && (
+        <View style={AppStyle.container}>
+          {message.error !== "" && (
+            <Message
+              type="error"
+              canClose={true}
+              message={message.error}
+              onHide={() => {
+                setMessage({ ...message, error: "" });
+              }}
+            />
+          )}
 
-        {!processing && message.info!=="" && <Success title="Success" message={message.info} />}
-
-        {!processing && message.info==="" && <ScrollView> 
-            {message.error!=="" && <Message type="error" canClose={true} message={message.error} onHide={() => {
-                setMessage({...message, "error": ""});
-                
-            }} />}
-        
-            <View style={AppStyle.container}>
-                <View style={loginStyle.section1}>
-                    <Logo />
-                    <Text style={loginStyle.title}>Create New Account</Text>
-                </View>  
-                <View style={loginStyle.section2}>
-                    <Text style={AppStyle.label}>Email</Text>
-                    <TextInput textContentType="text" placeholder='default@email.com' onChangeText={setEmail} style={AppStyle.input} />
-                    <Text style={AppStyle.label}>First Name</Text>
-                    <TextInput textContentType="text" placeholder='First Name' onChangeText={setFName} style={AppStyle.input} />
-                    <Text style={AppStyle.label}>Last Name</Text>
-                    <TextInput textContentType="text" placeholder='Last Name' onChangeText={setLName} style={AppStyle.input} />
-                    <Button title="Sign up" onPress={goRegistration} />
-                </View>      
+          <KeyboardAvoidingView
+            style={styles.keyboardOffset}
+            keyboardVerticalOffset={5}
+            behavior={"position"}
+          >
+            <View style={styles.prompt}>
+              <Logo />
+              <Text style={styles.title}>Create New Account</Text>
             </View>
-        </ScrollView>}
-    </>;
+            <View>
+              <Text style={AppStyle.label}>Email</Text>
+              <TextInput
+                textContentType="text"
+                placeholder="default@email.com"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+                style={AppStyle.input}
+                autoCapitalize={false}
+                autoCorrect={false}
+              />
+              <Text style={AppStyle.label}>First Name</Text>
+              <TextInput
+                textContentType="text"
+                placeholder="First Name"
+                onChangeText={setFName}
+                style={AppStyle.input}
+              />
+              <Text style={AppStyle.label}>Last Name</Text>
+              <TextInput
+                textContentType="text"
+                placeholder="Last Name"
+                onChangeText={setLName}
+                style={AppStyle.input}
+              />
+              <Button title="Sign up" onPress={goRegistration} />
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      )}
+    </>
+  );
 };
 
-const loginStyle = StyleSheet.create({
+const styles = StyleSheet.create({
+  prompt: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 100,
+  },
 
-    container: {
-        flex: 1,
-        flexDirection: "column"
-    },
+  keyboardOffset: {
+    width: "100%",
+  },
 
-    section1:{
-        flex:2,
-        justifyContent: "center",
-        alignItems: "center",
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginTop:100
-       
-    },
-
-    section2:{
-        flex:2,
-        justifyContent: "flex-start",
-        marginLeft:22,
-        marginRight:22
-    },
-
-    title: {
-        fontFamily: "Poppins_400Regular",
-        fontWeight: "700",
-        fontSize: 24,
-        lineHeight: 36,
-        textAlign: "center",
-        color: "#1F2937",
-        marginBottom: 10
-    },
-
-    subtitle:{
-        fontFamily: "Poppins_400Regular",
-        fontSize: 16,
-        lineHeight: 24,
-        textAlign: "center",
-        color: "#6B7280"
-    },
-
-    link: {
-        textAlign: "center",
-        fontFamily: "Poppins_400Regular",
-        fontWeight: "700",
-        color: '#3B1FA3',
-        paddingTop: 25
-    }
-
+  title: {
+    fontFamily: "Poppins_700Bold",
+    fontSize: 24,
+    lineHeight: 36,
+    textAlign: "center",
+    color: "#1F2937",
+    marginBottom: 10,
+  },
 });
 
 export default Registration;

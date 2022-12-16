@@ -4,68 +4,57 @@ import {Logo,Button,Link} from '../components';
 import AppStyle from '../../AppStyle';
 
 const Onboarding = (props) => {
-
-
-    return <View style={AppStyle.container}>
-        <View style={obStyle.section1}>
-            <Logo />
-            <Text style={obStyle.title}>Let's Get Started</Text>
-            <Text style={obStyle.subtitle}>Sign In or Create a new account to get started.</Text>
-        </View>
-        <View style={obStyle.section2}>
-            <Button title="Sign In" onPress={() => props.navigation.navigate("Login")} />
-            <Link title="Create new account!" onPress={() => props.navigation.navigate("Registration")} />
-        </View>
-    </View>;
+  return (
+    <View style={AppStyle.container}>
+      <View style={styles.prompt}>
+        <Logo />
+        <Text style={styles.title}>Let's Get Started</Text>
+        <Text style={styles.subtitle}>
+          Sign In or Create a new account to get started.
+        </Text>
+      </View>
+      <View style={styles.form}>
+        <Button
+          title="Sign In"
+          onPress={() => props.navigation.navigate("Login")}
+        />
+        <Link
+          title="Create new account!"
+          onPress={() => props.navigation.navigate("Registration")}
+        />
+      </View>
+    </View>
+  );
 };
 
-const obStyle = StyleSheet.create({
+const styles = StyleSheet.create({
+  prompt: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 100,
+    marginBottom: 60,
+  },
 
-    container: {
-        flex: 1,
-        padding: 20,
-        flexDirection: "column",
-    },
+  form: {
+    width: "100%",
+  },
 
-    section1:{
-        flex:1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginLeft: "auto",
-        marginRight: "auto"
-       
-    },
+  title: {
+    fontSize: 24,
+    lineHeight: 36,
+    textAlign: "center",
+    color: "#1F2937",
+    marginBottom: 10,
+    fontFamily: "Poppins_700Bold",
+  },
 
-    section2:{
-        flex:1,
-        justifyContent: "flex-start",
-        marginLeft:22,
-        marginRight:22
-    },
-
-    title: {
-        fontWeight: "700",
-        fontSize: 24,
-        lineHeight: 36,
-        textAlign: "center",
-        color: "#1F2937",
-        marginBottom: 10
-    },
-
-    subtitle:{
-        fontSize: 16,
-        lineHeight: 24,
-        textAlign: "center",
-        color: "#6B7280"
-    },
-
-    link: {
-        textAlign: "center",
-        fontWeight: "700",
-        color: '#3B1FA3',
-        paddingTop: 25
-    }
-
+  subtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    color: "#6B7280",
+    fontFamily: "Poppins_400Regular",
+  },
 });
 
 export default Onboarding;

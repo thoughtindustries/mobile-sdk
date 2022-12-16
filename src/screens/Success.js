@@ -4,16 +4,23 @@ import {Loader} from '../components';
 import _ from 'lodash';
 
 const Success = (props) => {
-    
-   const [loading, setLoading] = useState(false);
-   
-    return <View style={successStyle.container}>
-        <View style={successStyle.section1}>
-            <Image source={require("../../assets/logo-white.png")}  style={successStyle.logo} />
-            {_.get(props,'title','')!=='' && <Text style={successStyle.title}>{props.title}</Text>}
-            {props.message.split("\n").map((msg,idx) => <Text key={idx} style={successStyle.message}>{msg}</Text>)}           
-        </View>
-        <View style={successStyle.section2}>
+  return (
+    <View style={successStyle.container}>
+      <View style={successStyle.section1}>
+        <Image
+          source={require("../../assets/logo-white.png")}
+          style={successStyle.logo}
+        />
+        {_.get(props, "title", "") !== "" && (
+          <Text style={successStyle.title}>{props.title}</Text>
+        )}
+        {props.message.split("\n").map((msg, idx) => (
+          <Text key={idx} style={successStyle.message}>
+            {msg}
+          </Text>
+        ))}
+      </View>
+      <View style={successStyle.section2}>
         <Loader size={50} />
         </View>
         
