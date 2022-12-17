@@ -4,8 +4,7 @@ import {Loader} from '../components';
 import _ from 'lodash';
 
 const Success = (props) => {
-  return (
-    <View style={successStyle.container}>
+  return <View style={successStyle.container}>
       <View style={successStyle.section1}>
         <Image
           source={require("../../assets/logo-white.png")}

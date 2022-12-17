@@ -54,6 +54,8 @@ const Registration = (props) => {
 
    };
 
+   return <>
+
       {!processing && message.info === "" && (
         <View style={AppStyle.container}>
           {message.error !== "" && (
@@ -106,8 +108,7 @@ const Registration = (props) => {
           </KeyboardAvoidingView>
         </View>
       )}
-    </>
-  );
+    </>;
 };
 
 const styles = StyleSheet.create({
