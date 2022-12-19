@@ -1,33 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Loader } from "../components";
-import _ from "lodash";
 
-const Success = (props) => {
+interface SuccessProps {
+  title: string;
+  message: string;
+}
+
+const Success = ({ title, message }: SuccessProps) => {
   return (
-    <View style={successStyle.container}>
-      <View style={successStyle.section1}>
+    <View style={styles.container}>
+      <View style={styles.section1}>
         <Image
           source={require("../../assets/logo-white.png")}
-          style={successStyle.logo}
+          style={styles.logo}
         />
-        {_.get(props, "title", "") !== "" && (
-          <Text style={successStyle.title}>{props.title}</Text>
-        )}
-        {props.message.split("\n").map((msg, idx) => (
-          <Text key={idx} style={successStyle.message}>
+        <Text style={styles.title}>{title}</Text>
+        {message.split("\n").map((msg, index) => (
+          <Text key={index} style={styles.message}>
             {msg}
           </Text>
         ))}
       </View>
-      <View style={successStyle.section2}>
+      <View style={styles.section2}>
         <Loader size={50} />
       </View>
     </View>
   );
 };
 
-const successStyle = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",

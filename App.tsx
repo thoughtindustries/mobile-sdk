@@ -1,6 +1,6 @@
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Onboarding, Offline, Login, Registration } from "./src/screens";
+import Screens from "./src/screens";
 import { StyleSheet, View } from "react-native";
 import { FooterMenu } from "./src/components";
 import {
@@ -46,10 +46,11 @@ const App = () => {
   const RouterContainer = () => (
     <NavigationContainer theme={MyTheme}>
       <Stack.Navigator initialRouteName="Onboarding" screenOptions={opts}>
-        <Stack.Screen name="Offline" component={Offline} />
-        <Stack.Screen name="Onboarding" component={Onboarding} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Registration" component={Registration} />
+        <Stack.Screen name="Offline" component={Screens.Offline} />
+        <Stack.Screen name="Onboarding" component={Screens.Onboarding} />
+        <Stack.Screen name="Login" component={Screens.Login} />
+        <Stack.Screen name="Registration" component={Screens.Registration} />
+        <Stack.Screen name="TopCategories" component={Screens.Offline} />
         <Stack.Screen name="Home" component={FooterMenu} />
         <Stack.Screen name="Explore" component={FooterMenu} />
         <Stack.Screen name="My Learning" component={FooterMenu} />
