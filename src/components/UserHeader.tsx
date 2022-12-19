@@ -3,7 +3,7 @@ import {Image, View, Text} from 'react-native';
 import Utils from '../helpers/Utils';
 import _ from 'lodash';
 
-const UserHeader = (props) => {
+const UserHeader = () => {
 
     const [udata,setUdata] = useState(false);
 

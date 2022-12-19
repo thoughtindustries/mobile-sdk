@@ -31,7 +31,7 @@ const Message = ({canClose, mtype,message, onHide}:MessageProps) => {
             {canClose && <Pressable style={styles.buttonClose} onPress={onHide}>
               <Text style={styles.textClose}>X</Text>
             </Pressable>}
-            {!_.isEmpty(mtype) && <Image source={icon[mtype]} style={styles.icon} />}
+            {!_.isEmpty(mtype) && <Image source={icon[`mtype`]} style={styles.icon} />}
             <Text style={styles.modalText}>{message}</Text>
           </View>
         </View>

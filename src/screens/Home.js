@@ -6,6 +6,13 @@ import _ from 'lodash';
 const Home = (props) => {
     
     const categories = ['Category 1','Category 2','Category 3','Category 4','Category 5'];
+    const recommendedCourse = [
+            {thumbnail : "https://loremflickr.com/640/360", coursename: "Course Name1"},
+            {thumbnail : "https://loremflickr.com/640/360", coursename: "Course Name2"},
+            {thumbnail : "https://loremflickr.com/640/360", coursename: "Course Name2"},
+            {thumbnail : "https://loremflickr.com/640/360", coursename: "Course Name2"},
+            {thumbnail : "https://loremflickr.com/640/360", coursename: "Course Name2"}
+        ];
 
     let bannerText = "You need a way to manage your customer relationships, and contacts. You will learn how to build a customized database that will allow you to document and store customer data, look up prior orders, and generate reports such as product price lists, order totals and customer satisfaction.";
     bannerText = _.truncate(bannerText,{length: 70});
@@ -35,10 +42,30 @@ const Home = (props) => {
         </View>;
     };
 
+    const Recommendation = () => {
+        return <View>
+            <View style={style.CourseBox}>
+                <Text style={style.heading}>Recommendation</Text>
+            </View>
+            <ScrollView horizontal={true} style={style.courseContainer}>
+            
+                {recommendedCourse.map((course,idx) => <View style={style.recConetentBox}>
+                <ImageBackground key={idx} source={{uri:course.thumbnail}} resizeMode="cover">
+                    <View style={style.bannerArea}>
+                        <Text style={style.courseTitle}>{course.coursename}</Text>
+                    </View>
+                </ImageBackground>
+                </View>)}
+
+            </ScrollView>
+        </View>;
+    };
+
     return <View style={style.page}>
         <UserHeader />
         <Banner />
         <TopCategories />
+        <Recommendation />
     </View>;
 };
 
@@ -94,6 +121,12 @@ const style = StyleSheet.create({
         padding: 5
     },
 
+    courseContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        padding: 5
+    },
+
     catBox: {
         backgroundColor: '#f9fafv',
         borderWidth: 1,
@@ -105,13 +138,38 @@ const style = StyleSheet.create({
         margin: 4
     },
 
+    topCatBox: {
+        marginTop: 5,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+
+    recConetentBox: {
+        backgroundColor: '#f9fafv',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: '#d1d5db',
+        borderRadius: 8,
+        width: 260,
+        height:280,
+        margin:12
+       
+    },
+
     catTitle: {
         color: '#1f2937',
         fontWeight: '400',
         fontSize: 14,
         lineHeight: 50
+    },
+    courseTitle: {
+        color: '#1f2937',
+        fontWeight: '400',
+        fontSize: 14,
+        justifyContent: 'flex-start',
+        lineHeight: 50
     }
-
     
 
 });
