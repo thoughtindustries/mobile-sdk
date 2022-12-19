@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { Alert, Modal, StyleSheet, Text, Pressable, View, Image } from "react-native";
+import React from "react";
+import { Modal, StyleSheet, Text, Pressable, View, Image } from "react-native";
 import _ from 'lodash';
 
 interface MessageProps {
   canClose:boolean;
-  mtype:any;
+  type:string;
   message:string;
   onHide(): void;
 }
 
-const Message = ({canClose, mtype,message, onHide}:MessageProps) => {
-  const icon: { success: any, error: any } = {
+const Message = ({canClose, type,message, onHide}:MessageProps) => {
+  const icon: any = {
     success: require('../../assets/success.png'),
     error: require('../../assets/error.png'),
   };
@@ -31,7 +31,7 @@ const Message = ({canClose, mtype,message, onHide}:MessageProps) => {
             {canClose && <Pressable style={styles.buttonClose} onPress={onHide}>
               <Text style={styles.textClose}>X</Text>
             </Pressable>}
-            {!_.isEmpty(mtype) && <Image source={icon[`mtype`]} style={styles.icon} />}
+            {!_.isEmpty(type) && <Image source={icon[type]} style={styles.icon} />}
             <Text style={styles.modalText}>{message}</Text>
           </View>
         </View>

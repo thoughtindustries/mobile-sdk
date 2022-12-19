@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -11,21 +11,27 @@ import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
 import _ from "lodash";
 import validator from "validator";
-import Success from "./Success";
 import { TI_INSTANCE_NAME } from "@env";
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from "../../types";
 
-const Registration = (props) => {
+const Registration = () => {
    
-   const [email, setEmail] = useState("");
-   const [fname, setFName] = useState("");
-   const [lname, setLName] = useState("");
-   const [processing, setProcessing] = useState(false);
-   const [message, setMessage] = useState({error: "", info: ''});
+   const [email, setEmail] = React.useState<string>("");
+   const [fname, setFName] = React.useState<string>("");
+   const [lname, setLName] = React.useState<string>("");
+   const [processing, setProcessing] = React.useState<boolean>(false);
+   const [message, setMessage] = React.useState<any>({error: "", info: ''});
 
+
+   type registrationScreenProp = StackNavigationProp<RootStackParamList, 'Registration'>;
+
+   const navigation = useNavigation<registrationScreenProp>();
 
    const goRegistration = () => {
     
-        const udata = {
+        const udata : {firstName: string, lastName: string, email: string} = {
             firstName:fname,
             lastName:lname,
             email:email
@@ -43,7 +49,7 @@ const Registration = (props) => {
             setProcessing(false);
             setMessage({error:"", info:`Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`});
             window.setTimeout(() => {
-                props.navigation.navigate('Login');
+                navigation.navigate('Login');
             },3000);
         })
         .catch(err => {
@@ -81,24 +87,23 @@ const Registration = (props) => {
             <View>
               <Text style={AppStyle.label}>Email</Text>
               <TextInput
-                textContentType="text"
+                textContentType="emailAddress"
                 placeholder="default@email.com"
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 style={AppStyle.input}
-                autoCapitalize={false}
                 autoCorrect={false}
               />
               <Text style={AppStyle.label}>First Name</Text>
               <TextInput
-                textContentType="text"
+                textContentType="name"
                 placeholder="First Name"
                 onChangeText={setFName}
                 style={AppStyle.input}
               />
               <Text style={AppStyle.label}>Last Name</Text>
               <TextInput
-                textContentType="text"
+                textContentType="name"
                 placeholder="Last Name"
                 onChangeText={setLName}
                 style={AppStyle.input}

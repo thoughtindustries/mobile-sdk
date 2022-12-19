@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 import {TI_API_INSTANCE, TI_API_KEY} from '@env';
+import { UserDetailType } from '../../types';
 
 class TIApi{
 
@@ -11,11 +12,11 @@ class TIApi{
         }};
     }
 
-    apiUrl(url){
+    apiUrl(url:string){
         return TI_API_INSTANCE + url;
     }
 
-    userDetails(email){
+    userDetails(email:string):Promise<UserDetailType>{
 
         return new Promise((resolve,reject) => {
             axios.get(this.apiUrl(`/incoming/v2/users/${email}`), this.headers())
@@ -33,7 +34,7 @@ class TIApi{
     }
 
 
-    createUser(userDetail){
+    createUser(userDetail:any):Promise<UserDetailType>{
 
         const uData = {
             ..._.pick(userDetail,['firstName','lastName','email']),

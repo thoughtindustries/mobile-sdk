@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {Image} from 'react-native';
+import _ from 'lodash';
 
 import Screens from '../screens';
 
@@ -12,14 +13,14 @@ const FooterMenu = (props:FMProps) => {
 
   const Tab = createBottomTabNavigator();
 
-  const tabs = [{
+  const tabs:{title:string, image: any, component: string}[] = [{
     title: 'Home',    
     image: require('./../../assets/footer-home.png'),
     component: 'Home'
   },{
     title: 'Explore',    
     image: require('./../../assets/footer-explore-d.png'),
-    component: 'MyLearnings'
+    component: 'MyLearning'
   },{
     title: 'My Learning',    
     image: require('./../../assets/footer-mylearning-d.png'),
@@ -27,7 +28,7 @@ const FooterMenu = (props:FMProps) => {
   },{
     title: 'Account',    
     image: require('./../../assets/footer-account-d.png'),    
-    component: 'MyLearnings'
+    component: 'MyLearning'
   }];
 
   return <Tab.Navigator initialRouteName={props.route.name} screenOptions={{
@@ -42,7 +43,7 @@ const FooterMenu = (props:FMProps) => {
     {tabs.map((t,idx) => <Tab.Screen 
       key={idx}
       name={t.title}       
-      component={Screens[t.component]}
+      component={_.get(Screens,t.component,() => <></>)}
       options={{tabBarIcon: ({color, size}) => <Image source={t.image} style={{tintColor: color, width: size, height: size}} />}}
     />)}    
   </Tab.Navigator>;

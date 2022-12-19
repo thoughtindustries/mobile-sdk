@@ -1,13 +1,13 @@
-import {useState, useEffect} from 'react';
+import React from 'react';
 import {Image, View, Text} from 'react-native';
 import Utils from '../helpers/Utils';
 import _ from 'lodash';
 
 const UserHeader = () => {
 
-    const [udata,setUdata] = useState(false);
+    const [udata,setUdata] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         Utils.fetch('udata')
         .then(setUdata);
     },[]);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,8 +7,9 @@ import {
   Pressable,
   Linking,
   KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
-import { Logo, Button, Link } from "../components";
+import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TI_API_INSTANCE } from "@env";
@@ -18,17 +19,24 @@ import tiGql from "../helpers/TIGraphQL";
 import tiApi from "../helpers/TIApi";
 import Utils from "../helpers/Utils";
 import Success from "./Success";
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from "../../types";
 
-const Login = (props) => {
-  const [email, setEmail] = useState();
-  const [passwd, setPasswd] = useState();
+type loginScreenProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
-  const [isPasswordSecure, setIsPasswordSecure] = useState(true);
-  const [processing, setProcessing] = useState(false);
-  const [message, setMessage] = useState({ error: "", info: "" });
+const Login = () => {
 
-  const onSignIn = (e) => {
-    const params = {
+  const navigation = useNavigation<loginScreenProp>();
+  const [email, setEmail] = React.useState<string>('');
+  const [passwd, setPasswd] = React.useState<string>('');
+
+  const [isPasswordSecure, setIsPasswordSecure] = React.useState<boolean>(true);
+  const [processing, setProcessing] = React.useState<boolean>(false);
+  const [message, setMessage] = React.useState<any>({ error: "", info: "" });
+
+  const onSignIn = () => {
+    const params:any = {
       email: email,
       password: passwd,
     };
@@ -41,10 +49,10 @@ const Login = (props) => {
     setProcessing(true);
     tiGql
       .goLogin(params)
-      .then((token) => Utils.store("logintoken", token)) //== got login token, save it locally
+      .then(token => Utils.store("logintoken", token)) //== got login token, save it locally
       .then(() => tiApi.userDetails(params.email)) //== fetch user data of logged in user
       .then((udata) => Utils.store("udata", udata)) //== save user data locally
-      .then(() => props.navigation.navigate("Home")) //== navigate to home
+      .then(() => navigation.navigate("Home")) //== navigate to home
       .catch((err) => {
         setProcessing(false);
         setMessage({ info: "", error: _.get(err, "message", err) });
@@ -59,7 +67,6 @@ const Login = (props) => {
       }} />}
       <View style={AppStyle.container}>
         <KeyboardAvoidingView
-          style={styles.keyboardOffset}
           keyboardVerticalOffset={5}
           behavior={"position"}
         >
@@ -70,12 +77,11 @@ const Login = (props) => {
           <View>
             <Text style={AppStyle.label}>Email</Text>
             <TextInput
-              textContentType="text"
+              textContentType="emailAddress"
               onChangeText={setEmail}
               placeholder="default@email.com"
               style={AppStyle.input}
               keyboardType="email-address"
-              autoCapitalize={false}
               autoCorrect={false}
             />
             <Text style={AppStyle.label}>Password</Text>

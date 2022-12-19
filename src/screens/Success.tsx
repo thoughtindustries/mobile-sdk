@@ -1,18 +1,19 @@
-import React,{useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet,Image} from 'react-native';
 import {Loader} from '../components'; 
 import _ from 'lodash';
 
-const Success = (props) => {
+interface successProps {
+  message: string;
+}
+
+const Success = (props: successProps) => {
   return <View style={successStyle.container}>
       <View style={successStyle.section1}>
         <Image
           source={require("../../assets/logo-white.png")}
           style={successStyle.logo}
         />
-        {_.get(props, "title", "") !== "" && (
-          <Text style={successStyle.title}>{props.title}</Text>
-        )}
         {props.message.split("\n").map((msg, idx) => (
           <Text key={idx} style={successStyle.message}>
             {msg}
@@ -58,14 +59,6 @@ const successStyle = StyleSheet.create({
         marginBottom:20 
     },
 
-    title: {
-        fontSize: 24,
-        lineHeight: 36,
-        textAlign: "center",
-        color: "#ffffff",
-        marginBottom: 10
-    },
-    
     message: {
         textAlign: "center",
         fontSize: 16,

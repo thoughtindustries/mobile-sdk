@@ -1,27 +1,25 @@
-import {useState,useEffect} from 'react';
+import React from 'react';
 import {View, StyleSheet, Animated} from 'react-native';
+
 
 interface LoaderProps {
     size: number;
-    Infinite:boolean;
-    onPress(): void;
   }
 
 const Loader = (props:LoaderProps) => {
 
-    const [size,setSize] = useState(new Animated.Value(0));
+    const [size,setSize] = React.useState(new Animated.Value(0));
 
     const startAnimation = () =>{
         Animated.loop(
             Animated.timing(size, {
               toValue: props.size,
               duration: props.size*10,
-              Infinite:true,
               useNativeDriver: false
             })).start();
        };
     
-       useEffect(startAnimation,[]);
+       React.useEffect(startAnimation,[]);
 
        const style = StyleSheet.create({
            container: {

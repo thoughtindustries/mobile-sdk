@@ -16,7 +16,7 @@ const Offline = () => {
             <Text style={offStyle.subtitle}>Get all your offline files here.</Text>
         </View>
         <View style={offStyle.section2}>
-            <Button title="Offline Mode"  />
+            <Button title="Offline Mode" onPress={()=>{}}  />
         </View>
     </View>;
 };
