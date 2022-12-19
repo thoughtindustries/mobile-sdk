@@ -2,12 +2,20 @@ import React, { useState } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, Image } from "react-native";
 import _ from 'lodash';
 
-const Message = ({canClose, type,message, onHide}) => {
+interface MessageProps {
+  canClose:boolean;
+  mtype:any;
+  message:string;
+  onHide(): void;
+}
 
-  const icon = {
-    'success': require("../../assets/success.png"),
-    'error':  require("../../assets/error.png")
+const Message = ({canClose, mtype,message, onHide}:MessageProps) => {
+  const icon: { success: any, error: any } = {
+    success: require('../../assets/success.png'),
+    error: require('../../assets/error.png'),
   };
+
+  
 
   return (
     <View style={styles.centeredView}>
@@ -23,7 +31,7 @@ const Message = ({canClose, type,message, onHide}) => {
             {canClose && <Pressable style={styles.buttonClose} onPress={onHide}>
               <Text style={styles.textClose}>X</Text>
             </Pressable>}
-            {!_.isEmpty(type) && <Image source={icon[type]} style={styles.icon} />}
+            {!_.isEmpty(mtype) && <Image source={icon[mtype]} style={styles.icon} />}
             <Text style={styles.modalText}>{message}</Text>
           </View>
         </View>

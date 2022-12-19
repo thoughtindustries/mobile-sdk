@@ -1,10 +1,15 @@
 import React from 'react';
 import {TouchableOpacity, Text, StyleSheet} from 'react-native';
 
-const Link = (props) => {
+interface LinkProps {
+  title: string;
+  onPress(): void;
+}
+
+const Link = ({title, onPress}: LinkProps) => {
   return (
-    <TouchableOpacity style={styles.link} onPress={props.onPress}>
-      <Text style={styles.linkText}>{props.title}</Text>
+    <TouchableOpacity style={styles.link} onPress={onPress}>
+      <Text style={styles.linkText}>{title}</Text>
     </TouchableOpacity>
   );
 };

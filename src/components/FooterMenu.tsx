@@ -4,7 +4,11 @@ import {Image} from 'react-native';
 
 import Screens from '../screens';
 
-const FooterMenu = (props) => {
+interface FMProps {
+  route: {name:string}
+}
+
+const FooterMenu = (props:FMProps) => {
 
   const Tab = createBottomTabNavigator();
 

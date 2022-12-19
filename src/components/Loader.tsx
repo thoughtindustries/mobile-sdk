@@ -1,7 +1,13 @@
 import {useState,useEffect} from 'react';
 import {View, StyleSheet, Animated} from 'react-native';
 
-const Loader = (props) => {
+interface LoaderProps {
+    size: number;
+    Infinite:boolean;
+    onPress(): void;
+  }
+
+const Loader = (props:LoaderProps) => {
 
     const [size,setSize] = useState(new Animated.Value(0));
 
@@ -10,7 +16,7 @@ const Loader = (props) => {
             Animated.timing(size, {
               toValue: props.size,
               duration: props.size*10,
-              Infinite: true,
+              Infinite:true,
               useNativeDriver: false
             })).start();
        };
