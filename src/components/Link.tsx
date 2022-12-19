@@ -1,12 +1,12 @@
-import React from 'react';
-import {TouchableOpacity, Text, StyleSheet} from 'react-native';
+import React from "react";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 interface LinkProps {
   title: string;
   onPress(): void;
 }
 
-const Link = ({title, onPress}: LinkProps) => {
+const Link = ({ title, onPress }: LinkProps) => {
   return (
     <TouchableOpacity style={styles.link} onPress={onPress}>
       <Text style={styles.linkText}>{title}</Text>
@@ -29,6 +29,3 @@ const styles = StyleSheet.create({
 });
 
 export default Link;
-
-
-

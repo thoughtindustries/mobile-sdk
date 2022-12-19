@@ -12,56 +12,58 @@ import tiApiObj from "../helpers/TIApi";
 import _ from "lodash";
 import validator from "validator";
 import { TI_INSTANCE_NAME } from "@env";
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from "../../types";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 
 const Registration = () => {
-   
-   const [email, setEmail] = React.useState<string>("");
-   const [fname, setFName] = React.useState<string>("");
-   const [lname, setLName] = React.useState<string>("");
-   const [processing, setProcessing] = React.useState<boolean>(false);
-   const [message, setMessage] = React.useState<any>({error: "", info: ''});
+  const [email, setEmail] = React.useState<string>("");
+  const [fname, setFName] = React.useState<string>("");
+  const [lname, setLName] = React.useState<string>("");
+  const [processing, setProcessing] = React.useState<boolean>(false);
+  const [message, setMessage] = React.useState<any>({ error: "", info: "" });
 
+  type registrationScreenProp = StackNavigationProp<
+    RootStackParamList,
+    "Registration"
+  >;
 
-   type registrationScreenProp = StackNavigationProp<RootStackParamList, 'Registration'>;
+  const navigation = useNavigation<registrationScreenProp>();
 
-   const navigation = useNavigation<registrationScreenProp>();
+  const goRegistration = () => {
+    const udata: { firstName: string; lastName: string; email: string } = {
+      firstName: fname,
+      lastName: lname,
+      email: email,
+    };
 
-   const goRegistration = () => {
-    
-        const udata : {firstName: string, lastName: string, email: string} = {
-            firstName:fname,
-            lastName:lname,
-            email:email
-        };
+    if (!validator.isEmail(udata.email)) {
+      setMessage({ info: "", error: `Please enter a valid email address!` });
+      return false;
+    }
 
-        if(!validator.isEmail(udata.email)){
-            setMessage({info:"", error: `Please enter a valid email address!`});
-            return false;
-        }
+    setProcessing(true);
 
-        setProcessing(true);
+    tiApiObj
+      .createUser(udata)
+      .then((res) => {
+        setProcessing(false);
+        setMessage({
+          error: "",
+          info: `Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`,
+        });
+        window.setTimeout(() => {
+          navigation.navigate("Login");
+        }, 3000);
+      })
+      .catch((err) => {
+        setProcessing(false);
+        setMessage({ info: "", error: _.get(err, "message", err) });
+      });
+  };
 
-        tiApiObj.createUser(udata)
-        .then(res => {
-            setProcessing(false);
-            setMessage({error:"", info:`Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`});
-            window.setTimeout(() => {
-                navigation.navigate('Login');
-            },3000);
-        })
-        .catch(err => {
-            setProcessing(false);
-            setMessage({info:"", error: _.get(err,'message',err)})
-        })
-    
-
-   };
-
-   return <>
-
+  return (
+    <>
       {!processing && message.info === "" && (
         <View style={AppStyle.container}>
           {message.error !== "" && (
@@ -113,7 +115,8 @@ const Registration = () => {
           </KeyboardAvoidingView>
         </View>
       )}
-    </>;
+    </>
+  );
 };
 
 const styles = StyleSheet.create({

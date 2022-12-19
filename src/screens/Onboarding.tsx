@@ -1,17 +1,18 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Logo,Button,Link} from '../components';
-import AppStyle from '../../AppStyle';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from "../../types";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Logo, Button, Link } from "../components";
+import AppStyle from "../../AppStyle";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 
-type onBoardingScreenProp = StackNavigationProp<RootStackParamList, 'Onboarding'>;
+type onBoardingScreenProp = StackNavigationProp<
+  RootStackParamList,
+  "Onboarding"
+>;
 
 const Onboarding = () => {
-
   const navigation = useNavigation<onBoardingScreenProp>();
-
 
   return (
     <View style={AppStyle.container}>
@@ -23,10 +24,7 @@ const Onboarding = () => {
         </Text>
       </View>
       <View style={styles.form}>
-        <Button
-          title="Sign In"
-          onPress={() => navigation.navigate("Login")}
-        />
+        <Button title="Sign In" onPress={() => navigation.navigate("Login")} />
         <Link
           title="Create new account!"
           onPress={() => navigation.navigate("Registration")}

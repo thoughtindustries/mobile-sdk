@@ -1,21 +1,19 @@
 import React from "react";
 import { Modal, StyleSheet, Text, Pressable, View, Image } from "react-native";
-import _ from 'lodash';
+import _ from "lodash";
 
 interface MessageProps {
-  canClose:boolean;
-  type:string;
-  message:string;
+  canClose: boolean;
+  type: string;
+  message: string;
   onHide(): void;
 }
 
-const Message = ({canClose, type,message, onHide}:MessageProps) => {
+const Message = ({ canClose, type, message, onHide }: MessageProps) => {
   const icon: any = {
-    success: require('../../assets/success.png'),
-    error: require('../../assets/error.png'),
+    success: require("../../assets/success.png"),
+    error: require("../../assets/error.png"),
   };
-
-  
 
   return (
     <View style={styles.centeredView}>
@@ -25,13 +23,16 @@ const Message = ({canClose, type,message, onHide}:MessageProps) => {
         visible={true}
         onRequestClose={onHide}
       >
-        
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            {canClose && <Pressable style={styles.buttonClose} onPress={onHide}>
-              <Text style={styles.textClose}>X</Text>
-            </Pressable>}
-            {!_.isEmpty(type) && <Image source={icon[type]} style={styles.icon} />}
+            {canClose && (
+              <Pressable style={styles.buttonClose} onPress={onHide}>
+                <Text style={styles.textClose}>X</Text>
+              </Pressable>
+            )}
+            {!_.isEmpty(type) && (
+              <Image source={icon[type]} style={styles.icon} />
+            )}
             <Text style={styles.modalText}>{message}</Text>
           </View>
         </View>
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    marginTop: 22,
   },
   modalView: {
     margin: 20,
@@ -56,40 +57,40 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   buttonClose: {
     borderRadius: 30,
     padding: 0,
     elevation: 2,
-    backgroundColor:"#000000",
+    backgroundColor: "#000000",
     position: "absolute",
     alignSelf: "flex-end",
     marginTop: -5,
-    marginRight: -10
+    marginRight: -10,
   },
   textClose: {
-    width:30,
-    height:30,
+    width: 30,
+    height: 30,
     lineHeight: 30,
-    color:"white",
+    color: "white",
     fontWeight: "bold",
-    textAlign: "center"
+    textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
     fontSize: 18,
-    textAlign: "center"
+    textAlign: "center",
   },
-  icon:{
+  icon: {
     width: 50,
     height: 50,
-    marginBottom: 20
-  }
+    marginBottom: 20,
+  },
 });
 
 export default Message;
