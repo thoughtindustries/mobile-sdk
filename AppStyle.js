@@ -30,4 +30,15 @@ export default StyleSheet.create({
     backgroundColor: "#FFFFFF",
     marginBottom: 12,
   },
+
+  inlineError: {
+    color: "#DF3131",
+    height: 13,
+    fontSize: 11,
+  },
+
+  errorField: {
+    borderColor: "#DF3131",
+    color: "#DF3131",
+  },
 });

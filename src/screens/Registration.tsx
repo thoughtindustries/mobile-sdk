@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
+  Modal,
+  TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
-import { Logo, Button, Message } from "../components";
+import { Logo, Button } from "../components";
 import Success from "./Success";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
@@ -23,6 +25,13 @@ const Registration = () => {
   const [lname, setLName] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
   const [message, setMessage] = useState<any>({ error: "", info: "" });
+  const [inlineMsg, setInlineMsg] = useState<any>({ field: "", message: "" });
+
+  useEffect(() => {
+    if (inlineMsg.field === "email") {
+      setInlineMsg({ field: "", message: "" });
+    }
+  }, [email]);
 
   type RegistrationScreenProps = StackNavigationProp<
     RootStackParamList,
@@ -38,10 +47,13 @@ const Registration = () => {
       email: email,
     };
 
-    // if (!validator.isEmail(udata.email)) {
-    //   setMessage({ info: "", error: `Please enter a valid email address!` });
-    //   return false;
-    // }
+    if (!validator.isEmail(udata.email)) {
+      setInlineMsg({
+        field: "email",
+        message: `Please enter a valid email (example@gmail.com)`,
+      });
+      return false;
+    }
 
     setProcessing(true);
 
@@ -54,6 +66,7 @@ const Registration = () => {
           info: `Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`,
         });
         window.setTimeout(() => {
+          setMessage({ info: "", error: "" });
           navigation.navigate("Login");
         }, 3000);
       })
@@ -61,6 +74,31 @@ const Registration = () => {
         setProcessing(false);
         setMessage({ info: "", error: get(err, "message", err) });
       });
+  };
+
+  const ShowRegistrationError: any = () => {
+    let modalTitle = "Email in use";
+    let modalMessage =
+      "Sorry, that email address is already in use. Please try another one or log in if you already have an account.";
+    return (
+      <Modal animationType="slide" transparent={true} visible={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalDialog}>
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <Button
+              title="Log into existing account"
+              onPress={() => navigation.navigate("Login")}
+            />
+            <TouchableOpacity
+              onPress={() => setMessage({ error: "", info: "" })}
+            >
+              <Text style={styles.closeBtn}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
   };
 
   return (
@@ -75,16 +113,7 @@ const Registration = () => {
 
       {!processing && message.info === "" && (
         <View style={AppStyle.container}>
-          {message.error !== "" && (
-            <Message
-              type="error"
-              canClose={true}
-              message={message.error}
-              onHide={() => {
-                setMessage({ ...message, error: "" });
-              }}
-            />
-          )}
+          {message.error !== "" && <ShowRegistrationError />}
 
           <KeyboardAvoidingView
             style={styles.keyboardOffset}
@@ -102,15 +131,22 @@ const Registration = () => {
                 placeholder="example@email.com"
                 keyboardType="email-address"
                 onChangeText={setEmail}
-                style={AppStyle.input}
+                defaultValue={email}
+                style={
+                  inlineMsg.field === "email"
+                    ? { ...AppStyle.input, ...AppStyle.errorField }
+                    : AppStyle.input
+                }
                 autoCorrect={false}
                 autoCapitalize="none"
               />
+              <Text style={AppStyle.inlineError}>{inlineMsg.message}</Text>
               <Text style={AppStyle.label}>First Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="First Name"
                 onChangeText={setFName}
+                defaultValue={fname}
                 style={AppStyle.input}
               />
               <Text style={AppStyle.label}>Last Name</Text>
@@ -118,6 +154,7 @@ const Registration = () => {
                 textContentType="name"
                 placeholder="Last Name"
                 onChangeText={setLName}
+                defaultValue={lname}
                 style={AppStyle.input}
               />
               <Button title="Sign up" onPress={goRegistration} />
@@ -141,12 +178,48 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: "Poppins_700Bold",
+    fontFamily: "Poppins_400Regular",
     fontSize: 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
+  },
+
+  modalContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#18242Ebb",
+    height: "100%",
+  },
+
+  modalDialog: {
+    backgroundColor: "#ffffff",
+    borderRadius: 5,
+    margin: 40,
+    padding: 40,
+  },
+
+  modalTitle: {
+    fontFamily: "Poppins_700Bold",
+    fontSize: 16,
+    lineHeight: 24,
+  },
+
+  modalMessage: {
+    fontFamily: "Inter_400Regular",
+    paddingTop: 16,
+    fontSize: 12,
+    color: "#6B7280",
+    lineHeight: 15,
+    textAlign: "left",
+  },
+
+  closeBtn: {
+    color: "#6B7280",
+    fontSize: 14,
+    alignSelf: "center",
   },
 });
 

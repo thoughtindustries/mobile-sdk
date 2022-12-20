@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -33,6 +33,13 @@ const Login = () => {
   const [isPasswordSecure, setIsPasswordSecure] = useState<boolean>(true);
   const [processing, setProcessing] = useState<boolean>(false);
   const [message, setMessage] = useState<any>({ error: "", info: "" });
+  const [inlineMsg, setInlineMsg] = useState<any>({ field: "", message: "" });
+
+  useEffect(() => {
+    if (inlineMsg.field === "email") {
+      setInlineMsg({ field: "", message: "" });
+    }
+  }, [email]);
 
   const onSignIn = () => {
     const params: any = {
@@ -41,7 +48,10 @@ const Login = () => {
     };
 
     if (!validator.isEmail(params.email)) {
-      setMessage({ info: "", error: `Please enter a valid email address!` });
+      setInlineMsg({
+        field: "email",
+        message: `Please enter a valid email (example@gmail.com)`,
+      });
       return false;
     }
 
@@ -95,16 +105,23 @@ const Login = () => {
                   textContentType="emailAddress"
                   onChangeText={setEmail}
                   placeholder="example@email.com"
-                  style={AppStyle.input}
+                  defaultValue={email}
+                  style={
+                    inlineMsg.field === "email"
+                      ? { ...AppStyle.input, ...AppStyle.errorField }
+                      : AppStyle.input
+                  }
                   keyboardType="email-address"
                   autoCorrect={false}
                   autoCapitalize="none"
                 />
+                <Text style={AppStyle.inlineError}>{inlineMsg.message}</Text>
                 <Text style={AppStyle.label}>Password</Text>
                 <View style={{ ...AppStyle.input, flexDirection: "row" }}>
                   <TextInput
                     secureTextEntry={isPasswordSecure}
                     onChangeText={setPassword}
+                    defaultValue={password}
                     placeholder="Enter your password here"
                     style={{ margin: 0, padding: 0, width: "93%" }}
                   />
