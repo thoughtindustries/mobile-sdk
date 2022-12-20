@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   ImageBackground,
+  Image,
   ScrollView,
 } from "react-native";
 import { UserHeader, Link } from "../components";
@@ -45,6 +46,34 @@ const Home = () => {
     {
       thumbnail: "https://loremflickr.com/640/360",
       coursename: "Course Name2",
+    },
+  ];
+
+  const rececntLaunchCourse: { thumbnail: string; coursename: string; description:string; }[] = [
+    {
+      thumbnail: "https://placebear.com/640/360",
+      coursename: "Course Name1",
+      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+    },
+    {
+      thumbnail: "https://placebear.com/640/360",
+      coursename: "Course Name2",
+      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+    },
+    {
+      thumbnail: "https://placebear.com/640/360",
+      coursename: "Course Name2",
+      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+    },
+    {
+      thumbnail: "https://placebear.com/640/360",
+      coursename: "Course Name2",
+      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+    },
+    {
+      thumbnail: "https://placebear.com/640/360",
+      coursename: "Course Name2",
+      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
     },
   ];
 
@@ -113,12 +142,36 @@ const Home = () => {
     );
   };
 
+  const RecentLaunchedCourses = () => {
+    return (
+      <View>
+        <View style={styles.courseBox}>
+          <Text style={styles.heading}>Recently Launched Courses</Text>
+        </View>
+        <ScrollView horizontal={true} style={styles.courseContainer}>
+          {rececntLaunchCourse.map((course, idx) => (
+            <View style={styles.recContentBox}>
+                <View style={styles.courseThumbnail}>
+                  <Image key={idx} source={{ uri: course.thumbnail }} style={{width: '100%', height: '100%'}} />
+                </View>
+                <View style={styles.contentArea}>
+                  <Text style={styles.recCourseTitle}>{course.coursename}</Text>
+                  <Text style={styles.courseDes}>{course.description}</Text>
+                </View>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  };
+
   return (
     <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
       <UserHeader />
       <Banner />
       <TopCategories />
       <Recommendation />
+      <RecentLaunchedCourses />
     </ScrollView>
   );
 };
@@ -201,13 +254,12 @@ const styles = StyleSheet.create({
   },
 
   recContentBox: {
-    backgroundColor: "#f9fafv",
+    backgroundColor: "#FAFAFA",
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#d1d5db",
+    borderColor: "#E5E7EB",
     borderRadius: 8,
     width: 260,
-    height: 280,
     margin: 12,
   },
 
@@ -222,12 +274,32 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   courseTitle: {
-    color: "#1f2937",
-    fontWeight: "400",
-    fontSize: 14,
+    color: "#D4D4D8",
+    fontWeight: "700",
+    fontSize: 16,
     justifyContent: "flex-start",
     lineHeight: 50,
   },
+  recCourseTitle: {
+    color: "#1F2937",
+    fontWeight: "700",
+    fontSize: 16,
+    lineHeight:50
+  },
+  courseDes: {
+    color:"#6B7280",
+    fontSize:12,
+    fontWeight:"400",
+    lineHeight:18,
+  },
+  courseThumbnail: {
+    width: 260,
+    height: 150,
+  },
+  contentArea: {
+    padding:32,
+    fontFamily: "Poppins_400Regular",
+  }
 });
 
 export default Home;
