@@ -41,14 +41,15 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     marginLeft: 22,
     marginRight: 22,
+    width: "100%",
   },
 
   title: {
-    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
     fontSize: 24,
     lineHeight: 36,
     textAlign: "center",
-    color: "#1F2937",
+    color: "#6B7280",
     marginBottom: 10,
   },
 
@@ -57,6 +58,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: "center",
     color: "#6B7280",
+    fontFamily: "Poppins_400Regular",
   },
 
   networkOff: {

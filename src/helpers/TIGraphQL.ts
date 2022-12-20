@@ -35,7 +35,7 @@ class TIGraphQL {
 
   getTopCategories(): Promise<string[]> {
     return new Promise((resolve, reject) => {
-      resolve(["Partner", "Enablement", "News", "Release", "SalesEnablement"]);
+      resolve(["Partner", "Enablement", "News", "Release", "Sales Enablement"]);
     });
   }
 }

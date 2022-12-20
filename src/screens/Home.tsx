@@ -49,31 +49,40 @@ const Home = () => {
     },
   ];
 
-  const rececntLaunchCourse: { thumbnail: string; coursename: string; description:string; }[] = [
+  const rececntLaunchCourse: {
+    thumbnail: string;
+    coursename: string;
+    description: string;
+  }[] = [
     {
       thumbnail: "https://placebear.com/640/360",
       coursename: "Course Name1",
-      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+      description:
+        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
     },
     {
       thumbnail: "https://placebear.com/640/360",
       coursename: "Course Name2",
-      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+      description:
+        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
     },
     {
       thumbnail: "https://placebear.com/640/360",
       coursename: "Course Name2",
-      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+      description:
+        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
     },
     {
       thumbnail: "https://placebear.com/640/360",
       coursename: "Course Name2",
-      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+      description:
+        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
     },
     {
       thumbnail: "https://placebear.com/640/360",
       coursename: "Course Name2",
-      description:"Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
+      description:
+        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
     },
   ];
 
@@ -86,6 +95,7 @@ const Home = () => {
       <ImageBackground
         source={require("../../assets/dashboard-banner.png")}
         resizeMode="cover"
+        imageStyle={{ borderRadius: 8 }}
       >
         <View style={styles.bannerArea}>
           <Text style={styles.bannerTitle}>Become a Master: </Text>
@@ -130,6 +140,8 @@ const Home = () => {
                 key={idx}
                 source={{ uri: course.thumbnail }}
                 resizeMode="cover"
+                style={{ borderRadius: 10 }}
+                imageStyle={{ borderRadius: 8 }}
               >
                 <View style={styles.bannerArea}>
                   <Text style={styles.courseTitle}>{course.coursename}</Text>
@@ -151,13 +163,17 @@ const Home = () => {
         <ScrollView horizontal={true} style={styles.courseContainer}>
           {rececntLaunchCourse.map((course, idx) => (
             <View style={styles.recContentBox}>
-                <View style={styles.courseThumbnail}>
-                  <Image key={idx} source={{ uri: course.thumbnail }} style={{width: '100%', height: '100%'}} />
-                </View>
-                <View style={styles.contentArea}>
-                  <Text style={styles.recCourseTitle}>{course.coursename}</Text>
-                  <Text style={styles.courseDes}>{course.description}</Text>
-                </View>
+              <View style={styles.courseThumbnail}>
+                <Image
+                  key={idx}
+                  source={{ uri: course.thumbnail }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </View>
+              <View style={styles.contentArea}>
+                <Text style={styles.recCourseTitle}>{course.coursename}</Text>
+                <Text style={styles.courseDes}>{course.description}</Text>
+              </View>
             </View>
           ))}
         </ScrollView>
@@ -166,7 +182,11 @@ const Home = () => {
   };
 
   return (
-    <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.page}
+      showsVerticalScrollIndicator={false}
+      stickyHeaderIndices={[0]}
+    >
       <UserHeader />
       <Banner />
       <TopCategories />
@@ -197,14 +217,14 @@ const styles = StyleSheet.create({
   bannerTitle: {
     fontSize: 24,
     lineHeight: 36,
-    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
     color: "#fff",
   },
 
   bannerText: {
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: "400",
+    fontFamily: "Poppins_400Regular",
     color: "#ccc",
   },
 
@@ -219,7 +239,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: "700",
+    fontFamily: "Poppins_700Bold",
     color: "#000",
   },
 
@@ -255,10 +275,8 @@ const styles = StyleSheet.create({
 
   recContentBox: {
     backgroundColor: "#FAFAFA",
-    borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#E5E7EB",
-    borderRadius: 8,
     width: 260,
     margin: 12,
   },
@@ -284,22 +302,22 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     fontWeight: "700",
     fontSize: 16,
-    lineHeight:50
+    lineHeight: 50,
   },
   courseDes: {
-    color:"#6B7280",
-    fontSize:12,
-    fontWeight:"400",
-    lineHeight:18,
+    color: "#6B7280",
+    fontSize: 12,
+    fontWeight: "400",
+    lineHeight: 18,
   },
   courseThumbnail: {
     width: 260,
     height: 150,
   },
   contentArea: {
-    padding:32,
+    padding: 32,
     fontFamily: "Poppins_400Regular",
-  }
+  },
 });
 
 export default Home;
