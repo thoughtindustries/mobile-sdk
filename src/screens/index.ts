@@ -5,7 +5,7 @@ import Success from "./Success";
 import Offline from "./Offline";
 import Home from "./Home";
 import MyLearnings from "./MyLearnings";
-
+import Account from "./Account";
 export default {
   Onboarding,
   Login,
@@ -14,4 +14,5 @@ export default {
   Offline,
   Home,
   MyLearnings,
+  Account,
 };

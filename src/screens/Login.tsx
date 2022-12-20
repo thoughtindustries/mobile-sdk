@@ -51,12 +51,17 @@ const Login = () => {
       .then((token) => Utils.store("logintoken", token)) //== got login token, save it locally
       .then(() => tiApi.userDetails(params.email)) //== fetch user data of logged in user
       .then((udata) => Utils.store("udata", udata)) //== save user data locally
-      .then(() => navigation.navigate("Home")) //== navigate to home
+      .then(() => {
+        setProcessing(false);
+        navigation.navigate("Home");
+      }) //== navigate to home
       .catch((err) => {
         setProcessing(false);
         setMessage({ info: "", error: get(err, "message", err) });
       });
   };
+
+  React.useEffect(() => Utils.checkLogin(navigation), []);
 
   return (
     <>

@@ -16,6 +16,30 @@ const Utils = {
       }
     });
   },
+
+  isLoggedIn: () => {
+    return Utils.fetch("udata")
+      .then((val) => !_.isEmpty(_.get(val, "email", "")))
+      .catch((err) => false);
+  },
+
+  checkLogin: (navigation: any) => {
+    Utils.isLoggedIn().then((loggedIn) => {
+      if (loggedIn) {
+        navigation.navigate("Home");
+      }
+    });
+  },
+
+  logMeOut: (navigation: any) => {
+    try {
+      AsyncStorage.removeItem("udata")
+        .then(navigation.navigate("Login"))
+        .catch((err) => false);
+    } catch (exception) {
+      return false;
+    }
+  },
 };
 
 export default Utils;
