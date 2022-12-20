@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import AppStyle from "../../AppStyle";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TI_API_INSTANCE } from "@env";
 import validator from "validator";
-import _ from "lodash";
+import { get } from "lodash";
 import tiGql from "../helpers/TIGraphQL";
 import tiApi from "../helpers/TIApi";
 import Utils from "../helpers/Utils";
@@ -23,21 +23,21 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 
-type loginScreenProp = StackNavigationProp<RootStackParamList, "Login">;
+type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
 const Login = () => {
-  const navigation = useNavigation<loginScreenProp>();
-  const [email, setEmail] = React.useState<string>("");
-  const [passwd, setPasswd] = React.useState<string>("");
+  const navigation = useNavigation<LoginScreenProps>();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-  const [isPasswordSecure, setIsPasswordSecure] = React.useState<boolean>(true);
-  const [processing, setProcessing] = React.useState<boolean>(false);
-  const [message, setMessage] = React.useState<any>({ error: "", info: "" });
+  const [isPasswordSecure, setIsPasswordSecure] = useState<boolean>(true);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [message, setMessage] = useState<any>({ error: "", info: "" });
 
   const onSignIn = () => {
     const params: any = {
       email: email,
-      password: passwd,
+      password: password,
     };
 
     if (!validator.isEmail(params.email)) {
@@ -54,7 +54,7 @@ const Login = () => {
       .then(() => navigation.navigate("Home")) //== navigate to home
       .catch((err) => {
         setProcessing(false);
-        setMessage({ info: "", error: _.get(err, "message", err) });
+        setMessage({ info: "", error: get(err, "message", err) });
       });
   };
 
@@ -87,16 +87,17 @@ const Login = () => {
                 <TextInput
                   textContentType="emailAddress"
                   onChangeText={setEmail}
-                  placeholder="default@email.com"
+                  placeholder="example@email.com"
                   style={AppStyle.input}
                   keyboardType="email-address"
                   autoCorrect={false}
+                  autoCapitalize="none"
                 />
                 <Text style={AppStyle.label}>Password</Text>
                 <View style={{ ...AppStyle.input, flexDirection: "row" }}>
                   <TextInput
                     secureTextEntry={isPasswordSecure}
-                    onChangeText={setPasswd}
+                    onChangeText={setPassword}
                     placeholder="Enter your password here"
                     style={{ margin: 0, padding: 0, width: "93%" }}
                   />

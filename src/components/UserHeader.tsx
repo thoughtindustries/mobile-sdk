@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Image, View, Text } from "react-native";
 import Utils from "../helpers/Utils";
-import _ from "lodash";
+import { get } from "lodash";
 
 const UserHeader = () => {
-  const [udata, setUdata] = React.useState(false);
+  const [udata, setUdata] = useState<boolean>(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     Utils.fetch("udata").then(setUdata);
   }, []);
   return (
@@ -22,7 +22,7 @@ const UserHeader = () => {
       <Text
         style={{ margin: 5, fontWeight: "700", fontSize: 20, lineHeight: 30 }}
       >
-        Hi, {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
+        Hi, {get(udata, "firstName", "")} {get(udata, "lastName", "")}
       </Text>
     </View>
   );

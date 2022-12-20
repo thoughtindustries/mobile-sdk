@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, StyleSheet, Text, Pressable, View, Image } from "react-native";
-import _ from "lodash";
+import { isEmpty } from "lodash";
 
 interface MessageProps {
   canClose: boolean;
@@ -30,7 +30,7 @@ const Message = ({ canClose, type, message, onHide }: MessageProps) => {
                 <Text style={styles.textClose}>X</Text>
               </Pressable>
             )}
-            {!_.isEmpty(type) && (
+            {!isEmpty(type) && (
               <Image source={icon[type]} style={styles.icon} />
             )}
             <Text style={styles.modalText}>{message}</Text>

@@ -5,7 +5,7 @@ export default StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "start",
+    justifyContent: "flex-start",
     padding: 40,
     height: "100%",
     backgroundColor: "#F3F4F6",

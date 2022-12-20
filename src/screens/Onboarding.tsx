@@ -6,13 +6,13 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 
-type onBoardingScreenProp = StackNavigationProp<
+type OnboardingScreenProps = StackNavigationProp<
   RootStackParamList,
   "Onboarding"
 >;
 
 const Onboarding = () => {
-  const navigation = useNavigation<onBoardingScreenProp>();
+  const navigation = useNavigation<OnboardingScreenProps>();
 
   return (
     <View style={AppStyle.container}>

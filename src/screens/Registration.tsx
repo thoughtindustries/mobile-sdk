@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,10 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { Logo, Button, Message } from "../components";
+import Success from "./Success";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
-import _ from "lodash";
+import { get } from "lodash";
 import validator from "validator";
 import { TI_INSTANCE_NAME } from "@env";
 import { useNavigation } from "@react-navigation/native";
@@ -17,18 +18,18 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 
 const Registration = () => {
-  const [email, setEmail] = React.useState<string>("");
-  const [fname, setFName] = React.useState<string>("");
-  const [lname, setLName] = React.useState<string>("");
-  const [processing, setProcessing] = React.useState<boolean>(false);
-  const [message, setMessage] = React.useState<any>({ error: "", info: "" });
+  const [email, setEmail] = useState<string>("");
+  const [fname, setFName] = useState<string>("");
+  const [lname, setLName] = useState<string>("");
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [message, setMessage] = useState<any>({ error: "", info: "" });
 
-  type registrationScreenProp = StackNavigationProp<
+  type RegistrationScreenProps = StackNavigationProp<
     RootStackParamList,
     "Registration"
   >;
 
-  const navigation = useNavigation<registrationScreenProp>();
+  const navigation = useNavigation<RegistrationScreenProps>();
 
   const goRegistration = () => {
     const udata: { firstName: string; lastName: string; email: string } = {
@@ -37,16 +38,16 @@ const Registration = () => {
       email: email,
     };
 
-    if (!validator.isEmail(udata.email)) {
-      setMessage({ info: "", error: `Please enter a valid email address!` });
-      return false;
-    }
+    // if (!validator.isEmail(udata.email)) {
+    //   setMessage({ info: "", error: `Please enter a valid email address!` });
+    //   return false;
+    // }
 
     setProcessing(true);
 
     tiApiObj
       .createUser(udata)
-      .then((res) => {
+      .then(() => {
         setProcessing(false);
         setMessage({
           error: "",
@@ -58,12 +59,20 @@ const Registration = () => {
       })
       .catch((err) => {
         setProcessing(false);
-        setMessage({ info: "", error: _.get(err, "message", err) });
+        setMessage({ info: "", error: get(err, "message", err) });
       });
   };
 
   return (
     <>
+      {processing && (
+        <Success title="" message="Registration going on, Please wait.. " />
+      )}
+
+      {!processing && message.info !== "" && (
+        <Success title="Success" message={message.info} />
+      )}
+
       {!processing && message.info === "" && (
         <View style={AppStyle.container}>
           {message.error !== "" && (
@@ -90,11 +99,12 @@ const Registration = () => {
               <Text style={AppStyle.label}>Email</Text>
               <TextInput
                 textContentType="emailAddress"
-                placeholder="default@email.com"
+                placeholder="example@email.com"
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 style={AppStyle.input}
                 autoCorrect={false}
+                autoCapitalize="none"
               />
               <Text style={AppStyle.label}>First Name</Text>
               <TextInput
