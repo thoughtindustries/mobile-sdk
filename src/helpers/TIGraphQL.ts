@@ -32,6 +32,12 @@ class TIGraphQL {
         .catch(reject);
     });
   }
+
+  getTopCategories(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      resolve(["Partner", "Enablement", "News", "Release", "SalesEnablement"]);
+    });
+  }
 }
 
 export default new TIGraphQL();

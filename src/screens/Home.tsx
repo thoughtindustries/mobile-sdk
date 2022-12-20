@@ -11,18 +11,19 @@ import { truncate } from "lodash";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
+import tiGql from "../helpers/TIGraphQL";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Home = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const categories: string[] = [
-    "Category 1",
-    "Category 2",
-    "Category 3",
-    "Category 4",
-    "Category 5",
-  ];
+  const [categories, setCategories] = React.useState<string[]>([]);
+
+  const fetchTopCategories = () => {
+    tiGql.getTopCategories().then(setCategories).catch(console.log);
+  };
+
+  React.useEffect(fetchTopCategories, []);
 
   const recommendedCourse: { thumbnail: string; coursename: string }[] = [
     {
@@ -187,8 +188,8 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderColor: "#d1d5db",
     borderRadius: 8,
-    width: 104,
     alignItems: "center",
+    minWidth: 104,
     margin: 4,
   },
 
@@ -214,7 +215,11 @@ const styles = StyleSheet.create({
     color: "#1f2937",
     fontWeight: "400",
     fontSize: 14,
-    lineHeight: 50,
+    lineHeight: 24,
+    paddingTop: 13,
+    paddingBottom: 13,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
   courseTitle: {
     color: "#1f2937",

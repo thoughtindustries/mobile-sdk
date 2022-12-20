@@ -60,7 +60,9 @@ const Login = () => {
 
   return (
     <>
-      {processing && <Success message="Trying to login, Please wait.. " />}
+      {processing && (
+        <Success title="" message="Trying to login, Please wait.. " />
+      )}
       {!processing && (
         <ScrollView>
           {message.error !== "" && (
