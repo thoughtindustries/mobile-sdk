@@ -50,6 +50,7 @@ const App = () => {
         <Stack.Screen name="Onboarding" component={Screens.Onboarding} />
         <Stack.Screen name="Login" component={Screens.Login} />
         <Stack.Screen name="Registration" component={Screens.Registration} />
+        <Stack.Screen name="ProfileEdit" component={Screens.ProfileEdit} />
         <Stack.Screen name="TopCategories" component={Screens.Offline} />
         <Stack.Screen name="Home" component={FooterMenu} />
         <Stack.Screen name="Explore" component={FooterMenu} />

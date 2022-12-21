@@ -9,6 +9,7 @@ export type RootStackParamList = {
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
+  ProfileEdit:undefined;
 };
 
 export type UserDetailType = {

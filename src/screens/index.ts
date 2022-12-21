@@ -6,6 +6,7 @@ import Offline from "./Offline";
 import Home from "./Home";
 import MyLearnings from "./MyLearnings";
 import Account from "./Account";
+import ProfileEdit from "./ProfileEdit";
 export default {
   Onboarding,
   Login,
@@ -15,4 +16,5 @@ export default {
   Home,
   MyLearnings,
   Account,
+  ProfileEdit,
 };
