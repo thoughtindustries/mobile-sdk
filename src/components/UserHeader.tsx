@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Image, View, Text, StyleSheet } from "react-native";
 import Utils from "../helpers/Utils";
 import { get } from "lodash";
+import { UserDetailType } from "../../types";
 
 const UserHeader = () => {
-  const [udata, setUdata] = useState<boolean>(false);
+  const [udata, setUdata] = useState<UserDetailType | boolean>(false);
 
   useEffect(() => {
     Utils.fetch("udata").then(setUdata);

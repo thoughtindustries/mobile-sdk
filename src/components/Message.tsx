@@ -1,95 +1,79 @@
 import React from "react";
-import { Modal, StyleSheet, Text, Pressable, View, Image } from "react-native";
-import { isEmpty } from "lodash";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import _ from "lodash";
 
 interface MessageProps {
-  canClose: boolean;
-  type: string;
-  message: string;
-  onHide(): void;
+  type?: string;
+  title?: string;
+  message?: string;
+  extraJSX?: JSX.Element;
+  onHide?: Function;
 }
 
-const Message = ({ canClose, type, message, onHide }: MessageProps) => {
-  const icon: any = {
+const Message = ({
+  type = "info",
+  title = "",
+  message = "",
+  extraJSX = <></>,
+  onHide,
+}: MessageProps) => {
+  const icon: { success: NodeRequire; error: NodeRequire } = {
     success: require("../../assets/success.png"),
     error: require("../../assets/error.png"),
   };
 
   return (
-    <View style={styles.centeredView}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={true}
-        onRequestClose={onHide}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            {canClose && (
-              <Pressable style={styles.buttonClose} onPress={onHide}>
-                <Text style={styles.textClose}>X</Text>
-              </Pressable>
-            )}
-            {!isEmpty(type) && (
-              <Image source={icon[type]} style={styles.icon} />
-            )}
-            <Text style={styles.modalText}>{message}</Text>
-          </View>
+    <Modal animationType="slide" transparent={true} visible={true}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalDialog}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <Text style={styles.modalMessage}>{message}</Text>
+          {extraJSX}
+          <TouchableOpacity onPress={onHide}>
+            <Text style={styles.closeBtn}>Close</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </View>
+      </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
+  modalContainer: {
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
+    backgroundColor: "#18242Ebb",
+    height: "100%",
   },
-  modalView: {
-    margin: 20,
-    backgroundColor: "#fdf7e2",
-    borderRadius: 20,
-    padding: 25,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+
+  modalDialog: {
+    backgroundColor: "#ffffff",
+    borderRadius: 5,
+    margin: 40,
+    padding: 40,
   },
-  buttonClose: {
-    borderRadius: 30,
-    padding: 0,
-    elevation: 2,
-    backgroundColor: "#000000",
-    position: "absolute",
-    alignSelf: "flex-end",
-    marginTop: -5,
-    marginRight: -10,
+
+  modalTitle: {
+    fontFamily: "Poppins_700Bold",
+    fontSize: 16,
+    lineHeight: 24,
   },
-  textClose: {
-    width: 30,
-    height: 30,
-    lineHeight: 30,
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
+
+  modalMessage: {
+    fontFamily: "Inter_400Regular",
+    paddingTop: 16,
+    fontSize: 12,
+    color: "#6B7280",
+    lineHeight: 15,
+    textAlign: "left",
   },
-  modalText: {
-    marginBottom: 15,
-    fontSize: 18,
-    textAlign: "center",
-  },
-  icon: {
-    width: 50,
-    height: 50,
-    marginBottom: 20,
+
+  closeBtn: {
+    marginTop: 20,
+    color: "#6B7280",
+    fontSize: 14,
+    alignSelf: "center",
   },
 });
 

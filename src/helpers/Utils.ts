@@ -2,16 +2,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import _ from "lodash";
 
 const Utils = {
-  store: (name: string, value: any) => {
+  store: (name: string, value: object | string) => {
     value = _.isObject(value) ? JSON.stringify(value) : value;
     return AsyncStorage.setItem(name, value);
   },
 
   fetch: (name: string) => {
-    return AsyncStorage.getItem(name).then((val: any) => {
-      try {
+    return AsyncStorage.getItem(name).then((val) => {
+      if (!_.isEmpty(val)) {
         return JSON.parse(val);
-      } catch (e) {
+      } else {
         return val;
       }
     });

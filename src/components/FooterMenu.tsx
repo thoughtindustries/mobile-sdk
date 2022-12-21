@@ -12,7 +12,7 @@ interface FooterMenuProps {
 const FooterMenu = ({ route }: FooterMenuProps) => {
   const Tab = createBottomTabNavigator();
 
-  const tabs: { title: string; image: any; component: string }[] = [
+  const tabs: { title: string; image: NodeRequire; component: string }[] = [
     {
       title: "Home",
       image: require("./../../assets/footer-home.png"),

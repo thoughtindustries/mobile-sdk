@@ -7,6 +7,8 @@ import {
   Pressable,
   Linking,
   KeyboardAvoidingView,
+  Modal,
+  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Logo, Button, Link, Message } from "../components";
@@ -42,7 +44,7 @@ const Login = () => {
   }, [email]);
 
   const onSignIn = () => {
-    const params: any = {
+    const params: { email: string; password: string } = {
       email: email,
       password: password,
     };
@@ -73,6 +75,19 @@ const Login = () => {
 
   React.useEffect(() => Utils.checkLogin(navigation), []);
 
+  const ShowError = (): JSX.Element => {
+    let modalTitle = "Error Occurred";
+    let modalMessage = message.error;
+    return (
+      <Message
+        type="error"
+        title={modalTitle}
+        message={modalMessage}
+        onHide={() => setMessage({ info: "", error: "" })}
+      />
+    );
+  };
+
   return (
     <>
       {processing && (
@@ -80,16 +95,7 @@ const Login = () => {
       )}
       {!processing && (
         <ScrollView>
-          {message.error !== "" && (
-            <Message
-              type="error"
-              canClose={true}
-              message={message.error}
-              onHide={() => {
-                setMessage({ ...message, error: "" });
-              }}
-            />
-          )}
+          {message.error !== "" && <ShowError />}
           <View style={AppStyle.container}>
             <KeyboardAvoidingView
               keyboardVerticalOffset={5}

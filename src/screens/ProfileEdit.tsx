@@ -4,26 +4,33 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Modal,
-  TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
-import { Logo, Button } from "../components";
+import { Logo, Button, Message } from "../components";
 import Success from "./Success";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
-import { get } from "lodash";
-import { TI_INSTANCE_NAME } from "@env";
+import _ from "lodash";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
+import { UserDetailType } from "../../types";
+import Utils from "../helpers/Utils";
 
 const ProfileEdit = () => {
-  const [fname, setFName] = useState<string>("");
-  const [lname, setLName] = useState<string>("");
+  const [udata, setUdata] = useState<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }>({
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
   const [processing, setProcessing] = useState<boolean>(false);
   const [message, setMessage] = useState<any>({ error: "", info: "" });
-  const [inlineMsg, setInlineMsg] = useState<any>({ field: "", message: "" });
 
   type ProfileEditScreenProps = StackNavigationProp<
     RootStackParamList,
@@ -32,56 +39,31 @@ const ProfileEdit = () => {
 
   const navigation = useNavigation<ProfileEditScreenProps>();
 
-  const goUpdate = () => {
-    const udata: { firstName: string; lastName: string } = {
-      firstName: fname,
-      lastName: lname,
-    };
+  const loadStoredUserData = () => {
+    Utils.fetch("udata").then((val) =>
+      setUdata(_.pick(val, ["id", "firstName", "lastName", "email"]))
+    );
+  };
 
+  useEffect(loadStoredUserData, []);
+
+  const goUpdate = () => {
     setProcessing(true);
 
     tiApiObj
-      .createUser(udata)
-      .then(() => {
+      .updateUser(udata)
+      .then((res: UserDetailType | string) => {
         setProcessing(false);
         setMessage({
-          error: "",
-          info: `Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`,
+          error: _.isString(res) ? res : "",
+          info: _.isObject(res) ? "User updated successfully" : "",
         });
-        window.setTimeout(() => {
-          setMessage({ info: "", error: "" });
-          navigation.navigate("Login");
-        }, 3000);
+        return Utils.store("udata", res).then(loadStoredUserData);
       })
       .catch((err) => {
         setProcessing(false);
-        setMessage({ info: "", error: get(err, "message", err) });
+        setMessage({ info: "", error: _.get(err, "message", err) });
       });
-  };
-
-  const ShowRegistrationError: any = () => {
-    let modalTitle = "Email in use";
-    let modalMessage =
-      "Sorry, that email address is already in use. Please try another one or log in if you already have an account.";
-    return (
-      <Modal animationType="slide" transparent={true} visible={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalDialog}>
-            <Text style={styles.modalTitle}>{modalTitle}</Text>
-            <Text style={styles.modalMessage}>{modalMessage}</Text>
-            <Button
-              title="Log into existing account"
-              onPress={() => navigation.navigate("Login")}
-            />
-            <TouchableOpacity
-              onPress={() => setMessage({ error: "", info: "" })}
-            >
-              <Text style={styles.closeBtn}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
   };
 
   return (
@@ -90,13 +72,16 @@ const ProfileEdit = () => {
         <Success title="" message="Registration going on, Please wait.. " />
       )}
 
-      {!processing && message.info !== "" && (
-        <Success title="Success" message={message.info} />
-      )}
-
-      {!processing && message.info === "" && (
+      {!processing && (
         <View style={AppStyle.container}>
-          {message.error !== "" && <ShowRegistrationError />}
+          {(message.error !== "" || message.info !== "") && (
+            <Message
+              type={message.error !== "" ? "error" : "info"}
+              title={message.info !== "" ? "Profile Edit" : "Error Occurred"}
+              message={message.info !== "" ? message.info : message.error}
+              onHide={() => setMessage({ info: "", error: "" })}
+            />
+          )}
 
           <KeyboardAvoidingView
             style={styles.keyboardOffset}
@@ -112,16 +97,20 @@ const ProfileEdit = () => {
               <TextInput
                 textContentType="name"
                 placeholder="First Name"
-                onChangeText={setFName}
-                defaultValue={fname}
+                onChangeText={(text: string) => {
+                  setUdata({ ...udata, firstName: text });
+                }}
+                defaultValue={udata.firstName}
                 style={AppStyle.input}
               />
               <Text style={AppStyle.label}>Last Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="Last Name"
-                onChangeText={setLName}
-                defaultValue={lname}
+                onChangeText={(text: string) => {
+                  setUdata({ ...udata, lastName: text });
+                }}
+                defaultValue={udata.lastName}
                 style={AppStyle.input}
               />
               <Button title="Update" onPress={goUpdate} />
@@ -151,42 +140,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
-  },
-
-  modalContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#18242Ebb",
-    height: "100%",
-  },
-
-  modalDialog: {
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    margin: 40,
-    padding: 40,
-  },
-
-  modalTitle: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 16,
-    lineHeight: 24,
-  },
-
-  modalMessage: {
-    fontFamily: "Inter_400Regular",
-    paddingTop: 16,
-    fontSize: 12,
-    color: "#6B7280",
-    lineHeight: 15,
-    textAlign: "left",
-  },
-
-  closeBtn: {
-    color: "#6B7280",
-    fontSize: 14,
-    alignSelf: "center",
   },
 });
 
