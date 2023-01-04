@@ -45,7 +45,8 @@ const App = () => {
 
   const RouterContainer = () => (
     <NavigationContainer theme={MyTheme}>
-      <Stack.Navigator initialRouteName="Onboarding" screenOptions={opts}>
+      <Stack.Navigator initialRouteName="SplashScreen" screenOptions={opts}>
+        <Stack.Screen name="SplashScreen" component={Screens.SplashScreen} />
         <Stack.Screen name="Offline" component={Screens.Offline} />
         <Stack.Screen name="Onboarding" component={Screens.Onboarding} />
         <Stack.Screen name="Login" component={Screens.Login} />
