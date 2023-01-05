@@ -1,27 +1,29 @@
-import React, {useEffect, useState} from 'react';
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
-import { Loader } from '../components';
+import React, { useEffect } from "react";
+import { StyleSheet, View, ImageBackground } from "react-native";
+import { Loader } from "../components";
 
 interface Props {
   navigation: any;
 }
-const SplashScreen = (props:Props) => {
-    useEffect(() => {
-        window.setTimeout(() => props.navigation.navigate('Onboarding'), 3000);
-      }, []);
+const SplashScreen = (props: Props) => {
+  useEffect(() => {
+    window.setTimeout(() => props.navigation.navigate("Onboarding"), 5000);
+  }, []);
 
-      return (
-        <View style={styles.container}>
-        <ImageBackground source={require("../../assets/start-screen.png")} resizeMode="cover" style={styles.image} >
-          <View style={styles.loader}>
+  return (
+    <View style={styles.container}>
+      <ImageBackground
+        source={require("../../assets/start-screen.png")}
+        resizeMode="cover"
+        style={styles.image}
+      >
+        <View style={styles.loader}>
           <Loader size={50} />
-          </View> 
-        </ImageBackground>
         </View>
-        
-      );
-
-}
+      </ImageBackground>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -29,15 +31,14 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
-    justifyContent: "center"
+    justifyContent: "center",
   },
-  loader:{
+  loader: {
     lineHeight: 4,
     textAlign: "center",
     justifyContent: "flex-start",
     alignItems: "center",
-  }
-
+  },
 });
 
 export default SplashScreen;
