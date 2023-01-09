@@ -1,6 +1,7 @@
 import axios from "axios";
 import { get } from "lodash";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
+import { courseListType } from "../../types";
 
 interface LoginProps {
   email: string;
@@ -36,6 +37,39 @@ class TIGraphQL {
   getTopCategories(): Promise<string[]> {
     return new Promise((resolve, reject) => {
       resolve(["Partner", "Enablement", "News", "Release", "Sales Enablement"]);
+    });
+  }
+
+  fetchCourses(params: { page: number }): Promise<courseListType[]> {
+    const gql = {
+      query: `query CatalogContent(
+        $page: Int!
+      ) {
+        CatalogContent(
+          page: $page
+        ) {
+          contentItems {
+            asset
+            authors
+            title
+            displayCourse
+          }
+        }
+      }`,
+      variables: params,
+    };
+
+    return new Promise((resolve, reject) => {
+      axios
+        .post(this.gurl, gql)
+        .then((res) => {
+          if (get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            resolve(res.data.data.CatalogContent.contentItems);
+          }
+        })
+        .catch(reject);
     });
   }
 }

@@ -1,183 +1,188 @@
-import React from "react";
-import { UserHeader, Link } from "../components";
-import { truncate } from "lodash";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
-import { SearchBar, SearchBarProps } from 'react-native-elements';
-import { 
-    View, 
-    Image, 
-    Text, 
-    StyleSheet,
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  FlatList,
 } from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import _ from "lodash";
+import tiGql from "../helpers/TIGraphQL";
+import { courseListType } from "../../types";
 
-
-
-
-const SafeSearchBar = (SearchBar as unknown) as React.FC<SearchBarBaseProps>;\
 const ExploreCatalog = () => {
-    const [value, setValue] = React.useState("");
-    const Search = () => (
-        <View>
-            import * as React from "react";
-import { SearchBar } from "@rneui/base";
+  const [filters, setFilters] = useState({
+    search: "",
+    page: 0,
+    searching: false,
+  });
+  const [courses, setCourses] = useState<courseListType[]>([]);
+  const [showFilter, setShowFilter] = useState(false);
 
-export default () => {
- 
-  return (
-    <SearchBar
-      platform="default"
-      containerStyle={{}}
-      inputContainerStyle={{}}
-      inputStyle={{}}
-      leftIconContainerStyle={{}}
-      rightIconContainerStyle={{}}
-      loadingProps={{}}
-      onChangeText={newVal => setValue(newVal)}
-      onClearText={() => console.log(onClearText())}
-      placeholder="Type query here..."
-      placeholderTextColor="#888"
-      cancelButtonTitle="Cancel"
-      cancelButtonProps={{}}
-      onCancel={() => console.log(onCancel())}
-      value={value}
-    />
-  );
-}
-        </View>
-    );
+  const fetchCourses = () => {
+    setFilters({ ...filters, page: filters.page + 1 });
+    tiGql
+      .fetchCourses({ page: filters.page })
+      .then((data) => setCourses([...courses, ...data]))
+      .then(() => console.log("page : ", filters.page))
+      .catch(console.log);
+  };
 
-    
+  useEffect(() => console.log(courses), [courses]);
 
+  useEffect(fetchCourses, []);
+
+  const goSearch = () => {
+    console.log(filters.search);
+  };
+
+  const SearchBar = () => {
     return (
-        <View><Text>Welocme To Explore Catalog Page</Text></View>
+      <View style={styles.searchboxContainer}>
+        <TextInput
+          onChangeText={(text) => setFilters({ ...filters, search: text })}
+          defaultValue={filters.search}
+          style={styles.searchbox}
+          placeholder="Search by Title, Instructor or Tag"
+        />
+        <Pressable onPress={() => goSearch()} style={styles.magnify}>
+          <MaterialCommunityIcons name="magnify" size={22} color="#232323" />
+        </Pressable>
+        <Pressable style={styles.filterbtn} onPress={() => setShowFilter(true)}>
+          <MaterialCommunityIcons
+            name="filter-variant"
+            size={25}
+            color="#232323"
+          />
+        </Pressable>
+      </View>
     );
+  };
 
-}
+  const CourseItem = (props: { data: courseListType }) => {
+    return (
+      <View style={styles.courseRow}>
+        <View style={styles.courseLeftBox}>
+          <Text style={styles.courseTitle}>{props.data.title}</Text>
+          {props.data.authors.length > 0 && (
+            <Text style={styles.courseAuthor}>
+              By {props.data.authors.join(",")}
+            </Text>
+          )}
+        </View>
+        <Image source={{ uri: props.data.asset }} style={styles.courseImage} />
+      </View>
+    );
+  };
+
+  return (
+    <View>
+      <View>
+        <Text style={styles.title}>Explore The Catalog</Text>
+      </View>
+      <SearchBar />
+      {filters.searching && <Text>Loading</Text>}
+      {courses.length > 0 && (
+        <FlatList
+          data={courses}
+          renderItem={({ item }) => <CourseItem data={item} />}
+          onEndReached={fetchCourses}
+          onEndReachedThreshold={0.5}
+          style={{ marginBottom: 130 }}
+        />
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    page: {
-      marginTop: 20,
-      marginLeft: 20,
-      marginRight: 20,
-    },
-  
-    bannerContainer: {
-      borderRadius: 10,
-    },
-  
-    bannerArea: {
-      height: 282,
-      padding: 32,
-      justifyContent: "flex-end",
-      fontFamily: "Poppins_400Regular",
-    },
-  
-    bannerTitle: {
-      fontSize: 24,
-      lineHeight: 36,
-      fontFamily: "Poppins_700Bold",
-      color: "#fff",
-    },
-  
-    bannerText: {
-      fontSize: 16,
-      lineHeight: 24,
-      fontFamily: "Poppins_400Regular",
-      color: "#ccc",
-    },
-  
-    topCatBox: {
-      marginTop: 10,
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-  
-    heading: {
-      marginTop: 15,
-      fontSize: 16,
-      lineHeight: 24,
-      fontFamily: "Poppins_700Bold",
-      color: "#000",
-    },
-  
-    catContainer: {
-      display: "flex",
-      flexDirection: "row",
-      padding: 5,
-    },
-  
-    courseContainer: {
-      display: "flex",
-      flexDirection: "row",
-      padding: 5,
-    },
-  
-    catBox: {
-      backgroundColor: "#f9fafv",
-      borderWidth: 1,
-      borderStyle: "solid",
-      borderColor: "#d1d5db",
-      borderRadius: 8,
-      alignItems: "center",
-      minWidth: 104,
-      margin: 4,
-    },
-  
-    courseBox: {
-      marginTop: 5,
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-  
-    recContentBox: {
-      backgroundColor: "#FAFAFA",
-      borderStyle: "solid",
-      borderColor: "#E5E7EB",
-      width: 260,
-      margin: 12,
-    },
-  
-    catTitle: {
-      color: "#1f2937",
-      fontWeight: "400",
-      fontSize: 14,
-      lineHeight: 24,
-      paddingTop: 13,
-      paddingBottom: 13,
-      paddingLeft: 5,
-      paddingRight: 5,
-    },
-    courseTitle: {
-      color: "#D4D4D8",
-      fontWeight: "700",
-      fontSize: 16,
-      justifyContent: "flex-start",
-      lineHeight: 50,
-    },
-    recCourseTitle: {
-      color: "#1F2937",
-      fontWeight: "700",
-      fontSize: 16,
-      lineHeight: 50,
-    },
-    courseDes: {
-      color: "#6B7280",
-      fontSize: 12,
-      fontWeight: "400",
-      lineHeight: 18,
-    },
-    courseThumbnail: {
-      width: 260,
-      height: 150,
-    },
-    contentArea: {
-      padding: 32,
-      fontFamily: "Poppins_400Regular",
-    },
-  });
+  page: {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+
+  title: {
+    fontSize: 20,
+    lineHeight: 36,
+    textAlign: "left",
+    color: "#1F2937",
+    marginTop: 20,
+    fontFamily: "Poppins_700Bold",
+  },
+
+  searchboxContainer: {
+    marginTop: 10,
+    marginBottom: 10,
+    height: 50,
+    display: "flex",
+    flexDirection: "row",
+  },
+
+  searchbox: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#E5E7EB",
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#F9FAFB",
+    flexGrow: 1,
+  },
+
+  magnify: {
+    right: 70,
+    top: 15,
+    position: "absolute",
+  },
+
+  filterbtn: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#E5E7EB",
+    borderRadius: 5,
+    padding: 10,
+    width: 50,
+    height: 50,
+    marginLeft: 5,
+    alignSelf: "center",
+  },
+
+  courseRow: {
+    display: "flex",
+    flexDirection: "row",
+    padding: 15,
+    borderBottomWidth: 1,
+    paddingBottom: 10,
+    borderBottomColor: "#ccc",
+  },
+
+  courseLeftBox: {
+    flexGrow: 1,
+  },
+
+  courseTitle: {
+    fontSize: 16,
+    maxWidth: "80%",
+    lineHeight: 24,
+    textAlign: "left",
+    color: "#1F2937",
+    fontFamily: "Poppins_700Bold",
+  },
+
+  courseAuthor: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    color: "#6B7280",
+  },
+
+  courseImage: {
+    width: 75,
+    height: 75,
+    borderRadius: 15,
+  },
+});
 
 export default ExploreCatalog;

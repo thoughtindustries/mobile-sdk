@@ -9,7 +9,7 @@ export type RootStackParamList = {
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
-  ProfileEdit:undefined;
+  ProfileEdit: undefined;
 };
 
 export type UserDetailType = {
@@ -38,4 +38,11 @@ export type UserDetailType = {
   ref8?: string;
   ref9?: string;
   ref10?: string;
+};
+
+export type courseListType = {
+  asset: string;
+  authors: string[];
+  title: string;
+  displayCourse: string;
 };
