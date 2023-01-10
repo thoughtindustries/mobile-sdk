@@ -3,11 +3,16 @@ import {
   View,
   Text,
   Image,
+  Modal,
   TextInput,
   StyleSheet,
   Pressable,
   FlatList,
+  ScrollView,
 } from "react-native";
+
+import CheckBox from "@react-native-community/checkbox";
+
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
@@ -16,6 +21,9 @@ import { courseListType } from "../../types";
 const ExploreCatalog = () => {
   const [filters, setFilters] = useState({
     search: "",
+    duration: "",
+    difficulty: "",
+    tags: "",
     page: 0,
     searching: false,
   });
@@ -78,11 +86,48 @@ const ExploreCatalog = () => {
     );
   };
 
+  const CourseFilter = () => {
+    return (
+      <Modal animationType="slide" transparent={true} visible={showFilter}>
+        <View style={styles.filterContainer}>
+          <Text style={styles.filterHeading}>Filters</Text>
+
+          <ScrollView>
+            <View style={styles.filterBox}>
+              <Text style={styles.filterTitle}>Duration</Text>
+            </View>
+            <View style={styles.filterBox}>
+              <Text style={styles.filterTitle}>Difficulty Level</Text>
+            </View>
+            <View style={styles.filterBox}>
+              <Text style={styles.filterTitle}>Tags</Text>
+            </View>
+          </ScrollView>
+
+          <View style={styles.row}>
+            <Pressable
+              style={styles.clearbtn}
+              onPress={() => setShowFilter(false)}
+            >
+              <Text style={styles.clearbtntxt}>Clear All</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.applybtn}
+              onPress={() => setShowFilter(false)}
+            >
+              <Text style={styles.applybtntxt}>Apply Filter</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   return (
-    <View>
-      <View>
-        <Text style={styles.title}>Explore The Catalog</Text>
-      </View>
+    <View style={styles.page}>
+      <Text style={styles.title}>Explore The Catalog</Text>
+
       <SearchBar />
       {filters.searching && <Text>Loading</Text>}
       {courses.length > 0 && (
@@ -91,21 +136,22 @@ const ExploreCatalog = () => {
           renderItem={({ item }) => <CourseItem data={item} />}
           onEndReached={fetchCourses}
           onEndReachedThreshold={0.5}
-          style={{ marginBottom: 130 }}
+          style={styles.listStyle}
         />
       )}
+      <CourseFilter />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   page: {
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
+    margin: 10,
+    marginBottom: 10,
   },
 
   title: {
+    paddingTop: 10,
     fontSize: 20,
     lineHeight: 36,
     textAlign: "left",
@@ -115,8 +161,6 @@ const styles = StyleSheet.create({
   },
 
   searchboxContainer: {
-    marginTop: 10,
-    marginBottom: 10,
     height: 50,
     display: "flex",
     flexDirection: "row",
@@ -130,6 +174,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#F9FAFB",
     flexGrow: 1,
+  },
+
+  listStyle: {
+    marginBottom: 120,
+    marginLeft: -10,
+    marginRight: -10,
   },
 
   magnify: {
@@ -182,6 +232,68 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     borderRadius: 15,
+  },
+
+  filterContainer: {
+    backgroundColor: "#fff",
+    height: "100%",
+    paddingTop: 10,
+    borderRadius: 20,
+  },
+
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  filterHeading: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    color: "#1F2937",
+    fontFamily: "Poppins_700Bold",
+  },
+
+  filterBox: {
+    borderTopWidth: 1,
+    padding: 10,
+    borderTopColor: "#D1D5DB",
+  },
+
+  filterTitle: {
+    fontSize: 16,
+    lineHeight: 24,
+    paddingTop: 16,
+    color: "#1F2937",
+    fontFamily: "Poppins_400Regular",
+  },
+
+  clearbtn: {
+    flexGrow: 1,
+    margin: 2,
+  },
+
+  clearbtntxt: {
+    color: "#3B1FA3",
+    textAlign: "center",
+    lineHeight: 40,
+    fontFamily: "Inter_700Bold",
+  },
+
+  applybtn: {
+    flexGrow: 1,
+    backgroundColor: "#3B1FA3",
+    borderRadius: 4,
+    margin: 2,
+  },
+
+  applybtntxt: {
+    color: "#fff",
+    textAlign: "center",
+    lineHeight: 40,
+    fontFamily: "Inter_700Bold",
   },
 });
 
