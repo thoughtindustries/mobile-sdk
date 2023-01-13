@@ -2,6 +2,8 @@ import axios from "axios";
 import { get } from "lodash";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
 import { courseListType } from "../../types";
+import _ from "lodash";
+import Utils from "../helpers/Utils";
 
 interface LoginProps {
   email: string;
@@ -36,17 +38,73 @@ class TIGraphQL {
 
   getTopCategories(): Promise<string[]> {
     return new Promise((resolve, reject) => {
-      resolve(["Partner", "Enablement", "News", "Release", "Sales Enablement"]);
+      resolve(Utils.topCategoriesArray);
     });
   }
 
-  fetchCourses(params: { page: number }): Promise<courseListType[]> {
+  fetchCourses(params: {
+    sortBy: string;
+    duration: string;
+    difficulty: string;
+    tag: string;
+    page: number;
+  }): Promise<courseListType[]> {
+    let gql1 = `query CatalogContent(
+      $page: Int!,
+      $sortColumn: SortColumn,
+      $sortDirection: SortDirection`;
+
+    let gql2 = `page: $page,
+      sortColumn: $sortColumn,
+      sortDirection: $sortDirection
+      `;
+
+    let vars: {
+      [key: string]: string | number | string[];
+    } = {
+      page: params.page,
+      sortColumn: "title",
+      sortDirection: params.sortBy,
+    };
+
+    if (!_.isEmpty(params.tag)) {
+      gql1 = `${gql1},
+      $query: String`;
+
+      gql2 = `${gql2},
+      query: $query`;
+
+      vars["query"] = `tags:${params.tag}`;
+    }
+
+    if (!_.isEmpty(params.duration) || !_.isEmpty(params.difficulty)) {
+      gql1 = `${gql1},
+      $labels: [String!],
+      $values: [String!]`;
+
+      gql2 = `${gql2},
+      labels: $labels,
+      values: $values`;
+
+      vars["labels"] = [];
+      vars["values"] = [];
+
+      if (!_.isEmpty(params.duration)) {
+        vars["labels"].push("Duration");
+        vars["values"].push(params.duration);
+      }
+
+      if (!_.isEmpty(params.difficulty)) {
+        vars["labels"].push("Level of Difficulty");
+        vars["values"].push(params.difficulty);
+      }
+    }
+
     const gql = {
-      query: `query CatalogContent(
-        $page: Int!
+      query: `${gql1},
       ) {
         CatalogContent(
-          page: $page
+          ${gql2}
         ) {
           contentItems {
             asset
@@ -56,7 +114,7 @@ class TIGraphQL {
           }
         }
       }`,
-      variables: params,
+      variables: vars,
     };
 
     return new Promise((resolve, reject) => {

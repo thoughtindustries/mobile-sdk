@@ -40,6 +40,20 @@ const Utils = {
       return false;
     }
   },
+
+  topCategoriesArray: [
+    "Partner",
+    "Enablement",
+    "News",
+    "Release",
+    "Sales Enablement",
+  ],
+
+  filterValues: {
+    duration: ["1 Hour", "3 - 8 Hours", "9 - 16 Hours", "A couple of days"],
+    difficulty: ["Beginner", "Intermediate", "Advanced"],
+    tags: ["QuickStart", "Business"],
+  },
 };
 
 export default Utils;
