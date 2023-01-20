@@ -60,7 +60,7 @@ const Login = () => {
     setProcessing(true);
     tiGql
       .goLogin(params)
-      .then((token) => Utils.store("logintoken", token)) //== got login token, save it locally
+      .then((token) => Utils.store("logintoken", { token: token })) //== got login token, save it locally
       .then(() => tiApi.userDetails(params.email)) //== fetch user data of logged in user
       .then((udata) => Utils.store("udata", udata)) //== save user data locally
       .then(() => {

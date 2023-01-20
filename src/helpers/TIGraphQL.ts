@@ -13,6 +13,15 @@ interface LoginProps {
 class TIGraphQL {
   gurl = `${TI_API_INSTANCE}/helium?apiKey=${TI_API_KEY}`;
 
+  headers(headers = {}) {
+    return Utils.fetch("logintoken").then((authToken) => ({
+      headers: {
+        authToken: authToken.token,
+        ...headers,
+      },
+    }));
+  }
+
   goLogin(params: LoginProps): Promise<string> {
     const gql = {
       query: `mutation Login($email: String!, $password: String!){
@@ -44,6 +53,7 @@ class TIGraphQL {
 
   fetchCourses(params: {
     sortBy: string;
+    sortDir: string;
     duration: string;
     difficulty: string;
     tag: string;
@@ -63,8 +73,8 @@ class TIGraphQL {
       [key: string]: string | number | string[];
     } = {
       page: params.page,
-      sortColumn: "title",
-      sortDirection: params.sortBy,
+      sortColumn: params.sortBy,
+      sortDirection: params.sortDir,
     };
 
     if (!_.isEmpty(params.tag)) {
@@ -118,13 +128,105 @@ class TIGraphQL {
     };
 
     return new Promise((resolve, reject) => {
-      axios
-        .post(this.gurl, gql)
+      this.headers()
+        .then((headers) => axios.post(this.gurl, gql, headers))
         .then((res) => {
           if (get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
             resolve(res.data.data.CatalogContent.contentItems);
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  myLearnings(params: {
+    sortBy: string;
+    sortDir: string;
+    tag: string;
+  }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
+    let gql1 = `query MyLearning(
+      $sortColumn: SortColumn,
+      $sortDirection: SortDirection`;
+
+    let gql2 = `sortColumn: $sortColumn,
+      sortDirection: $sortDirection
+      `;
+
+    let vars: {
+      [key: string]: string | number | string[];
+    } = {
+      sortColumn: params.sortBy,
+      sortDirection: params.sortDir,
+    };
+
+    if (!_.isEmpty(params.tag)) {
+      gql1 = `${gql1},
+      $query: String`;
+
+      gql2 = `${gql2},
+      query: $query`;
+
+      vars["query"] = `tags:${params.tag}`;
+    }
+
+    const gql = {
+      query: `${gql1},
+      ) {
+        UserContentItems(
+          ${gql2}
+        ) {
+          id
+          title
+          asset
+          contentTypeLabel
+        }
+        UserRecentContent(limit:1) {
+          id
+          title
+          asset
+          contentTypeLabel
+        }
+      }`,
+      variables: vars,
+    };
+
+    return new Promise((resolve, reject) => {
+      this.headers()
+        .then((headers) => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            resolve({
+              items: res.data.data.UserContentItems,
+              recent: res.data.data.UserRecentContent,
+            });
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  courseProgress(cid: string) {
+    const gql = {
+      query: `query CourseProgress($id: ID!) {
+        UserCourseProgress(id: $id) {
+          percentComplete
+        }
+      }`,
+      variables: { id: cid },
+    };
+
+    return new Promise((resolve, reject) => {
+      this.headers()
+        .then((headers) => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            resolve(res.data.UserCourseProgress.percentComplete);
           }
         })
         .catch(reject);

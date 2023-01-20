@@ -6,6 +6,8 @@ import Loader from "./Loader";
 import FooterMenu from "./FooterMenu";
 import UserHeader from "./UserHeader";
 import Checkbox from "./Checkbox";
+import Searchbar from "./Searchbar";
+import FilterControl from "./FilterControl";
 
 export {
   Button,
@@ -16,4 +18,6 @@ export {
   FooterMenu,
   UserHeader,
   Checkbox,
+  Searchbar,
+  FilterControl,
 };

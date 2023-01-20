@@ -26,7 +26,7 @@ const FooterMenu = ({ route }: FooterMenuProps) => {
     {
       title: "My Learning",
       image: require("./../../assets/footer-mylearning-d.png"),
-      component: "Offline",
+      component: "MyLearnings",
     },
     {
       title: "Account",
