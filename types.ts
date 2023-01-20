@@ -41,8 +41,18 @@ export type UserDetailType = {
 };
 
 export type courseListType = {
+  id: string;
   asset: string;
-  authors: string[];
+  authors?: string[];
   title: string;
-  displayCourse: string;
+  displayCourse?: string;
+  contentTypeLabel?: string;
+};
+
+export type filtersType = {
+  sortBy: string;
+  sortDir: string;
+  duration: string;
+  difficulty: string;
+  tag: string;
 };
