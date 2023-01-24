@@ -135,13 +135,5 @@ class Db {
       });
     });
   }
-
-  selectNow() {
-    this.db.transaction((tx) => {
-      tx.executeSql("select * from items", [], (_, { rows }) =>
-        console.log("got it", JSON.stringify(rows))
-      );
-    });
-  }
 }
 export default new Db();

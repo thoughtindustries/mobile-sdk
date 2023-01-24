@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
+import dbObj from "../helpers/Db";
 
 interface Props {
   navigation: any;
 }
 const SplashScreen = (props: Props) => {
   useEffect(() => {
+    dbObj.init().then(() => console.log("Database initiated..."));
     window.setTimeout(() => props.navigation.navigate("Onboarding"), 5000);
   }, []);
 

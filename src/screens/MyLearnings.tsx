@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  TextInput,
   StyleSheet,
   FlatList,
   ScrollView,
@@ -15,6 +14,8 @@ import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import Utils from "../helpers/Utils";
+
+import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
@@ -42,6 +43,22 @@ const MyLearnings = () => {
     showFilter: false,
   });
   const [fetchAgain, setFetchAgain] = useState(1);
+
+  const offlineData = (course: courseListType, mode: boolean) => {
+    Utils.fetch("user_dbid")
+      .then(({ id }) => dbObj.saveCourse(id, course, mode))
+      .then(() =>
+        setContent({
+          ...content,
+          items: content.items.map((c) => {
+            if (c.id === course.id) {
+              c.isOffline = mode;
+            }
+            return c;
+          }),
+        })
+      );
+  };
 
   const fetchCourses = (
     isPaginated: Boolean = true,
@@ -75,6 +92,38 @@ const MyLearnings = () => {
       );
   };
 
+  const fetchCourseProgresses = () => {
+    return new Promise<void>((resolve, reject) => {
+      const cids = content.items
+        .filter((c) => c.contentTypeLabel === "Course")
+        .map((c) => c.id);
+      let idx: number = -1;
+      const fetchCourseProgress = () => {
+        if (cids.length <= ++idx) {
+          resolve();
+        } else {
+          tiGql
+            .courseProgress(cids[idx])
+            .then((cp) => {
+              setContent({
+                ...content,
+                items: content.items.map((c) => {
+                  if (c.id === cids[idx]) {
+                    _.set(c, "progress", cp);
+                  }
+                  return c;
+                }),
+              });
+            })
+            .then(fetchCourseProgress)
+            .catch(fetchCourseProgress);
+        }
+      };
+
+      fetchCourseProgress();
+    });
+  };
+
   const fetchMyLearnings = () => {
     setPageVars({
       ...pageVars,
@@ -95,12 +144,12 @@ const MyLearnings = () => {
           fetchCourses(false, 1);
         }
       })
+      .then(() => fetchCourseProgresses())
       .catch(console.log)
       .finally(() =>
         setPageVars({ ...pageVars, showFilter: false, searching: false })
       );
   };
-
   useEffect(() => fetchMyLearnings(), [fetchAgain]);
 
   const onFilter = (flts: filtersType) => {
@@ -108,6 +157,9 @@ const MyLearnings = () => {
     setCourses([]);
     setFetchAgain(fetchAgain + 1);
   };
+
+  const filteredContents = () =>
+    content.items.filter((c) => c.title.includes(pageVars.search));
 
   const filteredCourses = () => {
     let data = courses.filter(
@@ -163,16 +215,33 @@ const MyLearnings = () => {
             >
               {props.data.contentTypeLabel}
             </Text>
-            <MaterialCommunityIcons name="download" size={22} color="#232323" />
+            {props.data.isOffline !== true && (
+              <MaterialCommunityIcons
+                name="download"
+                size={22}
+                color="#232323"
+                onPress={() => offlineData(props.data, true)}
+              />
+            )}
+            {props.data.isOffline == true && (
+              <MaterialCommunityIcons
+                name="close-circle-outline"
+                size={22}
+                color="#232323"
+                onPress={() => offlineData(props.data, false)}
+              />
+            )}
           </View>
           <Text style={styles.courseTitle}>{props.data.title}</Text>
           {props.data.contentTypeLabel === "Course" && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
                 <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>{50}%</Text>
+                <Text style={styles.note}>
+                  {_.get(props, "data.progress", 0)}%
+                </Text>
               </View>
-              <ProgressBar percent={50} />
+              <ProgressBar percent={_.get(props, "data.progress", 0)} />
             </View>
           )}
         </View>
@@ -230,7 +299,7 @@ const MyLearnings = () => {
 
   const ContentList = () => (
     <FlatList
-      data={content.items}
+      data={filteredContents()}
       renderItem={({ item }) => <ContentItem data={item} />}
       style={styles.contentListStyle}
       ListEmptyComponent={
@@ -370,7 +439,7 @@ const styles = StyleSheet.create({
   },
 
   contentListStyle: {
-    height: "40%",
+    height: "45%",
     marginBottom: 170,
   },
 
