@@ -57,9 +57,9 @@ const Utils = {
     tags: ["QuickStart", "Business"],
     myLearningsEvent: [
       "All",
-      "Events",
-      "Completed",
-      "Certifications",
+      //"Events",
+      //"Completed",
+      //"Certifications",
       "Offline",
     ],
   },

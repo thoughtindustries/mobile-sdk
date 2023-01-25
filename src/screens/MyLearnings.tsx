@@ -45,8 +45,12 @@ const MyLearnings = () => {
   const [fetchAgain, setFetchAgain] = useState(1);
 
   const offlineData = (course: courseListType, mode: boolean) => {
+    let user_id: number;
     Utils.fetch("user_dbid")
-      .then(({ id }) => dbObj.saveCourse(id, course, mode))
+      .then(({ id }) => (user_id = id))
+      .then(() => saveAsset(course.asset))
+      .then((asset) => (course.asset = asset))
+      .then(() => dbObj.saveCourse(user_id, course, mode))
       .then(() =>
         setContent({
           ...content,
@@ -58,6 +62,21 @@ const MyLearnings = () => {
           }),
         })
       );
+  };
+
+  const markOfflineStatus = () => {
+    Utils.fetch("user_dbid")
+      .then(({ id }) => dbObj.fetchOfflineCourses(id, false))
+      .then((courses: { cid: string }[]) => {
+        const cids = courses.map((c) => c.cid);
+        setContent({
+          ...content,
+          items: content.items.map((c) => {
+            c.isOffline = cids.includes(c.id);
+            return c;
+          }),
+        });
+      });
   };
 
   const fetchCourses = (
@@ -144,7 +163,8 @@ const MyLearnings = () => {
           fetchCourses(false, 1);
         }
       })
-      .then(() => fetchCourseProgresses())
+      .then(fetchCourseProgresses)
+      .then(markOfflineStatus)
       .catch(console.log)
       .finally(() =>
         setPageVars({ ...pageVars, showFilter: false, searching: false })
