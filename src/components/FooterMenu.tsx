@@ -21,12 +21,12 @@ const FooterMenu = ({ route }: FooterMenuProps) => {
     {
       title: "Explore",
       image: require("./../../assets/footer-explore-d.png"),
-      component: "Offline",
+      component: "ExploreCatalog",
     },
     {
       title: "My Learning",
       image: require("./../../assets/footer-mylearning-d.png"),
-      component: "MyLearning",
+      component: "MyLearnings",
     },
     {
       title: "Account",

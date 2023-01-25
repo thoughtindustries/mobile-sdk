@@ -7,6 +7,9 @@ import Home from "./Home";
 import MyLearnings from "./MyLearnings";
 import Account from "./Account";
 import ProfileEdit from "./ProfileEdit";
+import SplashScreen from "./SplashScreen";
+import ExploreCatalog from "./ExploreCatalog";
+
 export default {
   Onboarding,
   Login,
@@ -17,4 +20,6 @@ export default {
   MyLearnings,
   Account,
   ProfileEdit,
+  SplashScreen,
+  ExploreCatalog,
 };

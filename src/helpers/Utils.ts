@@ -9,9 +9,9 @@ const Utils = {
 
   fetch: (name: string) => {
     return AsyncStorage.getItem(name).then((val) => {
-      if (!_.isEmpty(val)) {
-        return JSON.parse(val);
-      } else {
+      try {
+        return JSON.parse(val || "{}");
+      } catch (e) {
         return val;
       }
     });
@@ -39,6 +39,27 @@ const Utils = {
     } catch (exception) {
       return false;
     }
+  },
+
+  topCategoriesArray: [
+    "Partner",
+    "Enablement",
+    "News",
+    "Release",
+    "Sales Enablement",
+  ],
+
+  filterValues: {
+    duration: ["1 Hour", "3 - 8 Hours", "9 - 16 Hours", "A couple of days"],
+    difficulty: ["Beginner", "Intermediate", "Advanced"],
+    tags: ["QuickStart", "Business"],
+    myLearningsEvent: [
+      "All",
+      "Events",
+      "Completed",
+      "Certifications",
+      "Offline",
+    ],
   },
 };
 
