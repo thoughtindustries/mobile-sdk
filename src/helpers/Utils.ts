@@ -63,6 +63,8 @@ const Utils = {
       "Offline",
     ],
   },
+
+  isOffline: () => false,
 };
 
 export default Utils;

@@ -17,7 +17,7 @@ class Db {
   }
 
   tableUpdates() {
-    //const sql = `DROP TABLE courseList;`;
+    //const sql = `DROP TABLE courseList,users;`;
 
     return new Promise((resolve, reject) => {
       /*this.db.transaction((tx) => {
@@ -137,22 +137,24 @@ class Db {
   }
 
   fetchOfflineCourses(user_id: number, full: boolean = false) {
-    return new Promise<{ cid: string }[]>((resolve, reject) => {
-      const sql = `SELECT ${
-        full ? "*" : "cid"
-      } FROM courseList WHERE user_id=?`;
-      this.db.transaction((tx) => {
-        tx.executeSql(
-          sql,
-          [user_id],
-          (tx, { rows: { _array } }) => resolve(_array),
-          (tx, error) => {
-            reject(error.message);
-            return false;
-          }
-        );
-      });
-    });
+    return new Promise<{ [key: string]: string | number }[]>(
+      (resolve, reject) => {
+        const sql = `SELECT ${
+          full ? "*" : "cid"
+        } FROM courseList WHERE user_id=?`;
+        this.db.transaction((tx) => {
+          tx.executeSql(
+            sql,
+            [user_id],
+            (tx, { rows: { _array } }) => resolve(_array),
+            (tx, error) => {
+              reject(error.message);
+              return false;
+            }
+          );
+        });
+      }
+    );
   }
 }
 export default new Db();
