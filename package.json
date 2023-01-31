@@ -28,6 +28,8 @@
     "concurrently": "^7.6.0",
     "expo": "~47.0.7",
     "expo-app-loading": "~2.1.1",
+    "expo-asset": "~8.7.0",
+    "expo-file-system": "~15.1.1",
     "expo-font": "~11.0.1",
     "expo-splash-screen": "^0.17.5",
     "expo-sqlite": "~11.0.0",
@@ -44,10 +46,9 @@
     "react-native-web": "~0.18.9",
     "react-test-renderer": "^18.1.0",
     "rimraf": "^3.0.2",
+    "striptags": "^3.2.0",
     "ts-jest": "^29.0.3",
-    "validator": "^13.7.0",
-    "expo-file-system": "~15.1.1",
-    "expo-asset": "~8.7.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

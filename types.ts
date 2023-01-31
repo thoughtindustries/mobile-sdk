@@ -8,6 +8,7 @@ export type RootStackParamList = {
   Offline: undefined;
   Home: undefined;
   MyLearning: undefined;
+  CourseDetails: { cid: string; title: string; asset: string };
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
@@ -51,6 +52,15 @@ export type courseListType = {
   contentTypeLabel?: string;
   progress?: Float;
   isOffline?: boolean;
+};
+
+export type topicType = {
+  language?: null | string;
+  label: string;
+  title?: string;
+  subtitle?: string;
+  body?: string;
+  copyright?: string;
 };
 
 export type filtersType = {

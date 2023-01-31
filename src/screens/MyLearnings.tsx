@@ -15,13 +15,21 @@ import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import Utils from "../helpers/Utils";
-
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 
+type MyLearningScreenProps = StackNavigationProp<
+  RootStackParamList,
+  "MyLearning"
+>;
+
 const MyLearnings = () => {
+  const navigation = useNavigation<MyLearningScreenProps>();
   const [filters, setFilters] = useState<{
     sortBy: string;
     sortDir: string;
@@ -290,7 +298,19 @@ const MyLearnings = () => {
               />
             )}
           </View>
-          <Text style={styles.courseTitle}>{props.data.title}</Text>
+          <Text
+            style={styles.courseTitle}
+            onPress={() => {
+              console.log(props.data.id);
+              navigation.navigate("CourseDetails", {
+                cid: props.data.id,
+                title: props.data.title,
+                asset: props.data.asset,
+              });
+            }}
+          >
+            {props.data.title}
+          </Text>
           {props.data.contentTypeLabel === "Course" && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
