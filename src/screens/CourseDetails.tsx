@@ -77,17 +77,17 @@ const CourseDetails = () => {
               color="#374151"
               onPress={() => setFullBody(false)}
             />
-            <Text>Back</Text>
+            <Text style={styles.backBtn}>Back</Text>
           </View>
 
-          <View>
-            <Text>{_.get(content, "label", "Article Title")}</Text>
+          <View style={styles.articleHeading}>
+            <Text style={styles.headingText}>{_.get(content, "label", "Article Title")}</Text>
           </View>
         </>
       )}
       {fullBody && (
         <View style={{ padding: 20 }}>
-          <Text>{striptags(_.get(content, "body", ""))}</Text>
+          <Text style={styles.articleDetails}>{striptags(_.get(content, "body", ""))}</Text>
         </View>
       )}
     </ScrollView>
@@ -119,20 +119,44 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     color: "#D4D4D8",
   },
-
   body: {
     fontFamily: "Inter_400Regular",
     fontSize: 14,
     lineHeight: 24,
     color: "#6B7280",
   },
-
   row: {
     backgroundColor: "#fff",
     paddingTop: 40,
     display: "flex",
     flexDirection: "row",
   },
+  articleDetails: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#6B7280",
+    paddingLeft:24,
+    paddingRight:24,
+    paddingTop:16,
+},
+  backBtn: {
+  paddingTop:7,
+  paddingLeft:-3,
+},
+  articleHeading: {
+    borderTopWidth:1,
+    borderColor:"#E5E7EB",
+    backgroundColor:"#FFFFFF",
+},
+headingText: {
+  color:"#3B1FA3",
+  fontFamily: "Poppins_700Bold",
+  fontSize:16,
+  lineHeight:24,
+  padding:16,
+}
+
 });
 
 export default CourseDetails;
