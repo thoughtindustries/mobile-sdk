@@ -3,11 +3,11 @@ import {
   View,
   Text,
   Image,
-  TextInput,
   StyleSheet,
   FlatList,
   ScrollView,
   Animated,
+  Pressable,
 } from "react-native";
 
 import _ from "lodash";
@@ -15,6 +15,8 @@ import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import Utils from "../helpers/Utils";
+
+import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
@@ -30,6 +32,7 @@ const MyLearnings = () => {
     tag: "",
   });
 
+  const [tab, setTab] = useState<string>("All");
   const [courses, setCourses] = useState<courseListType[]>([]);
   const [content, setContent] = useState<{
     items: courseListType[];
@@ -42,6 +45,49 @@ const MyLearnings = () => {
     showFilter: false,
   });
   const [fetchAgain, setFetchAgain] = useState(1);
+
+  const saveAsset = (asset: string) => {
+    // download code for asset
+    return asset;
+  };
+
+  const offlineData = (course: courseListType, mode: boolean) => {
+    let user_id: number;
+    Utils.fetch("user_dbid")
+      .then(({ id }) => (user_id = id))
+      .then(() => saveAsset(course.asset))
+      .then((asset: string) => (course.asset = asset))
+      .then(() => dbObj.saveCourse(user_id, course, mode))
+      .then(() =>
+        setContent({
+          ...content,
+          items: content.items.map((c) => {
+            if (c.id === course.id) {
+              c.isOffline = mode;
+            }
+            return c;
+          }),
+        })
+      );
+  };
+
+  const markOfflineStatus = (items: courseListType[]) => {
+    return new Promise<courseListType[]>((resolve, reject) => {
+      Utils.fetch("user_dbid")
+        .then(({ id }) => dbObj.fetchOfflineCourses(id, false))
+        .then((courses: { cid: string }[]) => {
+          const cids = courses.map((c) => c.cid);
+          if (cids.length > 0) {
+            items = items.map((c) => {
+              c.isOffline = cids.includes(c.id);
+              return c;
+            });
+          }
+          resolve(items);
+        })
+        .catch(() => resolve(items));
+    });
+  };
 
   const fetchCourses = (
     isPaginated: Boolean = true,
@@ -75,38 +121,98 @@ const MyLearnings = () => {
       );
   };
 
-  const fetchMyLearnings = () => {
-    setPageVars({
-      ...pageVars,
-      searching: true,
-      showFilter: false,
-    });
-
-    tiGql
-      .myLearnings({
-        sortBy: filters.sortBy,
-        sortDir: filters.sortDir,
-        tag: filters.tag,
-      })
-      .then((data) => {
-        setContent(data);
-        //console.log(data.recent.length);
-        if (data.recent.length === 0) {
-          fetchCourses(false, 1);
+  const fetchCourseProgresses = (items: courseListType[]) => {
+    return new Promise<courseListType[]>((resolve, reject) => {
+      const cids = items
+        .filter((c) => c.contentTypeLabel === "Course")
+        .map((c) => c.id);
+      let idx: number = -1;
+      const fetchCourseProgress = () => {
+        if (cids.length <= ++idx) {
+          resolve(items);
+        } else {
+          tiGql
+            .courseProgress(cids[idx])
+            .then((cp) => {
+              items = items.map((c) => {
+                if (c.id === cids[idx]) {
+                  _.set(c, "progress", cp);
+                }
+                return c;
+              });
+            })
+            .then(fetchCourseProgress)
+            .catch(fetchCourseProgress);
         }
-      })
-      .catch(console.log)
-      .finally(() =>
-        setPageVars({ ...pageVars, showFilter: false, searching: false })
-      );
+      };
+
+      fetchCourseProgress();
+    });
   };
 
+  const fetchMyLearnings = () => {
+    if (Utils.isOffline()) {
+      Utils.fetch("user_dbid")
+        .then(({ id }) => dbObj.fetchOfflineCourses(id, true))
+        .then((items) => {
+          console.log(items);
+          setContent({
+            ...content,
+            items: items.map((i) => ({
+              id: i.cid,
+              title: i.title,
+              contentTypeLabel: i.contentTypeLabel,
+              progress: parseFloat(i.percentComplete + ""),
+              asset: i.courseThumbnail,
+              isOffline: true,
+            })),
+          });
+        });
+    } else {
+      setPageVars({
+        ...pageVars,
+        searching: true,
+        showFilter: false,
+      });
+      tiGql
+        .myLearnings({
+          sortBy: filters.sortBy,
+          sortDir: filters.sortDir,
+          tag: filters.tag,
+        })
+        .then((data) => {
+          if (data.recent.length === 0) {
+            return fetchCourses(false, 1);
+          } else {
+            return fetchCourseProgresses(data.items)
+              .then((items) => (data.items = items))
+              .then(() => markOfflineStatus(data.items))
+              .then((items) => (data.items = items))
+              .then(() => setContent(data));
+          }
+        })
+        .catch(console.log)
+        .finally(() =>
+          setPageVars({ ...pageVars, showFilter: false, searching: false })
+        );
+    }
+  };
   useEffect(() => fetchMyLearnings(), [fetchAgain]);
 
   const onFilter = (flts: filtersType) => {
     setFilters({ ...filters, ...flts });
     setCourses([]);
     setFetchAgain(fetchAgain + 1);
+  };
+
+  const filteredContents = () => {
+    if (tab === "Offline" || Utils.isOffline()) {
+      return content.items.filter(
+        (c) => c.title.includes(pageVars.search) && c.isOffline
+      );
+    } else {
+      return content.items.filter((c) => c.title.includes(pageVars.search));
+    }
   };
 
   const filteredCourses = () => {
@@ -158,21 +264,42 @@ const MyLearnings = () => {
             <Text
               style={{
                 ...styles.contentTag,
-                ..._.get(styles, props.data.contentTypeLabel, {}),
+                ..._.get(
+                  styles,
+                  _.get(props, "data.contentTypeLabel", "Course"),
+                  {}
+                ),
               }}
             >
               {props.data.contentTypeLabel}
             </Text>
-            <MaterialCommunityIcons name="download" size={22} color="#232323" />
+            {props.data.isOffline !== true && (
+              <MaterialCommunityIcons
+                name="download"
+                size={22}
+                color="#232323"
+                onPress={() => offlineData(props.data, true)}
+              />
+            )}
+            {props.data.isOffline == true && (
+              <MaterialCommunityIcons
+                name="close-circle-outline"
+                size={22}
+                color="#232323"
+                onPress={() => offlineData(props.data, false)}
+              />
+            )}
           </View>
           <Text style={styles.courseTitle}>{props.data.title}</Text>
           {props.data.contentTypeLabel === "Course" && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
                 <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>{50}%</Text>
+                <Text style={styles.note}>
+                  {_.get(props, "data.progress", 0)}%
+                </Text>
               </View>
-              <ProgressBar percent={50} />
+              <ProgressBar percent={_.get(props, "data.progress", 0)} />
             </View>
           )}
         </View>
@@ -183,9 +310,26 @@ const MyLearnings = () => {
   const CategoryFilter = () => (
     <ScrollView horizontal={true} style={styles.catContainer}>
       {Utils.filterValues.myLearningsEvent.map((cat, idx) => (
-        <View key={idx} style={styles.catBox}>
-          <Text style={styles.catTitle}>{cat}</Text>
-        </View>
+        <Pressable onPress={() => setTab(cat)}>
+          <View
+            key={idx}
+            style={{
+              ...styles.catBox,
+              ...(tab === cat ? styles.catBoxSelected : styles.catBoxNormal),
+            }}
+          >
+            <Text
+              style={{
+                ...styles.catTitle,
+                ...(tab === cat
+                  ? styles.catTitleSelected
+                  : styles.catTitleNormal),
+              }}
+            >
+              {cat}
+            </Text>
+          </View>
+        </Pressable>
       ))}
     </ScrollView>
   );
@@ -230,9 +374,13 @@ const MyLearnings = () => {
 
   const ContentList = () => (
     <FlatList
-      data={content.items}
+      data={filteredContents()}
       renderItem={({ item }) => <ContentItem data={item} />}
-      style={styles.contentListStyle}
+      style={
+        Utils.isOffline()
+          ? styles.contentListStyleOffline
+          : styles.contentListStyle
+      }
       ListEmptyComponent={
         <Text style={styles.noRecords}>
           No records found, try using other filters.
@@ -245,35 +393,41 @@ const MyLearnings = () => {
     <View style={styles.page}>
       <Text style={styles.title}>My Learning</Text>
 
-      <View style={styles.searchboxContainer}>
-        <View style={{ flexGrow: 1 }}>
-          <Searchbar
-            searchText={pageVars.search}
-            onSearch={(str: string) =>
-              setPageVars({ ...pageVars, search: str })
-            }
-          />
-        </View>
-        <FilterControl onFilter={onFilter} />
-      </View>
+      {Utils.isOffline() === true && <ContentList />}
 
-      {pageVars.searching && (
-        <View style={styles.searching}>
-          <Text style={styles.searchingText}>Loading data </Text>
-          <Loader size={50} />
-        </View>
-      )}
-      {!pageVars.searching && (
+      {Utils.isOffline() !== true && (
         <>
-          {content.recent.length > 0 && (
+          <View style={styles.searchboxContainer}>
+            <View style={{ flexGrow: 1 }}>
+              <Searchbar
+                searchText={pageVars.search}
+                onSearch={(str: string) =>
+                  setPageVars({ ...pageVars, search: str })
+                }
+              />
+            </View>
+            <FilterControl onFilter={onFilter} />
+          </View>
+
+          {pageVars.searching && (
+            <View style={styles.searching}>
+              <Text style={styles.searchingText}>Loading data </Text>
+              <Loader size={50} />
+            </View>
+          )}
+          {!pageVars.searching && (
             <>
-              <LatestActive />
-              <CategoryFilter />
-              <ContentList />
+              {content.recent.length > 0 && (
+                <>
+                  <LatestActive />
+                  <CategoryFilter />
+                  <ContentList />
+                </>
+              )}
+
+              {content.recent.length === 0 && <RecommendedList />}
             </>
           )}
-
-          {content.recent.length === 0 && <RecommendedList />}
         </>
       )}
     </View>
@@ -311,22 +465,36 @@ const styles = StyleSheet.create({
   },
 
   catBox: {
-    backgroundColor: "#f9fafv",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "#d1d5db",
     borderRadius: 8,
     alignItems: "center",
     minWidth: 104,
     margin: 4,
   },
 
+  catBoxSelected: {
+    backgroundColor: "#3B1FA3",
+  },
+
+  catBoxNormal: {
+    backgroundColor: "#f9fafv",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#d1d5db",
+  },
+
   catTitle: {
-    color: "#1f2937",
     fontWeight: "400",
     fontSize: 14,
     lineHeight: 24,
-    padding: 10,
+    padding: 8,
+  },
+
+  catTitleSelected: {
+    color: "#ffffff",
+  },
+
+  catTitleNormal: {
+    color: "#1f2937",
   },
 
   listStyle: {
@@ -370,7 +538,12 @@ const styles = StyleSheet.create({
   },
 
   contentListStyle: {
-    height: "40%",
+    height: "45%",
+    marginBottom: 170,
+  },
+
+  contentListStyleOffline: {
+    height: "90%",
     marginBottom: 170,
   },
 
