@@ -77,7 +77,7 @@ const CourseDetails = () => {
               color="#374151"
               onPress={() => setFullBody(false)}
             />
-            <Text style={styles.backBtn}>Back</Text>
+            <Text style={styles.backBtn} onPress={() => setFullBody(false)}>Back</Text>
           </View>
 
           <View style={styles.articleHeading}>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 },
   backBtn: {
   paddingTop:7,
-  paddingLeft:-3,
+  marginLeft:0,
 },
   articleHeading: {
     borderTopWidth:1,
