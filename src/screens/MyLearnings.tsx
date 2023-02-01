@@ -306,6 +306,7 @@ const MyLearnings = () => {
                 cid: props.data.id,
                 title: props.data.title,
                 asset: props.data.asset,
+                contentTypeLabel: props.data.contentTypeLabel,
               });
             }}
           >

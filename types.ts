@@ -8,7 +8,12 @@ export type RootStackParamList = {
   Offline: undefined;
   Home: undefined;
   MyLearning: undefined;
-  CourseDetails: { cid: string; title: string; asset: string };
+  CourseDetails: {
+    cid: string;
+    title: string;
+    asset: string;
+    contentTypeLabel?: string;
+  };
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
