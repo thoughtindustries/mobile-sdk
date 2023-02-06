@@ -63,7 +63,7 @@ const CourseDetails = () => {
           <View style={{ padding: 32 }}>
             <Text style={styles.body}>
               {_.truncate(striptags(_.get(content, "body", "")), {
-                length: 475,
+                length: 200,
               })}
             </Text>
             <Button
@@ -77,7 +77,6 @@ const CourseDetails = () => {
           </View>
         </>
       )}
-
       {fullBody && (
         <>
           <View style={styles.row}>
@@ -101,9 +100,14 @@ const CourseDetails = () => {
       )}
       {fullBody && (
         <View style={{ padding: 20 }}>
-          <Text style={styles.articleDetails}>
-            {striptags(_.get(content, "body", ""))}
-          </Text>
+          {_.get(route, "params.contentTypeLabel", "Article") == "Article" && (
+            <Text style={styles.articleDetails}>
+              {striptags(_.get(content, "body", ""))}
+            </Text>
+          )}
+          {_.get(route, "params.contentTypeLabel", "Video") == "Video" && (
+            <Text style={styles.articleDetails}>{JSON.stringify(content)}</Text>
+          )}
         </View>
       )}
     </ScrollView>

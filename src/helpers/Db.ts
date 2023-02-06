@@ -136,6 +136,25 @@ class Db {
     });
   }
 
+  fetchAsset(user_id: number, cid: string) {
+    return new Promise<{ [key: string]: string | number }[]>(
+      (resolve, reject) => {
+        const sql = `SELECT courseThumbnail FROM courseList WHERE user_id=? AND cid=?`;
+        this.db.transaction((tx) => {
+          tx.executeSql(
+            sql,
+            [user_id, cid],
+            (tx, { rows: { _array } }) => resolve(_array[0]["asset"]),
+            (tx, error) => {
+              reject(error.message);
+              return false;
+            }
+          );
+        });
+      }
+    );
+  }
+
   fetchOfflineCourses(user_id: number, full: boolean = false) {
     return new Promise<{ [key: string]: string | number }[]>(
       (resolve, reject) => {
