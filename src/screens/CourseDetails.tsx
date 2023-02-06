@@ -23,15 +23,18 @@ const CourseDetails = () => {
   const route = useRoute();
   const [content, setContent] = useState<topicType[]>([]);
   const [fullBody, setFullBody] = useState<Boolean>(false);
+  let cid = _.get(route, "params.cid", "");
 
   const fetchCourseDetails = () => {
-    tiGql
-      .fetchCourseDetails(_.get(route, "params.cid", ""))
-      .then(setContent)
-      .catch(console.log);
+    tiGql.fetchCourseDetails(cid).then(setContent).catch(console.log);
   };
 
-  useEffect(fetchCourseDetails, []);
+  useEffect(fetchCourseDetails, [cid]);
+
+  const ctaLabel = {
+    Article: "Read Article",
+    Video: "Open Video",
+  };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[0]}>
@@ -63,7 +66,14 @@ const CourseDetails = () => {
                 length: 475,
               })}
             </Text>
-            <Button title="Read Article" onPress={() => setFullBody(true)} />
+            <Button
+              title={_.get(
+                ctaLabel,
+                _.get(route, "params.contentTypeLabel", "abc"),
+                "Read Details"
+              )}
+              onPress={() => setFullBody(true)}
+            />
           </View>
         </>
       )}
@@ -77,17 +87,23 @@ const CourseDetails = () => {
               color="#374151"
               onPress={() => setFullBody(false)}
             />
-            <Text style={styles.backBtn} onPress={() => setFullBody(false)}>Back</Text>
+            <Text style={styles.backBtn} onPress={() => setFullBody(false)}>
+              Back
+            </Text>
           </View>
 
           <View style={styles.articleHeading}>
-            <Text style={styles.headingText}>{_.get(content, "label", "Article Title")}</Text>
+            <Text style={styles.headingText}>
+              {_.get(route, "params.title", "Article Title")}
+            </Text>
           </View>
         </>
       )}
       {fullBody && (
         <View style={{ padding: 20 }}>
-          <Text style={styles.articleDetails}>{striptags(_.get(content, "body", ""))}</Text>
+          <Text style={styles.articleDetails}>
+            {striptags(_.get(content, "body", ""))}
+          </Text>
         </View>
       )}
     </ScrollView>
@@ -136,27 +152,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: "#6B7280",
-    paddingLeft:24,
-    paddingRight:24,
-    paddingTop:16,
-},
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 16,
+  },
   backBtn: {
-  paddingTop:7,
-  marginLeft:0,
-},
+    paddingTop: 7,
+    marginLeft: 0,
+  },
   articleHeading: {
-    borderTopWidth:1,
-    borderColor:"#E5E7EB",
-    backgroundColor:"#FFFFFF",
-},
-headingText: {
-  color:"#3B1FA3",
-  fontFamily: "Poppins_700Bold",
-  fontSize:16,
-  lineHeight:24,
-  padding:16,
-}
-
+    borderTopWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF",
+  },
+  headingText: {
+    color: "#3B1FA3",
+    fontFamily: "Poppins_700Bold",
+    fontSize: 16,
+    lineHeight: 24,
+    padding: 16,
+  },
 });
 
 export default CourseDetails;
