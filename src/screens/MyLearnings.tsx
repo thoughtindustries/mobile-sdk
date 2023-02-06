@@ -23,10 +23,9 @@ import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
-import * as Permissions from 'expo-permissions';
-
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import * as Permissions from "expo-permissions";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -61,50 +60,58 @@ const MyLearnings = () => {
 
   const saveAsset = (asset: string) => {
     // download code for asset
-    let path = asset.split('/');
-    const file_name = path[path.length-1];
-    let fileUri = FileSystem.documentDirectory + file_name;
-    FileSystem.downloadAsync(asset, fileUri)
-    .then(({ uri }) => {
-      console.log('Finished downloading to ', uri);
-
-        seekPermission(fileUri);
-    })
-    .catch(error => {
-      console.error(error);
-    });
-
-    return asset;
+    let path: string[] = asset.split("/");
+    const file_name: string = path[path.length - 1];
+    let fileUri: string = FileSystem.documentDirectory + file_name;
+    return FileSystem.downloadAsync(asset, fileUri)
+      .then(() => seekPermission(fileUri))
+      .then(() => {
+        console.log("Downloaded file is ", file_name);
+        return file_name;
+      })
+      .catch((error) => {
+        console.error(error);
+        return "";
+      });
   };
 
-const seekPermission = (fileUri: string) => {
-    let fname="";
-     return  Permissions.askAsync(Permissions.MEDIA_LIBRARY)
-    .then(permissions => {
-      if (!permissions.granted) {
-        throw "Permission denied";
-        }
-      else {
-        MediaLibrary.createAssetAsync(fileUri)
-        .then(asset => {
-          MediaLibrary.createAlbumAsync('Download', asset, false)
-          .then(() => {
-            console.log("downloade........");
-            return fname;
-          });
-        });
-}
-      
+  const deleteAsset = (asset: string) => {
+    return new Promise((resolve, reject) => {
+      /* write delete asset code here */
+      resolve(true);
     });
-};
+  };
+
+  const seekPermission = (fileUri: string) => {
+    let fname = "";
+    return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
+      (permissions) => {
+        if (!permissions.granted) {
+          throw "Permission denied";
+        } else {
+          MediaLibrary.createAssetAsync(fileUri).then((asset) => {
+            MediaLibrary.createAlbumAsync("Helium", asset, false).then(() => {
+              console.log("downloaded........", asset);
+            });
+          });
+        }
+      }
+    );
+  };
 
   const offlineData = (course: courseListType, mode: boolean) => {
     let user_id: number;
     Utils.fetch("user_dbid")
       .then(({ id }) => (user_id = id))
-     // .then(()=> seekPermission(course.asset))
-      .then(() => saveAsset(course.asset))
-      .then((asset: string) => (course.asset = asset))
+      .then(() => {
+        if (mode) {
+          return saveAsset(course.asset).then(
+            (asset) => (course.asset = asset)
+          );
+        } else {
+          return dbObj.fetchAsset(user_id, course.id).then(deleteAsset);
+        }
+      })
       .then(() => dbObj.saveCourse(user_id, course, mode))
       .then(() =>
         setContent({
@@ -631,6 +638,7 @@ const styles = StyleSheet.create({
   },
 
   contentTag: {
+    marginLeft: -5,
     borderRadius: 15,
     fontSize: 12,
     padding: 5,
@@ -653,6 +661,10 @@ const styles = StyleSheet.create({
   },
 
   "Learning Path": {
+    backgroundColor: "#DDD6FE",
+  },
+
+  Video: {
     backgroundColor: "#DDD6FE",
   },
 
