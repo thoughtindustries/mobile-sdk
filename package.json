@@ -31,6 +31,8 @@
     "expo-asset": "~8.7.0",
     "expo-file-system": "~15.1.1",
     "expo-font": "~11.0.1",
+    "expo-media-library": "~15.0.0",
+    "expo-permissions": "^14.0.0",
     "expo-splash-screen": "^0.17.5",
     "expo-sqlite": "~11.0.0",
     "expo-status-bar": "~1.4.2",

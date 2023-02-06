@@ -7,6 +7,7 @@ import {
   FlatList,
   ScrollView,
   Animated,
+  Permission,
   Pressable,
 } from "react-native";
 
@@ -22,6 +23,10 @@ import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import * as Permissions from 'expo-permissions';
+
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -56,13 +61,48 @@ const MyLearnings = () => {
 
   const saveAsset = (asset: string) => {
     // download code for asset
+    let path = asset.split('/');
+    const file_name = path[path.length-1];
+    let fileUri = FileSystem.documentDirectory + file_name;
+    FileSystem.downloadAsync(asset, fileUri)
+    .then(({ uri }) => {
+      console.log('Finished downloading to ', uri);
+
+        seekPermission(fileUri);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+
     return asset;
   };
+
+const seekPermission = (fileUri: string) => {
+    let fname="";
+     return  Permissions.askAsync(Permissions.MEDIA_LIBRARY)
+    .then(permissions => {
+      if (!permissions.granted) {
+        throw "Permission denied";
+        }
+      else {
+        MediaLibrary.createAssetAsync(fileUri)
+        .then(asset => {
+          MediaLibrary.createAlbumAsync('Download', asset, false)
+          .then(() => {
+            console.log("downloade........");
+            return fname;
+          });
+        });
+}
+      
+    });
+};
 
   const offlineData = (course: courseListType, mode: boolean) => {
     let user_id: number;
     Utils.fetch("user_dbid")
       .then(({ id }) => (user_id = id))
+     // .then(()=> seekPermission(course.asset))
       .then(() => saveAsset(course.asset))
       .then((asset: string) => (course.asset = asset))
       .then(() => dbObj.saveCourse(user_id, course, mode))
