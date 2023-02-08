@@ -64,7 +64,7 @@ const FooterMenu = ({ route }: FooterMenuProps) => {
           options={{
             tabBarIcon: ({ color, size }) => (
               <Image
-                source={table.image}
+                source={table.image as any}
                 style={{ tintColor: color, width: size, height: size }}
               />
             ),

@@ -26,9 +26,9 @@ const Utils = {
   checkLogin: (navigation: any) => {
     Utils.isLoggedIn().then((loggedIn) => {
       if (loggedIn) {
-        navigation.navigate("Home");
+        navigation.navigate("HomeScreen");
       } else {
-        navigation.navigate("Login");
+        navigation.navigate("Onboarding");
       }
     });
   },

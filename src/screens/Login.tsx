@@ -63,15 +63,13 @@ const Login = () => {
       .then((udata) => Utils.store("udata", udata)) //== save user data locally
       .then(() => {
         setProcessing(false);
-        navigation.navigate("Home");
+        navigation.navigate("HomeScreen");
       }) //== navigate to home
       .catch((err) => {
         setProcessing(false);
         setMessage({ info: "", error: get(err, "message", err) });
       });
   };
-
-  useEffect(() => Utils.checkLogin(navigation), []);
 
   const ShowError = (): JSX.Element => {
     let modalTitle = "Error Occurred";

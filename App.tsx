@@ -55,7 +55,7 @@ const App = () => {
         <Stack.Screen name="Registration" component={Screens.Registration} />
         <Stack.Screen name="Login" component={Screens.Login} />
         <Stack.Screen
-          name="Home"
+          name="HomeScreen"
           component={FooterMenu}
           options={{ gestureEnabled: false }}
         />

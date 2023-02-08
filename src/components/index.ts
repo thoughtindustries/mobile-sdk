@@ -8,6 +8,10 @@ import UserHeader from "./UserHeader";
 import Checkbox from "./Checkbox";
 import Searchbar from "./Searchbar";
 import FilterControl from "./FilterControl";
+import Banner from "./Banner";
+import TopCategories from "./TopCategories";
+import Recommendation from "./Recommendation";
+import RecentCourses from "./RecentCourses";
 
 export {
   Button,
@@ -20,4 +24,8 @@ export {
   Checkbox,
   Searchbar,
   FilterControl,
+  Banner,
+  TopCategories,
+  Recommendation,
+  RecentCourses,
 };
