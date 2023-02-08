@@ -144,7 +144,7 @@ class Db {
           tx.executeSql(
             sql,
             [user_id, cid],
-            (tx, { rows: { _array } }) => resolve(_array[0]["asset"]),
+            (tx, { rows: { _array } }) => resolve(_array[0]["courseThumbnail"]),
             (tx, error) => {
               reject(error.message);
               return false;

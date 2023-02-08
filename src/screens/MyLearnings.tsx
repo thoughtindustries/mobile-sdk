@@ -75,13 +75,29 @@ const MyLearnings = () => {
       });
   };
 
-  const deleteAsset = (asset: string) => {
+  const deleteAsset = (file_name: string) => {
     return new Promise((resolve, reject) => {
-      /* write delete asset code here */
+      let fileUri: string = FileSystem.documentDirectory + file_name;
+      Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
+        (permissions) => {
+          if (!permissions.granted) {
+            throw "Permission denied";
+          } else {
+            MediaLibrary.createAssetAsync(fileUri).then((asset) => {
+              MediaLibrary.deleteAssetsAsync(asset).then(() => {
+                console.log("deleted........", asset);
+              });
+            });
+          }
+        }
+      );
       resolve(true);
     });
   };
-
+  const getOfflineMedia = (file_name:string) => {
+    let fileUri: string = FileSystem.documentDirectory + file_name;
+    return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);    
+  }
   const seekPermission = (fileUri: string) => {
     let fname = "";
     return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
@@ -313,7 +329,7 @@ const MyLearnings = () => {
   const ContentItem = (props: { data: courseListType }) => {
     return (
       <View style={styles.contentRow}>
-        <Image source={{ uri: props.data.asset }} style={styles.contentImage} />
+        <Image source={{ uri: props.data.isOffline ? getOfflineMedia(props.data.asset) : props.data.asset}} style={styles.contentImage} />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
