@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ const Home = () => {
     tiGql.getTopCategories().then(setCategories).catch(console.log);
   };
 
-  React.useEffect(fetchTopCategories, []);
+  useEffect(fetchTopCategories, []);
 
   const recommendedCourse: { thumbnail: string; coursename: string }[] = [
     {

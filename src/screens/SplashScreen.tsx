@@ -5,9 +5,10 @@ import { Loader } from "../components";
 interface Props {
   navigation: any;
 }
-const SplashScreen = (props: Props) => {
+
+const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
-    window.setTimeout(() => props.navigation.navigate("Onboarding"), 5000);
+    window.setTimeout(() => navigation.navigate("Onboarding"), 5000);
   }, []);
 
   return (

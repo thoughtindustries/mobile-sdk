@@ -7,8 +7,6 @@ import {
   Pressable,
   Linking,
   KeyboardAvoidingView,
-  Modal,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Logo, Button, Link, Message } from "../components";
@@ -73,7 +71,7 @@ const Login = () => {
       });
   };
 
-  React.useEffect(() => Utils.checkLogin(navigation), []);
+  useEffect(() => Utils.checkLogin(navigation), []);
 
   const ShowError = (): JSX.Element => {
     let modalTitle = "Error Occurred";

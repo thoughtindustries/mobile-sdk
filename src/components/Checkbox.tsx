@@ -9,22 +9,20 @@ interface CheckboxProps {
   onPress(): void;
 }
 
-const Checkbox = (props: CheckboxProps) => (
+const Checkbox = ({ selected, title, onPress }: CheckboxProps) => (
   <View style={styles.row}>
-    {props.selected && (
+    {selected && (
       <MaterialCommunityIcons
         name="check"
         size={30}
         color="#ffffff"
         style={styles.checked}
-        onPress={props.onPress}
+        onPress={onPress}
       />
     )}
-    {!props.selected && (
-      <Pressable style={styles.unchecked} onPress={props.onPress} />
-    )}
-    <Text style={styles.label} onPress={props.onPress}>
-      {props.title}
+    {!selected && <Pressable style={styles.unchecked} onPress={onPress} />}
+    <Text style={styles.label} onPress={onPress}>
+      {title}
     </Text>
   </View>
 );
