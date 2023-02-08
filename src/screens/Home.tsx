@@ -135,7 +135,7 @@ const Home = () => {
         </View>
         <ScrollView horizontal={true} style={styles.courseContainer}>
           {recommendedCourse.map((course, idx) => (
-            <View style={styles.recContentBox}>
+            <View key={idx} style={styles.recContentBox}>
               <ImageBackground
                 key={idx}
                 source={{ uri: course.thumbnail }}
@@ -162,7 +162,7 @@ const Home = () => {
         </View>
         <ScrollView horizontal={true} style={styles.courseContainer}>
           {rececntLaunchCourse.map((course, idx) => (
-            <View style={styles.recContentBox}>
+            <View key={idx} style={styles.recContentBox}>
               <View style={styles.courseThumbnail}>
                 <Image
                   key={idx}

@@ -27,6 +27,8 @@ const Utils = {
     Utils.isLoggedIn().then((loggedIn) => {
       if (loggedIn) {
         navigation.navigate("Home");
+      } else {
+        navigation.navigate("Login");
       }
     });
   },

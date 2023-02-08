@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
+import Utils from "../helpers/Utils";
 
 interface Props {
   navigation: any;
@@ -8,7 +9,7 @@ interface Props {
 
 const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
-    window.setTimeout(() => navigation.navigate("Onboarding"), 5000);
+    setTimeout(() => Utils.checkLogin(navigation), 2000);
   }, []);
 
   return (
