@@ -1,14 +1,8 @@
 import React, { useState } from "react";
 
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 
+import { Picker } from "@react-native-picker/picker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { topicType } from "../../types";
@@ -19,11 +13,31 @@ const ResourceControl = (props: { data: topicType[] }) => {
   const [show, setShow] = useState<boolean>(false);
   const ResourceModal = () => {
     return (
-      <Modal transparent={true} visible={true}>
-        <View style={styles.resContainer}>
-          <Text style={styles.filterHeading}>VARIANT</Text>
+      <View style={styles.resContainer}>
+        <View style={styles.resSubContainer}>
+          <MaterialCommunityIcons
+            name="close"
+            size={25}
+            color="#1F2937"
+            onPress={() => setShow(true)}
+            style={{ marginBottom: 20 }}
+          />
+          <View style={styles.row}>
+            <MaterialCommunityIcons
+              name="view-grid-outline"
+              size={22}
+              color="#6B7280"
+              onPress={() => setShow(true)}
+            />
+            <Text style={styles.variant}>VARIANT</Text>
+          </View>
+
+          <Picker>
+            <Picker.Item label="Java" value="java" />
+            <Picker.Item label="JavaScript" value="js" />
+          </Picker>
         </View>
-      </Modal>
+      </View>
     );
   };
   return (
@@ -41,98 +55,34 @@ const ResourceControl = (props: { data: topicType[] }) => {
 };
 
 const styles = StyleSheet.create({
-  filterbtn: {
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "#E5E7EB",
-    borderRadius: 5,
-    padding: 10,
-    width: 50,
-    height: 50,
-    marginLeft: 5,
-    alignSelf: "center",
-  },
-
   resContainer: {
+    backgroundColor: "#00000066",
+    position: "absolute",
+    height: 1000,
+    width: "100%",
+    zIndex: 200,
+  },
+  resSubContainer: {
+    padding: 24,
+    paddingTop: 15,
     backgroundColor: "#F1F3F5",
-    height: "90%",
+    position: "absolute",
+    height: "100%",
     width: "70%",
-    marginTop: 52,
+    zIndex: 200,
+  },
+  variant: {
+    paddingLeft: 10,
+    fontSize: 18,
+    color: "#6B7280",
+    fontFamily: "Poppins_400Regular",
   },
 
   row: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
-  },
-
-  filterHeading: {
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
-  },
-
-  filterBox: {
-    borderBottomWidth: 1,
-    padding: 20,
-    paddingTop: 0,
-    borderBottomColor: "#D1D5DB",
-  },
-
-  filterTitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    paddingTop: 16,
-    color: "#1F2937",
-    fontFamily: "Poppins_400Regular",
-  },
-
-  clearbtn: {
-    flexGrow: 1,
-    margin: 2,
-  },
-
-  clearbtntxt: {
-    color: "#3B1FA3",
-    textAlign: "center",
-    lineHeight: 40,
-    fontFamily: "Inter_700Bold",
-  },
-
-  applybtn: {
-    flexGrow: 1,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 4,
-    margin: 2,
-    marginRight: 15,
-  },
-
-  applybtntxt: {
-    color: "#fff",
-    textAlign: "center",
-    lineHeight: 40,
-    fontFamily: "Inter_700Bold",
-  },
-
-  sortDir: {
-    width: "50%",
-    margin: 2,
-    lineHeight: 30,
-    textAlign: "center",
-  },
-  sortDirSelected: {
-    fontSize: 14,
-    width: "50%",
-    margin: 2,
-    lineHeight: 30,
-    textAlign: "center",
-    backgroundColor: "#3B1FA3",
-    color: "#fff",
-    fontFamily: "Inter_700Bold",
-    borderRadius: 5,
   },
 });
 

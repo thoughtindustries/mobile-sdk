@@ -5,12 +5,13 @@ import {
   StyleSheet,
   ImageBackground,
   ScrollView,
+  Linking,
 } from "react-native";
 import _ from "lodash";
 import { Button, ResourceControl } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList, topicType } from "../../types";
+import { RootStackParamList, pageType } from "../../types";
 import tiGql from "../helpers/TIGraphQL";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import striptags from "striptags";
@@ -21,7 +22,10 @@ type MyLearningProps = StackNavigationProp<RootStackParamList, "MyLearning">;
 const CourseDetails = () => {
   const navigation = useNavigation<MyLearningProps>();
   const route = useRoute();
-  const [content, setContent] = useState<topicType[]>([]);
+  const [content, setContent] = useState<pageType>({
+    languages: [],
+    videoAsset: "",
+  });
   const [fullBody, setFullBody] = useState<Boolean>(false);
   const [showResources, setShowResources] = useState<Boolean>(false);
   let cid = _.get(route, "params.cid", "");
@@ -96,7 +100,7 @@ const CourseDetails = () => {
             <View style={{ ...styles.row, paddingTop: 0 }}>
               <ResourceControl data={content} />
               <Text style={styles.headingText}>
-                {_.get(route, "params.title", "Article Title")}
+                {_.get(content, "languages[0].label", "Article Title")}
               </Text>
             </View>
           </View>
@@ -111,10 +115,13 @@ const CourseDetails = () => {
           )}
           {_.get(route, "params.contentTypeLabel", "Video") == "Video" &&
             _.get(content, "videoAsset", "na") !== "na" && (
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                stickyHeaderIndices={[0]}
-              >
+              <>
+                <Text style={styles.title}>
+                  {_.get(content, "languages[0].title", "Article Title")}
+                </Text>
+                <Text style={styles.subtitle}>
+                  {_.get(content, "languages[0].subtitle", "Article Title")}
+                </Text>
                 <WebView
                   source={{
                     uri: `https://fast.wistia.com/embed/medias/${content.videoAsset}`,
@@ -123,9 +130,39 @@ const CourseDetails = () => {
                 />
 
                 <Text style={styles.articleDetails}>
-                  {striptags(_.get(content, "languages[0].body", ""))}
+                  {_.truncate(
+                    striptags(_.get(content, "languages[0].body", "")),
+                    {
+                      length: 120,
+                    }
+                  )}
                 </Text>
-              </ScrollView>
+
+                {_.get(content, "languages[0].externalUrlCallToAction", "") !==
+                  "" && (
+                  <Button
+                    title="View More"
+                    onPress={() =>
+                      Linking.openURL(
+                        _.get(
+                          content,
+                          "languages[0].externalUrlCallToAction",
+                          ""
+                        )
+                      )
+                    }
+                  />
+                )}
+
+                <Text style={styles.articleDetails}>
+                  {_.truncate(
+                    striptags(_.get(content, "languages[0].copyright", "")),
+                    {
+                      length: 100,
+                    }
+                  )}
+                </Text>
+              </>
             )}
         </View>
       )}
@@ -157,6 +194,16 @@ const styles = StyleSheet.create({
     lineHeight: 36,
     fontFamily: "Poppins_700Bold",
     color: "#D4D4D8",
+  },
+  title: {
+    fontSize: 20,
+    color: "#1F2937",
+    fontFamily: "Poppins_700Bold",
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#6B7280",
+    fontFamily: "Inter_400Regular",
   },
   body: {
     fontFamily: "Inter_400Regular",

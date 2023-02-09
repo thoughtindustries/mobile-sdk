@@ -68,6 +68,12 @@ export type topicType = {
   copyright?: string;
   asset?: string;
   videoAsset?: string;
+  externalUrlCallToAction?: string;
+};
+
+export type pageType = {
+  languages: topicType[];
+  videoAsset?: string;
 };
 
 export type filtersType = {

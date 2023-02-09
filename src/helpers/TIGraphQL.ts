@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import { courseListType, topicType } from "../../types";
+import { courseListType, pageType } from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
 
@@ -281,7 +281,7 @@ class TIGraphQL {
       variables: { identifiers: [] },
     };
 
-    return new Promise<topicType[]>((resolve, reject) => {
+    return new Promise<pageType>((resolve, reject) => {
       let headers: { headers: { authToken: string } };
       this.headers()
         .then((h) => (headers = h))
