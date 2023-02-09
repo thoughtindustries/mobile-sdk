@@ -67,6 +67,7 @@ export type topicType = {
   body?: string;
   copyright?: string;
   asset?: string;
+  videoAsset?: string;
 };
 
 export type filtersType = {

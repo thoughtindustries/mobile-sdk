@@ -255,6 +255,7 @@ class TIGraphQL {
       query: `query Pages($identifiers: [String!]!) {
         Pages(identifiers: $identifiers) {
             ... on ArticlePage {
+            videoAsset
             languages {
               language
               label
@@ -262,6 +263,17 @@ class TIGraphQL {
               subtitle
               body
               copyright
+              allowAudioDownload
+              audioAsset
+              audioAssetUrl
+              externalUrl
+              externalUrlCallToAction
+              pdfAsset
+              pdfAssetSecondary
+              pdfAssetSecondaryUrl
+              pdfAssetTitle
+              pdfAssetTitleSecondary
+              pdfAssetUrl
             }
           }
         }
@@ -286,9 +298,7 @@ class TIGraphQL {
           }
         })
         .then(() => axios.post(this.gurl, gql2, headers))
-        .then((res) =>
-          resolve(_.get(res, "data.data.Pages[0].languages[0]", []))
-        )
+        .then((res) => resolve(_.get(res, "data.data.Pages[0]", [])))
         .catch(reject);
     });
   }

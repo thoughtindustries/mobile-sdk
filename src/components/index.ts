@@ -8,6 +8,7 @@ import UserHeader from "./UserHeader";
 import Checkbox from "./Checkbox";
 import Searchbar from "./Searchbar";
 import FilterControl from "./FilterControl";
+import ResourceControl from "./ResourceControl";
 
 export {
   Button,
@@ -20,4 +21,5 @@ export {
   Checkbox,
   Searchbar,
   FilterControl,
+  ResourceControl,
 };

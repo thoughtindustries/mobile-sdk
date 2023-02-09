@@ -5,16 +5,16 @@ import {
   StyleSheet,
   ImageBackground,
   ScrollView,
-  SafeAreaView,
 } from "react-native";
 import _ from "lodash";
-import { Button } from "../components";
+import { Button, ResourceControl } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, topicType } from "../../types";
 import tiGql from "../helpers/TIGraphQL";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import striptags from "striptags";
+import WebView from "react-native-webview";
 
 type MyLearningProps = StackNavigationProp<RootStackParamList, "MyLearning">;
 
@@ -23,6 +23,7 @@ const CourseDetails = () => {
   const route = useRoute();
   const [content, setContent] = useState<topicType[]>([]);
   const [fullBody, setFullBody] = useState<Boolean>(false);
+  const [showResources, setShowResources] = useState<Boolean>(false);
   let cid = _.get(route, "params.cid", "");
 
   const fetchCourseDetails = () => {
@@ -62,8 +63,8 @@ const CourseDetails = () => {
         <>
           <View style={{ padding: 32 }}>
             <Text style={styles.body}>
-              {_.truncate(striptags(_.get(content, "body", "")), {
-                length: 200,
+              {_.truncate(striptags(_.get(content, "languages[0].body", "")), {
+                length: 500,
               })}
             </Text>
             <Button
@@ -92,9 +93,12 @@ const CourseDetails = () => {
           </View>
 
           <View style={styles.articleHeading}>
-            <Text style={styles.headingText}>
-              {_.get(route, "params.title", "Article Title")}
-            </Text>
+            <View style={{ ...styles.row, paddingTop: 0 }}>
+              <ResourceControl data={content} />
+              <Text style={styles.headingText}>
+                {_.get(route, "params.title", "Article Title")}
+              </Text>
+            </View>
           </View>
         </>
       )}
@@ -102,12 +106,27 @@ const CourseDetails = () => {
         <View style={{ padding: 20 }}>
           {_.get(route, "params.contentTypeLabel", "Article") == "Article" && (
             <Text style={styles.articleDetails}>
-              {striptags(_.get(content, "body", ""))}
+              {striptags(_.get(content, "languages[0].body", ""))}
             </Text>
           )}
-          {_.get(route, "params.contentTypeLabel", "Video") == "Video" && (
-            <Text style={styles.articleDetails}>{JSON.stringify(content)}</Text>
-          )}
+          {_.get(route, "params.contentTypeLabel", "Video") == "Video" &&
+            _.get(content, "videoAsset", "na") !== "na" && (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                stickyHeaderIndices={[0]}
+              >
+                <WebView
+                  source={{
+                    uri: `https://fast.wistia.com/embed/medias/${content.videoAsset}`,
+                  }}
+                  style={{ marginTop: 20, height: 200 }}
+                />
+
+                <Text style={styles.articleDetails}>
+                  {striptags(_.get(content, "languages[0].body", ""))}
+                </Text>
+              </ScrollView>
+            )}
         </View>
       )}
     </ScrollView>

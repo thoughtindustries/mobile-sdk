@@ -46,6 +46,8 @@
     "react-native-screens": "^3.18.2",
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "~0.18.9",
+    "react-native-webview": "^11.26.1",
+    "react-native-wistia": "^0.2.0",
     "react-test-renderer": "^18.1.0",
     "rimraf": "^3.0.2",
     "striptags": "^3.2.0",
