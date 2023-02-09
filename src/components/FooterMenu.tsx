@@ -1,36 +1,27 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image } from "react-native";
 import { get } from "lodash";
-
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Screens from "../screens";
 
-interface FooterMenuProps {
-  route: { name: string };
-}
-
-const FooterMenu = ({ route }: FooterMenuProps) => {
+const FooterMenu = ({ route }: { route: { name: string } }) => {
   const Tab = createBottomTabNavigator();
 
-  const tabs: { title: string; image: NodeRequire; component: string }[] = [
+  const tabs: { title: string; component: string }[] = [
     {
       title: "Home",
-      image: require("./../../assets/footer-home.png"),
       component: "Home",
     },
     {
       title: "Explore",
-      image: require("./../../assets/footer-explore-d.png"),
       component: "ExploreCatalog",
     },
     {
       title: "My Learning",
-      image: require("./../../assets/footer-mylearning-d.png"),
       component: "MyLearnings",
     },
     {
       title: "Account",
-      image: require("./../../assets/footer-account-d.png"),
       component: "Account",
     },
   ];
@@ -63,9 +54,18 @@ const FooterMenu = ({ route }: FooterMenuProps) => {
           ))}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Image
-                source={table.image as any}
-                style={{ tintColor: color, width: size, height: size }}
+              <MaterialCommunityIcons
+                name={
+                  table.title === "Home"
+                    ? "home"
+                    : table.title === "Explore"
+                    ? "magnify"
+                    : table.title === "My Learning"
+                    ? "school"
+                    : "account"
+                }
+                color={color}
+                size={size}
               />
             ),
           }}

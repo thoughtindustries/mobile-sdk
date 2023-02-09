@@ -1,6 +1,5 @@
 import React from "react";
 import { Pressable, View, Text, StyleSheet } from "react-native";
-
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface CheckboxProps {
