@@ -9,8 +9,12 @@ import { topicType } from "../../types";
 
 import Utils from "../helpers/Utils";
 
+import _ from "lodash";
+
 const ResourceControl = (props: { data: topicType[] }) => {
   const [show, setShow] = useState<boolean>(false);
+  const [variant, setVariant] = useState<number>(0);
+  
   const ResourceModal = () => {
     return (
       <View style={styles.resContainer}>
@@ -19,7 +23,7 @@ const ResourceControl = (props: { data: topicType[] }) => {
             name="close"
             size={25}
             color="#1F2937"
-            onPress={() => setShow(true)}
+            onPress={() => setShow(false)}
             style={{ marginBottom: 20 }}
           />
           <View style={styles.row}>
@@ -27,14 +31,15 @@ const ResourceControl = (props: { data: topicType[] }) => {
               name="view-grid-outline"
               size={22}
               color="#6B7280"
-              onPress={() => setShow(true)}
             />
             <Text style={styles.variant}>VARIANT</Text>
           </View>
 
-          <Picker>
-            <Picker.Item label="Java" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
+          <Picker selectedValue={variant}
+            onValueChange={(itemValue, itemIndex) =>
+            setVariant(itemValue)
+          }>
+            {_.get(props,'data.languages',[]).map((lang,idx) => <Picker.Item label={lang.label} value={idx} />)}
           </Picker>
         </View>
       </View>
@@ -60,16 +65,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: 1000,
     width: "100%",
-    zIndex: 200,
   },
   resSubContainer: {
     padding: 24,
     paddingTop: 15,
     backgroundColor: "#F1F3F5",
-    position: "absolute",
-    height: "100%",
+    height: 1000,
     width: "70%",
-    zIndex: 200,
+    zIndex: 200
   },
   variant: {
     paddingLeft: 10,
