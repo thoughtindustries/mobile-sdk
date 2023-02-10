@@ -9,6 +9,7 @@ import Account from "./Account";
 import ProfileEdit from "./ProfileEdit";
 import SplashScreen from "./SplashScreen";
 import ExploreCatalog from "./ExploreCatalog";
+import CourseDetails from "./CourseDetails";
 
 export default {
   Onboarding,
@@ -22,4 +23,5 @@ export default {
   ProfileEdit,
   SplashScreen,
   ExploreCatalog,
+  CourseDetails,
 };

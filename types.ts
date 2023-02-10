@@ -1,3 +1,5 @@
+import { Float } from "react-native/Libraries/Types/CodegenTypes";
+
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
@@ -6,6 +8,12 @@ export type RootStackParamList = {
   Offline: undefined;
   HomeScreen: undefined;
   MyLearning: undefined;
+  CourseDetails: {
+    cid: string;
+    title: string;
+    asset: string;
+    contentTypeLabel?: string;
+  };
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
@@ -47,6 +55,25 @@ export type courseListType = {
   title: string;
   displayCourse?: string;
   contentTypeLabel?: string;
+  progress?: Float;
+  isOffline?: boolean;
+};
+
+export type topicType = {
+  language?: null | string;
+  label: string;
+  title?: string;
+  subtitle?: string;
+  body?: string;
+  copyright?: string;
+  asset?: string;
+  videoAsset?: string;
+  externalUrlCallToAction?: string;
+};
+
+export type pageType = {
+  languages: topicType[];
+  videoAsset?: string;
 };
 
 export type filtersType = {

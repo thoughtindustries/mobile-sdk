@@ -1,7 +1,7 @@
 import axios from "axios";
-import { get } from "lodash";
+
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import { courseListType } from "../../types";
+import { courseListType, pageType } from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
 
@@ -34,7 +34,7 @@ class TIGraphQL {
       axios
         .post(this.gurl, gql)
         .then((res) => {
-          if (get(res, "data.errors.length", 0) > 0) {
+          if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
             //console.log('Login token:', res.data.data.Login);
@@ -131,7 +131,7 @@ class TIGraphQL {
       this.headers()
         .then((headers) => axios.post(this.gurl, gql, headers))
         .then((res) => {
-          if (get(res, "data.errors.length", 0) > 0) {
+          if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
             resolve(res.data.data.CatalogContent.contentItems);
@@ -196,7 +196,7 @@ class TIGraphQL {
       this.headers()
         .then((headers) => axios.post(this.gurl, gql, headers))
         .then((res) => {
-          if (get(res, "data.errors.length", 0) > 0) {
+          if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
             resolve({
@@ -223,12 +223,82 @@ class TIGraphQL {
       this.headers()
         .then((headers) => axios.post(this.gurl, gql, headers))
         .then((res) => {
-          if (get(res, "data.errors.length", 0) > 0) {
+          if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
-            resolve(res.data.UserCourseProgress.percentComplete);
+            resolve(res.data.data.UserCourseProgress.percentComplete);
           }
         })
+        .catch(reject);
+    });
+  }
+
+  fetchCourseDetails(cid: string) {
+    const gql = {
+      query: `query CourseById($id: ID!) {
+        CourseById(id: $id) {
+            sections {
+                lessons {
+                    topics {
+                        ... on ArticlePage {
+                            id
+                          }
+                    }
+                }
+            }
+        }
+    }`,
+      variables: { id: cid },
+    };
+
+    let gql2 = {
+      query: `query Pages($identifiers: [String!]!) {
+        Pages(identifiers: $identifiers) {
+            ... on ArticlePage {
+            videoAsset
+            languages {
+              language
+              label
+              title
+              subtitle
+              body
+              copyright
+              allowAudioDownload
+              audioAsset
+              audioAssetUrl
+              externalUrl
+              externalUrlCallToAction
+              pdfAsset
+              pdfAssetSecondary
+              pdfAssetSecondaryUrl
+              pdfAssetTitle
+              pdfAssetTitleSecondary
+              pdfAssetUrl
+            }
+          }
+        }
+      }`,
+      variables: { identifiers: [] },
+    };
+
+    return new Promise<pageType>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            gql2.variables.identifiers = _.flattenDeep(
+              _.map(res.data.data.CourseById.sections, (s) =>
+                _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id))
+              )
+            );
+          }
+        })
+        .then(() => axios.post(this.gurl, gql2, headers))
+        .then((res) => resolve(_.get(res, "data.data.Pages[0]", [])))
         .catch(reject);
     });
   }

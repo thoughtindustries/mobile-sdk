@@ -17,6 +17,7 @@ import validator from "validator";
 import { get } from "lodash";
 import tiGql from "../helpers/TIGraphQL";
 import tiApi from "../helpers/TIApi";
+import dbObj from "../helpers/Db";
 import Utils from "../helpers/Utils";
 import Success from "./Success";
 import { useNavigation } from "@react-navigation/native";
@@ -61,6 +62,8 @@ const Login = () => {
       .then((token) => Utils.store("logintoken", { token: token })) //== got login token, save it locally
       .then(() => tiApi.userDetails(params.email)) //== fetch user data of logged in user
       .then((udata) => Utils.store("udata", udata)) //== save user data locally
+      .then(() => dbObj.userLookup(params.email))
+      .then((id: Number) => Utils.store("user_dbid", { id: id }))
       .then(() => {
         setProcessing(false);
         navigation.navigate("HomeScreen");

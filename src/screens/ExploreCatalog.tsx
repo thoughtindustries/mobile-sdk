@@ -91,7 +91,12 @@ const ExploreCatalog = () => {
             </Text>
           )}
         </View>
-        <Image source={{ uri: props.data.asset }} style={styles.courseImage} />
+        {_.get(props, "data.asset", "na") === "na" && (
+          <Image
+            source={{ uri: props.data.asset }}
+            style={styles.courseImage}
+          />
+        )}
       </View>
     );
   };
