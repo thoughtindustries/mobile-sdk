@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Logo, Button, Link } from "../components";
 import AppStyle from "../../AppStyle";
@@ -15,7 +15,7 @@ type OnboardingScreenProps = StackNavigationProp<
 const Onboarding = () => {
   const navigation = useNavigation<OnboardingScreenProps>();
 
-  React.useEffect(() => Utils.checkLogin(navigation), []);
+  // useEffect(() => Utils.checkLogin(navigation), []);
 
   return (
     <View style={AppStyle.container}>
