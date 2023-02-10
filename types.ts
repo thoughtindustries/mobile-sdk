@@ -6,7 +6,7 @@ export type RootStackParamList = {
   Registration: undefined;
   Success: undefined;
   Offline: undefined;
-  Home: undefined;
+  HomeScreen: undefined;
   MyLearning: undefined;
   CourseDetails: {
     cid: string;

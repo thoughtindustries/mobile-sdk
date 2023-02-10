@@ -47,17 +47,29 @@ const App = () => {
     <NavigationContainer theme={MyTheme}>
       <Stack.Navigator initialRouteName="SplashScreen" screenOptions={opts}>
         <Stack.Screen name="SplashScreen" component={Screens.SplashScreen} />
-        <Stack.Screen name="Offline" component={Screens.Offline} />
-        <Stack.Screen name="Onboarding" component={Screens.Onboarding} />
-        <Stack.Screen name="Login" component={Screens.Login} />
+        <Stack.Screen
+          name="Onboarding"
+          component={Screens.Onboarding}
+          options={{ gestureEnabled: false }}
+        />
         <Stack.Screen name="Registration" component={Screens.Registration} />
-        <Stack.Screen name="ProfileEdit" component={Screens.ProfileEdit} />
+        <Stack.Screen name="Login" component={Screens.Login} />
+        <Stack.Screen
+          name="HomeScreen"
+          component={FooterMenu}
+          options={{ gestureEnabled: false }}
+        />
         <Stack.Screen name="TopCategories" component={Screens.Offline} />
+<<<<<<< HEAD
         <Stack.Screen name="CourseDetails" component={Screens.CourseDetails} />
         <Stack.Screen name="Home" component={FooterMenu} />
+=======
+>>>>>>> general-fixes
         <Stack.Screen name="Explore" component={FooterMenu} />
         <Stack.Screen name="My Learning" component={FooterMenu} />
         <Stack.Screen name="Account" component={FooterMenu} />
+        <Stack.Screen name="ProfileEdit" component={Screens.ProfileEdit} />
+        <Stack.Screen name="Offline" component={Screens.Offline} />
       </Stack.Navigator>
     </NavigationContainer>
   );
