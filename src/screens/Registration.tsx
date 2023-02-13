@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: "Poppins_400Regular",
+    fontFamily: "Poppins_700Bold",
     fontSize: 24,
     lineHeight: 36,
     textAlign: "center",

@@ -7,8 +7,6 @@ import {
   Pressable,
   Linking,
   KeyboardAvoidingView,
-  Modal,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Logo, Button, Link, Message } from "../components";
@@ -68,15 +66,13 @@ const Login = () => {
       .then((id: Number) => Utils.store("user_dbid", { id: id }))
       .then(() => {
         setProcessing(false);
-        navigation.navigate("Home");
+        navigation.navigate("HomeScreen");
       }) //== navigate to home
       .catch((err) => {
         setProcessing(false);
         setMessage({ info: "", error: get(err, "message", err) });
       });
   };
-
-  React.useEffect(() => Utils.checkLogin(navigation), []);
 
   const ShowError = (): JSX.Element => {
     let modalTitle = "Error Occurred";

@@ -6,10 +6,11 @@ import dbObj from "../helpers/Db";
 interface Props {
   navigation: any;
 }
-const SplashScreen = (props: Props) => {
+
+const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
     dbObj.init().then(() => console.log("Database initiated..."));
-    window.setTimeout(() => props.navigation.navigate("Onboarding"), 5000);
+    setTimeout(() => navigation.navigate("Onboarding"), 5000);
   }, []);
 
   return (
