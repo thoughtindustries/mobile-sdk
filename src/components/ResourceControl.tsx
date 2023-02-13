@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Linking } from "react-native";
 
-import { Picker } from "@react-native-picker/picker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { topicType } from "../../types";
@@ -11,11 +10,54 @@ import Utils from "../helpers/Utils";
 
 import _ from "lodash";
 
+import { SelectList } from "react-native-dropdown-select-list";
+
 const ResourceControl = (props: { data: topicType[] }) => {
   const [show, setShow] = useState<boolean>(false);
   const [variant, setVariant] = useState<number>(0);
-  
+
   const ResourceModal = () => {
+    const getOption = (lang: { label: string }, idx: number) => ({
+      key: idx,
+      value: _.get(lang, "label", ""),
+    });
+
+    const renderResource = (url: string) => {
+      return (
+        <View style={styles.resourceContainer}>
+          <View style={styles.row}>
+            <MaterialCommunityIcons
+              name="file-outline"
+              size={20}
+              color="#3B1FA3"
+            />
+            <Text style={styles.link} onPress={() => Linking.openURL(url)}>
+              View/Download
+            </Text>
+          </View>
+        </View>
+      );
+    };
+
+    const RenderResources = () => {
+      const resource: {
+        pdfAssetUrl: string;
+        pdfAssetSecondaryUrl: string;
+      } = _.get(props, `data.languages.${variant}`, {
+        pdfAssetUrl: "",
+        pdfAssetSecondaryUrl: "",
+      });
+      return (
+        <View>
+          {!_.isEmpty(resource.pdfAssetUrl) &&
+            renderResource(resource.pdfAssetUrl)}
+
+          {!_.isEmpty(resource.pdfAssetSecondaryUrl) &&
+            renderResource(resource.pdfAssetSecondaryUrl)}
+        </View>
+      );
+    };
+
     return (
       <View style={styles.resContainer}>
         <View style={styles.resSubContainer}>
@@ -35,12 +77,28 @@ const ResourceControl = (props: { data: topicType[] }) => {
             <Text style={styles.variant}>VARIANT</Text>
           </View>
 
-          <Picker selectedValue={variant}
-            onValueChange={(itemValue, itemIndex) =>
-            setVariant(itemValue)
-          }>
-            {_.get(props,'data.languages',[]).map((lang,idx) => <Picker.Item label={lang.label} value={idx} />)}
-          </Picker>
+          <SelectList
+            setSelected={setVariant}
+            defaultOption={getOption(
+              _.get(props, `data.languages.${variant}`, { label: "" }),
+              variant
+            )}
+            search={false}
+            data={_.get(props, "data.languages", []).map(getOption)}
+            fontFamily="Poppins_400Regular"
+            boxStyles={{ marginTop: 10, marginBottom: 10 }}
+          />
+
+          <View style={styles.row}>
+            <MaterialCommunityIcons
+              name="flag-outline"
+              size={22}
+              color="#6B7280"
+            />
+            <Text style={styles.variant}>RESOURCES</Text>
+          </View>
+
+          <RenderResources />
         </View>
       </View>
     );
@@ -72,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F1F3F5",
     height: 1000,
     width: "70%",
-    zIndex: 200
+    zIndex: 200,
   },
   variant: {
     paddingLeft: 10,
@@ -86,6 +144,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
+  },
+
+  resourceContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    marginTop: 4,
+    padding: 5,
+  },
+
+  link: {
+    fontSize: 16,
+    color: "#3B1FA3",
+    fontFamily: "Poppins_400Regular",
+    marginTop: 3,
+    marginLeft: 5,
   },
 });
 
