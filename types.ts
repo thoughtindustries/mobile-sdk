@@ -1,3 +1,5 @@
+import { Float } from "react-native/Libraries/Types/CodegenTypes";
+
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
@@ -47,6 +49,8 @@ export type courseListType = {
   title: string;
   displayCourse?: string;
   contentTypeLabel?: string;
+  progress?: Float;
+  isOffline?: boolean;
 };
 
 export type filtersType = {

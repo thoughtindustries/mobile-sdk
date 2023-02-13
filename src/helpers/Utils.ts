@@ -35,7 +35,9 @@ const Utils = {
 
   logMeOut: (navigation: any) => {
     try {
-      AsyncStorage.removeItem("udata")
+      AsyncStorage.removeItem("user_dbid")
+        .then(() => AsyncStorage.removeItem("udata"))
+        .then(() => AsyncStorage.removeItem("logintoken"))
         .then(navigation.navigate("Login"))
         .catch((err) => false);
     } catch (exception) {
@@ -57,12 +59,14 @@ const Utils = {
     tags: ["QuickStart", "Business"],
     myLearningsEvent: [
       "All",
-      "Events",
-      "Completed",
-      "Certifications",
+      //"Events",
+      //"Completed",
+      //"Certifications",
       "Offline",
     ],
   },
+
+  isOffline: () => false,
 };
 
 export default Utils;

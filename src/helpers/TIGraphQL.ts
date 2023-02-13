@@ -226,7 +226,7 @@ class TIGraphQL {
           if (get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
-            resolve(res.data.UserCourseProgress.percentComplete);
+            resolve(res.data.data.UserCourseProgress.percentComplete);
           }
         })
         .catch(reject);

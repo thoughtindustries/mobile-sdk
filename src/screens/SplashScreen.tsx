@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
-import Utils from "../helpers/Utils";
+import dbObj from "../helpers/Db";
 
 interface Props {
   navigation: any;
@@ -9,7 +9,8 @@ interface Props {
 
 const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
-    setTimeout(() => Utils.checkLogin(navigation), 2000);
+    dbObj.init().then(() => console.log("Database initiated..."));
+    setTimeout(() => navigation.navigate("Onboarding"), 5000);
   }, []);
 
   return (
