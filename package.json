@@ -42,7 +42,6 @@
     "react-native-screens": "^3.18.2",
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "~0.18.9",
-    "react-test-renderer": "^18.1.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.0.3",
     "validator": "^13.7.0"
