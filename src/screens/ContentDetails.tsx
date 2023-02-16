@@ -30,7 +30,8 @@ type ContentDetailsScreenProps = StackNavigationProp<
 >;
 
 const ContentDetails = () => {
-  const cid = "090558e1-cad4-4a58-bc87-dbce45d4ec15"; //b9645873-39c6-455e-ba0b-7f15934245c7";
+  //const cid = "090558e1-cad4-4a58-bc87-dbce45d4ec15";
+  const cid = "b9645873-39c6-455e-ba0b-7f15934245c7";
   const navigation = useNavigation<ContentDetailsScreenProps>();
   const [content, setContent] = React.useState<contentListType>({
     course: [],
@@ -50,11 +51,15 @@ const ContentDetails = () => {
 
   React.useEffect(fetchContentDetails, [cid]);
 
-  React.useEffect(() => {
-    let asec = false;
+  const getLastViewedSection = () => {
     let secreads = _.get(content, "course.sections", []).filter(isSectionRead);
-    if (secreads.length > 0) {
-      setActiveSection(_.get(_.last(secreads), "id", ""));
+    return _.get(_.last(secreads), "id", "");
+  };
+
+  React.useEffect(() => {
+    const lastId = getLastViewedSection();
+    if (lastId != "") {
+      setActiveSection(lastId);
     } else {
       setActiveSection(_.get(content, "course.sections[0].id", ""));
     }
@@ -167,9 +172,14 @@ const ContentDetails = () => {
               <Text style={styles.sectionTitle}>{sec.title}</Text>
               {sec.lessons.length > 0 && (
                 <>
-                  <Text style={styles.sectionCount}>
-                    {lessonsRead}/{sec.lessons.length} Lessons
-                  </Text>
+                  {lessonsRead > 0 && (
+                    <Text style={styles.sectionCount}>
+                      {lessonsRead}/{sec.lessons.length} Lessons started
+                    </Text>
+                  )}
+                  {lessonsRead === 0 && (
+                    <Text style={styles.sectionCount}>No Lessons Started</Text>
+                  )}
                   {SectionProgress((lessonsRead / sec.lessons.length) * 100)}
                 </>
               )}
@@ -199,22 +209,36 @@ const ContentDetails = () => {
   };
 
   const clickHandler = () => {
-    alert('Kya karna hai click pe!');
+    alert("This will go to section");
   };
 
   const FloatingContainer = () => {
-    return ( <View style={styles.touchableOpacityStyle}>
-    <View style={styles.FlotingText}>
-      <Text style={styles.ftextItem}>UP NEXT</Text>
-      <Text style={styles.fsection}>Section 1: Task Analysis</Text>
-      <Text style={styles.ftopic}>Five Tips: Identifying a Task</Text>
-    </View>
-    <TouchableOpacity style={styles.button} onPress={clickHandler} activeOpacity={0.7}>
-      <Text style={styles.buttonText}>GO</Text>
-    </TouchableOpacity>
-  </View>
-    )
-};
+    const secId = getLastViewedSection();
+    let sec = _.get(content, "course.sections[0]", false);
+    if (secId != "") {
+      sec = _.get(content, "course.sections", []).find(
+        (s: { id: String }) => s.id === secId
+      );
+    }
+    return (
+      <View style={styles.floatingFooter}>
+        <View style={styles.FlotingText}>
+          <Text style={styles.ftextItem}>UP NEXT</Text>
+          <Text style={styles.fsection}>{sec.title}</Text>
+          <Text style={styles.ftopic}>
+            {_.get(sec, "lessons[0].title", "")}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={clickHandler}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.buttonText}>GO</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView>
@@ -240,7 +264,6 @@ const ContentDetails = () => {
           </View>
           {!loading && <CustomReport />}
           {!loading && <AboutCourse />}
-         
         </View>
 
         {loading && (
@@ -251,9 +274,8 @@ const ContentDetails = () => {
         )}
 
         {!loading && <SectionList />}
-        
       </ScrollView>
-      <FloatingContainer />
+      {!loading && <FloatingContainer />}
     </SafeAreaView>
   );
 };
@@ -261,6 +283,7 @@ const ContentDetails = () => {
 const styles = StyleSheet.create({
   sectionList: {
     marginTop: 20,
+    marginBottom: 150,
   },
   collapse: {
     backgroundColor: "#FAFAFA",
@@ -322,7 +345,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   page: {
-    marginTop: 50,
+    marginTop: 32,
     paddingLeft: 32,
     paddingRight: 32,
     backgroundColor: "#F5F5F7",
@@ -417,45 +440,45 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     padding: 20,
   },
-  touchableOpacityStyle: {
-    position: 'absolute',
+  floatingFooter: {
+    position: "absolute",
     width: "92%",
     height: 120,
-    alignItems: 'center',
+    alignItems: "center",
     right: 16,
     left: 16,
-    bottom: 30,
-    backgroundColor:"#3B1FA3",
+    bottom: 10,
+    backgroundColor: "#3B1FA3",
     borderColor: "#D1D5DB",
-    borderRadius:8,
-    borderWidth:1,
+    borderRadius: 8,
+    borderWidth: 1,
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
   FlotingText: {
-    color:"#ffffff",
-    textAlign:"Center",
-    alignContent:"flex-start",
-    paddingLeft:20,
+    color: "#ffffff",
+    textAlign: "Center",
+    alignContent: "flex-start",
+    paddingLeft: 20,
   },
   ftextItem: {
-    color:"#D4D4D8",
-    fontSize:10,
-    lineHeight:12,
+    color: "#D4D4D8",
+    fontSize: 10,
+    lineHeight: 12,
     fontFamily: "Inter_700Bold",
   },
   fsection: {
-    fontSize:10,
-    lineHeight:12,
+    fontSize: 10,
+    lineHeight: 12,
     fontFamily: "Inter_700Bold",
-    color:"#ffffff",
+    color: "#ffffff",
   },
   ftopic: {
-    fontSize:16,
-    lineHeight:24,
-    color:"#ffffff",
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#ffffff",
     fontFamily: "Poppins_400Regular",
   },
   button: {
@@ -465,12 +488,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 4,
-    width:60,
-    height:60,
+    width: 60,
+    height: 60,
   },
   buttonText: {
     fontFamily: "Inter_700Bold",
-    fontSize:14,
+    fontSize: 14,
   },
   floatingBox: {
     display: "flex",
