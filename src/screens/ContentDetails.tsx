@@ -7,6 +7,7 @@ import {
   Image,
   Animated,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import _ from "lodash";
 import { Loader } from "../components";
@@ -197,6 +198,24 @@ const ContentDetails = () => {
     );
   };
 
+  const clickHandler = () => {
+    alert('Kya karna hai click pe!');
+  };
+
+  const FloatingContainer = () => {
+    return ( <View style={styles.touchableOpacityStyle}>
+    <View style={styles.FlotingText}>
+      <Text style={styles.ftextItem}>UP NEXT</Text>
+      <Text style={styles.fsection}>Section 1: Task Analysis</Text>
+      <Text style={styles.ftopic}>Five Tips: Identifying a Task</Text>
+    </View>
+    <TouchableOpacity style={styles.button} onPress={clickHandler} activeOpacity={0.7}>
+      <Text style={styles.buttonText}>GO</Text>
+    </TouchableOpacity>
+  </View>
+    )
+};
+
   return (
     <SafeAreaView>
       <ScrollView
@@ -221,6 +240,7 @@ const ContentDetails = () => {
           </View>
           {!loading && <CustomReport />}
           {!loading && <AboutCourse />}
+         
         </View>
 
         {loading && (
@@ -231,7 +251,9 @@ const ContentDetails = () => {
         )}
 
         {!loading && <SectionList />}
+        
       </ScrollView>
+      <FloatingContainer />
     </SafeAreaView>
   );
 };
@@ -394,6 +416,67 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontFamily: "Poppins_700Bold",
     padding: 20,
+  },
+  touchableOpacityStyle: {
+    position: 'absolute',
+    width: "92%",
+    height: 120,
+    alignItems: 'center',
+    right: 16,
+    left: 16,
+    bottom: 30,
+    backgroundColor:"#3B1FA3",
+    borderColor: "#D1D5DB",
+    borderRadius:8,
+    borderWidth:1,
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  FlotingText: {
+    color:"#ffffff",
+    textAlign:"Center",
+    alignContent:"flex-start",
+    paddingLeft:20,
+  },
+  ftextItem: {
+    color:"#D4D4D8",
+    fontSize:10,
+    lineHeight:12,
+    fontFamily: "Inter_700Bold",
+  },
+  fsection: {
+    fontSize:10,
+    lineHeight:12,
+    fontFamily: "Inter_700Bold",
+    color:"#ffffff",
+  },
+  ftopic: {
+    fontSize:16,
+    lineHeight:24,
+    color:"#ffffff",
+    fontFamily: "Poppins_400Regular",
+  },
+  button: {
+    marginTop: 60,
+    marginRight: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 4,
+    width:60,
+    height:60,
+  },
+  buttonText: {
+    fontFamily: "Inter_700Bold",
+    fontSize:14,
+  },
+  floatingBox: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
 });
 
