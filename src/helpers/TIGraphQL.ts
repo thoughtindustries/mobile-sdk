@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import { courseListType, pageType } from "../../types";
+import { courseListType, pageType, contentListType } from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
 
@@ -299,6 +299,83 @@ class TIGraphQL {
         })
         .then(() => axios.post(this.gurl, gql2, headers))
         .then((res) => resolve(_.get(res, "data.data.Pages[0]", [])))
+        .catch(reject);
+    });
+  }
+
+  fetchContentDetails(cid: string) {
+    const gql = {
+      query: `query CourseById($id: ID!) {
+        CourseById(id: $id) {
+            id
+            title
+            courseGroup{
+              description
+              authors
+              asset
+            }
+            sections {
+              id
+              title
+              lessons {
+                id
+                title
+                topics {
+                  ... on TextPage {
+                    id
+                  }
+                  ... on ArticlePage {
+                    id
+                  }
+                  ... on QuizPage{
+                    id
+                  }
+                }
+              }
+            }
+        }
+    }`,
+      variables: { id: cid },
+    };
+
+    const gql2 = {
+      query: `query CourseProgress($id: ID!) {
+        PagesCompletedByCourse(courseId: $id) {
+          ... on TextPage {
+              id
+          }
+        }
+      }`,
+      variables: { id: cid },
+    };
+
+    const content: contentListType = { course: [], progress: [] };
+
+    return new Promise<contentListType>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            content.course = _.get(res, "data.data.CourseById", {});
+          }
+        })
+        .then(() => axios.post(this.gurl, gql2, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            content.progress = _.get(
+              res,
+              "data.data.PagesCompletedByCourse",
+              []
+            ).map((pc: { id: String }) => pc.id);
+            resolve(content);
+          }
+        })
         .catch(reject);
     });
   }

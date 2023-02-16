@@ -10,6 +10,8 @@ import ProfileEdit from "./ProfileEdit";
 import SplashScreen from "./SplashScreen";
 import ExploreCatalog from "./ExploreCatalog";
 import CourseDetails from "./CourseDetails";
+import ContentDetails from "./ContentDetails";
+import TopCategories from "./TopCategories";
 
 export default {
   Onboarding,
@@ -24,4 +26,6 @@ export default {
   SplashScreen,
   ExploreCatalog,
   CourseDetails,
+  ContentDetails,
+  TopCategories,
 };

@@ -15,7 +15,7 @@ type OnboardingScreenProps = StackNavigationProp<
 const Onboarding = () => {
   const navigation = useNavigation<OnboardingScreenProps>();
 
-  // useEffect(() => Utils.checkLogin(navigation), []);
+  useEffect(() => Utils.checkLogin(navigation), []);
 
   return (
     <View style={AppStyle.container}>
