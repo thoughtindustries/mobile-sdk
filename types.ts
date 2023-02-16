@@ -17,6 +17,8 @@ export type RootStackParamList = {
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
+  Home:undefined;
+  ContentDetails:undefined;
   ProfileEdit: undefined;
 };
 
