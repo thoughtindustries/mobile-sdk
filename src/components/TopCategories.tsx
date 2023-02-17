@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Link } from "../components";
 import { useNavigation } from "@react-navigation/native";
@@ -10,7 +10,7 @@ type TopCategoriesProps = StackNavigationProp<RootStackParamList, "HomeScreen">;
 
 const TopCategories = () => {
   const navigation = useNavigation<TopCategoriesProps>();
-  const [categories, setCategories] = React.useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const fetchTopCategories = () => {
     tiGql.getTopCategories().then(setCategories).catch(console.log);
   };
