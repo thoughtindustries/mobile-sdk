@@ -8,6 +8,7 @@ import {
   Animated,
   ScrollView,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import _ from "lodash";
 import { Loader } from "../components";
@@ -125,6 +126,7 @@ const ContentDetails = () => {
         lesson.topics.map((t: { id: String }) => t.id)
       ).length > 0;
     return (
+      <Pressable onPress={() => navigation.navigate("ExploreCourse")}>
       <View style={styles.lessonBox}>
         <Text style={styles.lessonTitle}>{lesson.title}</Text>
         <View style={styles.lessonStatus}>
@@ -144,6 +146,7 @@ const ContentDetails = () => {
           )}
         </View>
       </View>
+      </Pressable>
     );
   };
 
@@ -325,7 +328,7 @@ const styles = StyleSheet.create({
     paddingRight: 32,
   },
   lessonBox: {
-    width: "48.5%",
+    minWidth: "48.5%",
     borderColor: "#E5E7EB",
     backgroundColor: "#fafafa",
     borderWidth: 1,

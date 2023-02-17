@@ -20,6 +20,7 @@ export type RootStackParamList = {
   Home: undefined;
   ContentDetails: undefined;
   ProfileEdit: undefined;
+  ExploreCourse: undefined;
 };
 
 export type UserDetailType = {
