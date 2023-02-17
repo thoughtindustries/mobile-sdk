@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -33,12 +33,12 @@ const ContentDetails = () => {
   //const cid = "090558e1-cad4-4a58-bc87-dbce45d4ec15";
   const cid = "b9645873-39c6-455e-ba0b-7f15934245c7";
   const navigation = useNavigation<ContentDetailsScreenProps>();
-  const [content, setContent] = React.useState<contentListType>({
+  const [content, setContent] = useState<contentListType>({
     course: [],
     progress: [],
   });
-  const [loading, setloading] = React.useState<boolean>(true);
-  const [activeSection, setActiveSection] = React.useState<string>("");
+  const [loading, setloading] = useState<boolean>(true);
+  const [activeSection, setActiveSection] = useState<string>("");
   const initialLayout = { width: Dimensions.get("window").width };
 
   const fetchContentDetails = () => {
@@ -49,14 +49,14 @@ const ContentDetails = () => {
       .finally(() => setloading(false));
   };
 
-  React.useEffect(fetchContentDetails, [cid]);
+  useEffect(fetchContentDetails, [cid]);
 
   const getLastViewedSection = () => {
     let secreads = _.get(content, "course.sections", []).filter(isSectionRead);
     return _.get(_.last(secreads), "id", "");
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const lastId = getLastViewedSection();
     if (lastId != "") {
       setActiveSection(lastId);
@@ -103,7 +103,7 @@ const ContentDetails = () => {
     }
   };
 
-  const SectionProgress = (percent: Float) => (
+  const SectionProgress = (percent: Number) => (
     <View style={styles.sectionProgress}>
       <Animated.View
         style={
