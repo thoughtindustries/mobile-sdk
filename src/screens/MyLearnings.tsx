@@ -7,6 +7,7 @@ import {
   FlatList,
   ScrollView,
   Animated,
+  Permission,
   Pressable,
 } from "react-native";
 
@@ -15,13 +16,24 @@ import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import Utils from "../helpers/Utils";
-
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import * as Permissions from "expo-permissions";
+
+type MyLearningScreenProps = StackNavigationProp<
+  RootStackParamList,
+  "MyLearning"
+>;
 
 const MyLearnings = () => {
+  const navigation = useNavigation<MyLearningScreenProps>();
   const [filters, setFilters] = useState<{
     sortBy: string;
     sortDir: string;
@@ -48,15 +60,72 @@ const MyLearnings = () => {
 
   const saveAsset = (asset: string) => {
     // download code for asset
-    return asset;
+    let path: string[] = asset.split("/");
+    const file_name: string = path[path.length - 1];
+    let fileUri: string = FileSystem.documentDirectory + file_name;
+    return FileSystem.downloadAsync(asset, fileUri)
+      .then(() => seekPermission(fileUri))
+      .then(() => {
+        console.log("Downloaded file is ", file_name);
+        return file_name;
+      })
+      .catch((error) => {
+        console.error(error);
+        return "";
+      });
+  };
+
+  const deleteAsset = (file_name: string) => {
+    return new Promise((resolve, reject) => {
+      let fileUri: string = FileSystem.documentDirectory + file_name;
+      Permissions.askAsync(Permissions.MEDIA_LIBRARY).then((permissions) => {
+        if (!permissions.granted) {
+          throw "Permission denied";
+        } else {
+          MediaLibrary.createAssetAsync(fileUri).then((asset) => {
+            MediaLibrary.deleteAssetsAsync(asset).then(() => {
+              console.log("deleted........", asset);
+            });
+          });
+        }
+      });
+      resolve(true);
+    });
+  };
+  const getOfflineMedia = (file_name: string) => {
+    let fileUri: string = FileSystem.documentDirectory + file_name;
+    return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);
+  };
+  const seekPermission = (fileUri: string) => {
+    let fname = "";
+    return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
+      (permissions) => {
+        if (!permissions.granted) {
+          throw "Permission denied";
+        } else {
+          MediaLibrary.createAssetAsync(fileUri).then((asset) => {
+            MediaLibrary.createAlbumAsync("Helium", asset, false).then(() => {
+              console.log("downloaded........", asset);
+            });
+          });
+        }
+      }
+    );
   };
 
   const offlineData = (course: courseListType, mode: boolean) => {
     let user_id: number;
     Utils.fetch("user_dbid")
       .then(({ id }) => (user_id = id))
-      .then(() => saveAsset(course.asset))
-      .then((asset: string) => (course.asset = asset))
+      .then(() => {
+        if (mode) {
+          return saveAsset(course.asset).then(
+            (asset) => (course.asset = asset)
+          );
+        } else {
+          return dbObj.fetchAsset(user_id, course.id).then(deleteAsset);
+        }
+      })
       .then(() => dbObj.saveCourse(user_id, course, mode))
       .then(() =>
         setContent({
@@ -256,9 +325,15 @@ const MyLearnings = () => {
   );
 
   const ContentItem = (props: { data: courseListType }) => {
+    let imgurl = props.data.isOffline
+      ? getOfflineMedia(props.data.asset)
+      : props.data.asset;
+
     return (
       <View style={styles.contentRow}>
-        <Image source={{ uri: props.data.asset }} style={styles.contentImage} />
+        {imgurl && (
+          <Image source={{ uri: imgurl }} style={styles.contentImage} />
+        )}
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
@@ -290,7 +365,20 @@ const MyLearnings = () => {
               />
             )}
           </View>
-          <Text style={styles.courseTitle}>{props.data.title}</Text>
+          <Text
+            style={styles.courseTitle}
+            onPress={() => {
+              console.log(props.data.id);
+              navigation.navigate("CourseDetails", {
+                cid: props.data.id,
+                title: props.data.title,
+                asset: props.data.asset,
+                contentTypeLabel: props.data.contentTypeLabel,
+              });
+            }}
+          >
+            {props.data.title}
+          </Text>
           {props.data.contentTypeLabel === "Course" && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
@@ -310,9 +398,8 @@ const MyLearnings = () => {
   const CategoryFilter = () => (
     <ScrollView horizontal={true} style={styles.catContainer}>
       {Utils.filterValues.myLearningsEvent.map((cat, idx) => (
-        <Pressable onPress={() => setTab(cat)}>
+        <Pressable key={idx} onPress={() => setTab(cat)}>
           <View
-            key={idx}
             style={{
               ...styles.catBox,
               ...(tab === cat ? styles.catBoxSelected : styles.catBoxNormal),
@@ -570,6 +657,7 @@ const styles = StyleSheet.create({
   },
 
   contentTag: {
+    marginLeft: -5,
     borderRadius: 15,
     fontSize: 12,
     padding: 5,
@@ -592,6 +680,10 @@ const styles = StyleSheet.create({
   },
 
   "Learning Path": {
+    backgroundColor: "#DDD6FE",
+  },
+
+  Video: {
     backgroundColor: "#DDD6FE",
   },
 

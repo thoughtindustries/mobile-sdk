@@ -8,9 +8,17 @@ export type RootStackParamList = {
   Offline: undefined;
   HomeScreen: undefined;
   MyLearning: undefined;
+  CourseDetails: {
+    cid: string;
+    title: string;
+    asset: string;
+    contentTypeLabel?: string;
+  };
   TopCategories: undefined;
   Explore: undefined;
   Account: undefined;
+  Home: undefined;
+  ContentDetails: undefined;
   ProfileEdit: undefined;
 };
 
@@ -53,10 +61,32 @@ export type courseListType = {
   isOffline?: boolean;
 };
 
+export type topicType = {
+  language?: null | string;
+  label: string;
+  title?: string;
+  subtitle?: string;
+  body?: string;
+  copyright?: string;
+  asset?: string;
+  videoAsset?: string;
+  externalUrlCallToAction?: string;
+};
+
+export type pageType = {
+  languages: topicType[];
+  videoAsset?: string;
+};
+
 export type filtersType = {
   sortBy: string;
   sortDir: string;
   duration: string;
   difficulty: string;
   tag: string;
+};
+
+export type contentListType = {
+  course: pageType[];
+  progress: String[];
 };

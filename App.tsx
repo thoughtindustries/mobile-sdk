@@ -59,7 +59,12 @@ const App = () => {
           component={FooterMenu}
           options={{ gestureEnabled: false }}
         />
-        <Stack.Screen name="TopCategories" component={Screens.TopCategories} />
+        <Stack.Screen name="TopCategories" component={Screens.Offline} />
+        <Stack.Screen name="CourseDetails" component={Screens.CourseDetails} />
+        <Stack.Screen
+          name="ContentDetails"
+          component={Screens.ContentDetails}
+        />
         <Stack.Screen name="Explore" component={FooterMenu} />
         <Stack.Screen name="My Learning" component={FooterMenu} />
         <Stack.Screen name="Account" component={FooterMenu} />

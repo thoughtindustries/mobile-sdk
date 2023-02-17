@@ -12,6 +12,7 @@ import Banner from "./Banner";
 import TopCategories from "./TopCategories";
 import Recommendation from "./Recommendation";
 import RecentCourses from "./RecentCourses";
+import ResourceControl from "./ResourceControl";
 
 export {
   Button,
@@ -28,4 +29,5 @@ export {
   TopCategories,
   Recommendation,
   RecentCourses,
+  ResourceControl,
 };

@@ -1,13 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../types";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   ImageBackground,
+  TouchableOpacity,
 } from "react-native";
 
+type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
+
 const Recommendation = () => {
+  const navigation = useNavigation<HomeScreenProps>();
   const recommendedCourse: { thumbnail: string; coursename: string }[] = [
     {
       thumbnail: "https://loremflickr.com/640/360",
@@ -37,19 +44,24 @@ const Recommendation = () => {
       </View>
       <ScrollView horizontal={true} style={styles.courseContainer}>
         {recommendedCourse.map((course, idx) => (
-          <View key={idx} style={styles.recContentBox}>
-            <ImageBackground
-              key={idx}
-              source={{ uri: course.thumbnail }}
-              resizeMode="cover"
-              style={{ borderRadius: 10 }}
-              imageStyle={{ borderRadius: 8 }}
-            >
-              <View style={styles.bannerArea}>
-                <Text style={styles.courseTitle}>{course.coursename}</Text>
-              </View>
-            </ImageBackground>
-          </View>
+          <TouchableOpacity
+            key={idx}
+            onPress={() => navigation.navigate("ContentDetails")}
+          >
+            <View style={styles.recContentBox}>
+              <ImageBackground
+                key={idx}
+                source={{ uri: course.thumbnail }}
+                resizeMode="cover"
+                style={{ borderRadius: 10 }}
+                imageStyle={{ borderRadius: 8 }}
+              >
+                <View style={styles.bannerArea}>
+                  <Text style={styles.courseTitle}>{course.coursename}</Text>
+                </View>
+              </ImageBackground>
+            </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
