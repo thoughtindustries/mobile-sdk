@@ -18,9 +18,18 @@ export type RootStackParamList = {
   Explore: undefined;
   Account: undefined;
   Home: undefined;
-  ContentDetails: undefined;
+  ContentDetails: {
+    cid: string;
+  };
   ProfileEdit: undefined;
-  ExploreCourse: undefined;
+  ExploreCourse: {
+    cid: string;
+    course: string;
+    section: string;
+    lesson: string;
+    progress: number;
+    topics?: [];
+  };
 };
 
 export type UserDetailType = {

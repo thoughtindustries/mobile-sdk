@@ -31,8 +31,8 @@ type ContentDetailsScreenProps = StackNavigationProp<
 >;
 
 const ContentDetails = () => {
-  //const cid = "090558e1-cad4-4a58-bc87-dbce45d4ec15";
-  const cid = "b9645873-39c6-455e-ba0b-7f15934245c7";
+  const route = useRoute();
+  const cid = _.get(route, "params.cid", "");
   const navigation = useNavigation<ContentDetailsScreenProps>();
   const [content, setContent] = useState<contentListType>({
     course: [],
@@ -119,40 +119,55 @@ const ContentDetails = () => {
     </View>
   );
 
-  const LessonView = (lesson) => {
+  const LessonView = (
+    lesson: { topics: []; title: string },
+    section: string,
+    secProgress: number
+  ) => {
     const lessonRead =
       _.intersection(
         content.progress,
-        lesson.topics.map((t: { id: String }) => t.id)
+        lesson.topics.map((t: { id: string }) => t.id)
       ).length > 0;
     return (
-      <Pressable onPress={() => navigation.navigate("ExploreCourse")}>
-      <View style={styles.lessonBox}>
-        <Text style={styles.lessonTitle}>{lesson.title}</Text>
-        <View style={styles.lessonStatus}>
-          {!lessonRead && (
-            <MaterialCommunityIcons
-              name="lock-outline"
-              size={20}
-              color="#000000"
-            />
-          )}
-          {lessonRead && (
-            <MaterialCommunityIcons
-              name="check-circle-outline"
-              size={20}
-              color="#008463"
-            />
-          )}
+      <Pressable
+        onPress={() =>
+          navigation.navigate("ExploreCourse", {
+            cid: cid,
+            course: _.get(content, "course.title", ""),
+            section: section,
+            lesson: lesson.title,
+            progress: secProgress,
+            topics: lesson.topics,
+          })
+        }
+      >
+        <View style={styles.lessonBox}>
+          <Text style={styles.lessonTitle}>{lesson.title}</Text>
+          <View style={styles.lessonStatus}>
+            {!lessonRead && (
+              <MaterialCommunityIcons
+                name="lock-outline"
+                size={20}
+                color="#000000"
+              />
+            )}
+            {lessonRead && (
+              <MaterialCommunityIcons
+                name="check-circle-outline"
+                size={20}
+                color="#008463"
+              />
+            )}
+          </View>
         </View>
-      </View>
       </Pressable>
     );
   };
 
   const isSectionRead = (sec) => {
     return sec.lessons.filter(
-      (lesson: { topics: { id: String }[] }) =>
+      (lesson: { topics: { id: string }[] }) =>
         _.intersection(
           content.progress,
           lesson.topics.map((t) => t.id)
@@ -160,8 +175,9 @@ const ContentDetails = () => {
     ).length;
   };
 
-  const SectionView = (sec) => {
+  const SectionView = (sec: { id: string; title: string; lessons: [] }) => {
     const lessonsRead = isSectionRead(sec);
+    const secProgress = (lessonsRead / sec.lessons.length) * 100;
 
     return (
       <Collapse
@@ -183,7 +199,7 @@ const ContentDetails = () => {
                   {lessonsRead === 0 && (
                     <Text style={styles.sectionCount}>No Lessons Started</Text>
                   )}
-                  {SectionProgress((lessonsRead / sec.lessons.length) * 100)}
+                  {SectionProgress(secProgress)}
                 </>
               )}
             </View>
@@ -196,7 +212,7 @@ const ContentDetails = () => {
         </CollapseHeader>
         <CollapseBody>
           <View style={styles.lessonContainer}>
-            {sec.lessons.map(LessonView)}
+            {sec.lessons.map((l) => LessonView(l, sec.title, secProgress))}
           </View>
         </CollapseBody>
       </Collapse>
@@ -217,17 +233,17 @@ const ContentDetails = () => {
 
   const FloatingContainer = () => {
     const secId = getLastViewedSection();
-    let sec = _.get(content, "course.sections[0]", false);
+    let sec: any = _.get(content, "course.sections[0]", {});
     if (secId != "") {
       sec = _.get(content, "course.sections", []).find(
-        (s: { id: String }) => s.id === secId
+        (s: { id: string }) => s.id === secId
       );
     }
     return (
       <View style={styles.floatingFooter}>
         <View style={styles.FlotingText}>
           <Text style={styles.ftextItem}>UP NEXT</Text>
-          <Text style={styles.fsection}>{sec.title}</Text>
+          <Text style={styles.fsection}>{_.get(sec, "title", "")}</Text>
           <Text style={styles.ftopic}>
             {_.get(sec, "lessons[0].title", "")}
           </Text>
