@@ -46,7 +46,11 @@ const Recommendation = () => {
         {recommendedCourse.map((course, idx) => (
           <TouchableOpacity
             key={idx}
-            onPress={() => navigation.navigate("ContentDetails")}
+            onPress={() =>
+              navigation.navigate("ContentDetails", {
+                cid: "b9645873-39c6-455e-ba0b-7f15934245c7",
+              })
+            }
           >
             <View style={styles.recContentBox}>
               <ImageBackground

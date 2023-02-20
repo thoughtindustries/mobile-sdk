@@ -12,6 +12,7 @@ import ExploreCatalog from "./ExploreCatalog";
 import CourseDetails from "./CourseDetails";
 import ContentDetails from "./ContentDetails";
 import TopCategories from "./TopCategories";
+import ExploreCourse from "./ExploreCourse";
 
 export default {
   Onboarding,
@@ -28,4 +29,5 @@ export default {
   CourseDetails,
   ContentDetails,
   TopCategories,
+  ExploreCourse,
 };

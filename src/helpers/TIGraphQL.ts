@@ -323,12 +323,19 @@ class TIGraphQL {
                 topics {
                   ... on TextPage {
                     id
+                    type
                   }
                   ... on ArticlePage {
                     id
+                    type
                   }
                   ... on QuizPage{
                     id
+                    type
+                  }
+                  ... on VideoPage{
+                    id
+                    type
                   }
                 }
               }
@@ -374,6 +381,135 @@ class TIGraphQL {
               []
             ).map((pc: { id: String }) => pc.id);
             resolve(content);
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  fetchTopicPage(tid: string, type: string) {
+    console.log(tid, type);
+    const gqlAry: { [key: string]: string } = {
+      ArticlePage: `... on ArticlePage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        catalogAsset
+        clientId
+        companyId
+        completionTimeSeconds
+        contentDescription
+        contentEstimate
+        contentTime
+        createdAt
+        editableByChildren
+        id
+        indentationLevel
+        
+        lessonId
+        publishDate
+        title
+        type
+        updatedAt
+        videoAsset
+      }`,
+      QuizPage: `... on QuizPage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        allowToResume
+        catalogAsset
+        clientId
+        companyId
+        completionTimeSeconds
+        contentDescription
+        contentEstimate
+        contentTime
+        continueAfterTimerExpires
+        createdAt
+        displayAllHints
+        displayAttemptNumbers
+        editableByChildren
+        failMessage
+        hintControlEnabled
+        id
+        indentationLevel
+        instructorAssessment
+        isGraded
+        lessonId
+        maxAttempts
+        minPassingPercent
+        navigationDisabled
+        passMessage
+        preventProgression
+        questionSkipEnabled
+        
+        
+        showAnswerAfterPass
+        startMessage
+        timeLimitInSeconds
+        timePerQuestionInSeconds
+        timerEnabled
+        title
+        type
+        updatedAt
+      }`,
+      text: `... on TextPage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        body
+        catalogAsset
+        clientId
+        companyId
+        completionTimeSeconds
+        contentDescription
+        contentEstimate
+        contentTime
+        createdAt
+        editableByChildren
+        id
+        indentationLevel
+        lessonId
+       
+       
+        title
+        type
+        updatedAt
+      }`,
+      video: `... on VideoPage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        body
+        asset
+        postAsset
+        posterImageAsset
+        preAsset
+        preTextBlock
+        title
+        type
+      }`,
+    };
+
+    const gql = {
+      query: `query Pages($identifiers: [String!]!) {
+
+      Pages(identifiers: $identifiers) {
+        ${gqlAry[type]}
+      }
+    }`,
+      variables: { identifiers: [tid] },
+    };
+
+    return new Promise((resolve, reject) => {
+      this.headers()
+        .then((headers) => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(res.data.errors[0].message);
+          } else {
+            resolve(res.data.data.Pages[0]);
           }
         })
         .catch(reject);

@@ -75,7 +75,7 @@ const ExploreCatalog = () => {
     let data = courses.filter(
       (c) =>
         c.title.includes(pageVars.search) ||
-        c.authors.join(",").includes(pageVars.search)
+        _.get(c, "authors", []).join(",").includes(pageVars.search)
     );
     return data;
   };
@@ -85,13 +85,13 @@ const ExploreCatalog = () => {
       <View style={styles.courseRow}>
         <View style={styles.courseLeftBox}>
           <Text style={styles.courseTitle}>{props.data.title}</Text>
-          {props.data.authors.length > 0 && (
+          {_.get(props, "data.authors.length", 0) > 0 && (
             <Text style={styles.courseAuthor}>
-              By {props.data.authors.join(",")}
+              By {_.get(props, "data.authors", []).join(",")}
             </Text>
           )}
         </View>
-        {_.get(props, "data.asset", "na") === "na" && (
+        {_.get(props, "data.asset", "na") !== "na" && (
           <Image
             source={{ uri: props.data.asset }}
             style={styles.courseImage}
