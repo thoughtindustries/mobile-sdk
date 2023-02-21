@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Animated } from "react-native";
 import _ from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Loader, CourseQuiz } from "../components";
+import { Loader } from ".";
 import { RootStackParamList } from "../../types";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -15,7 +15,7 @@ type ExploreCourseProps = StackNavigationProp<
   "ExploreCourse"
 >;
 
-const ExploreCourse = () => {
+const CourseQuiz = () => {
   const navigation = useNavigation<ExploreCourseProps>();
   const [topicIndex, setTopicIndex] = useState<number>(0);
   const [loading, setLoading] = useState<Boolean>(false);
@@ -31,8 +31,7 @@ const ExploreCourse = () => {
     setLoading(true);
     tiGql
       .fetchTopicPage(topic.id, topic.type)
-      //.then(setTopicData)
-      .then(console.log)
+      .then(setTopicData)
       .catch(console.log)
       .finally(() => setLoading(false));
   };
@@ -43,10 +42,10 @@ const ExploreCourse = () => {
     ({
       video: renderVideo,
       text: renderText,
-      quiz:renderQuiz,
     }[_.get(topicData, "type", "text")]());
 
   const renderVideo = () => {
+    console.log(topicData);
     return (
       <>
         <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
@@ -86,16 +85,6 @@ const ExploreCourse = () => {
       </Text>
     </>
   );
-  const renderQuiz = () => {
-    console.log(topicData);
-    return <>
-      <Text style={styles.topicTitle}>Quiz Title</Text>
-      <Text style={styles.topicText}>
-        This is Quiz
-      </Text>
-    </>
-  };
-  
 
   return (
     <>
@@ -322,4 +311,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExploreCourse;
+export default CourseQuiz;
