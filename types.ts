@@ -20,6 +20,7 @@ export type RootStackParamList = {
   Home: undefined;
   ContentDetails: {
     cid: string;
+    from: string;
   };
   ProfileEdit: undefined;
   ExploreCourse: {
@@ -29,6 +30,7 @@ export type RootStackParamList = {
     lesson: string;
     progress: number;
     topics?: [];
+    from: string;
   };
 };
 

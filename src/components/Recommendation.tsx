@@ -49,6 +49,7 @@ const Recommendation = () => {
             onPress={() =>
               navigation.navigate("ContentDetails", {
                 cid: "b9645873-39c6-455e-ba0b-7f15934245c7",
+                from: "Home",
               })
             }
           >

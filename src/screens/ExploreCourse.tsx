@@ -103,6 +103,7 @@ const ExploreCourse = () => {
               onPress={() =>
                 navigation.navigate("ContentDetails", {
                   cid: _.get(route, "params.cid", ""),
+                  from: _.get(route, "params.from", ""),
                 })
               }
             />
@@ -111,6 +112,7 @@ const ExploreCourse = () => {
               onPress={() =>
                 navigation.navigate("ContentDetails", {
                   cid: _.get(route, "params.cid", ""),
+                  from: _.get(route, "params.from", ""),
                 })
               }
             >
