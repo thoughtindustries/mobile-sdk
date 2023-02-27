@@ -28,11 +28,11 @@ const ExploreCourse = () => {
       id: "",
       type: "",
     });
+    //console.log(topic);
     setLoading(true);
     tiGql
       .fetchTopicPage(topic.id, topic.type)
-      //.then(setTopicData)
-      .then(console.log)
+      .then(setTopicData)
       .catch(console.log)
       .finally(() => setLoading(false));
   };
@@ -43,7 +43,7 @@ const ExploreCourse = () => {
     ({
       video: renderVideo,
       text: renderText,
-      quiz:renderQuiz,
+      quiz: renderQuiz,
     }[_.get(topicData, "type", "text")]());
 
   const renderVideo = () => {
@@ -86,16 +86,7 @@ const ExploreCourse = () => {
       </Text>
     </>
   );
-  const renderQuiz = () => {
-    console.log(topicData);
-    return <>
-      <Text style={styles.topicTitle}>Quiz Title</Text>
-      <Text style={styles.topicText}>
-        This is Quiz
-      </Text>
-    </>
-  };
-  
+  const renderQuiz = () => <CourseQuiz quiz={topicData} />;
 
   return (
     <>

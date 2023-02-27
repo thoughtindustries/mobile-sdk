@@ -1,313 +1,341 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, Animated } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  ScrollView,
+  Animated,
+} from "react-native";
+import { Button } from "../components";
 import _ from "lodash";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Loader } from ".";
-import { RootStackParamList } from "../../types";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import tiGql from "../helpers/TIGraphQL";
-import WebView from "react-native-webview";
 
-type ExploreCourseProps = StackNavigationProp<
-  RootStackParamList,
-  "ExploreCourse"
->;
+interface CourseQuizProps {
+  quiz: any;
+}
 
-const CourseQuiz = () => {
-  const navigation = useNavigation<ExploreCourseProps>();
-  const [topicIndex, setTopicIndex] = useState<number>(0);
-  const [loading, setLoading] = useState<Boolean>(false);
-  const [topicData, setTopicData] = useState({});
+const CourseQuiz = (props: CourseQuizProps) => {
+  const [qIndex, setQIndex] = useState<number>(5);
+  const [attempts, setAttempts] = useState<string[]>([]);
 
-  const route = useRoute();
+  //useEffect(() => console.log(JSON.stringify(props.quiz)), []);
 
-  const fetchTopic = () => {
-    const topic = _.get(route, `params.topics.${topicIndex}`, {
-      id: "",
-      type: "",
-    });
-    setLoading(true);
-    tiGql
-      .fetchTopicPage(topic.id, topic.type)
-      .then(setTopicData)
-      .catch(console.log)
-      .finally(() => setLoading(false));
+  const saveAttempt = (ans: string, isMulti: boolean) => {
+    let tmp = [...attempts];
+
+    if (isMulti) {
+      let ary: string[] = [];
+      if (_.includes(_.get(tmp, qIndex, []), ans)) {
+        ary = _.filter(_.get(tmp, qIndex, []), (a) => a !== ans);
+      } else {
+        ary.push(ans);
+      }
+      _.set(tmp, qIndex, ary);
+    } else {
+      if (!_.isUndefined(tmp[qIndex]) && tmp[qIndex] === ans) {
+        _.remove(tmp, (v, idx) => idx === qIndex);
+      } else {
+        _.set(tmp, qIndex, ans);
+      }
+    }
+    setAttempts([...tmp]);
   };
 
-  useEffect(fetchTopic, [topicIndex]);
+  const renderQuestion = () => {
+    const question = _.get(props, `quiz.questions.${qIndex - 1}`, {});
+    return (
+      <View>
+        {attempts.length === 0 && renderQuizInfo()}
+        <View style={styles.questionBox}>
+          {_.get(question, "preText", "") !== "" && (
+            <Text style={styles.questionText}>
+              {striptags(_.get(question, "preText", ""))}
+            </Text>
+          )}
+          <Text style={styles.questionTitle}>
+            {striptags(_.get(question, "body", ""))}
+          </Text>
 
-  const renderPage = () =>
-    ({
-      video: renderVideo,
-      text: renderText,
-    }[_.get(topicData, "type", "text")]());
+          {question.type === "multipleChoice" && (
+            <View style={{ marginTop: 16 }}>
+              {renderChoice(question.choices, true)}
+            </View>
+          )}
 
-  const renderVideo = () => {
-    console.log(topicData);
+          {question.type === "booleanChoice" && (
+            <View style={{ marginTop: 16 }}>
+              {renderChoice(question.choices, false)}
+            </View>
+          )}
+
+          {(question.type === "openEnded" || question.type === "essay") && (
+            <View style={{ marginTop: 16 }}>
+              <TextInput
+                onChangeText={(txt) => saveAttempt(txt, false)}
+                defaultValue={_.get(attempts, qIndex, "")}
+                style={styles.textArea}
+                multiline={true}
+                numberOfLines={6}
+                placeholder="Fill in your answer"
+              />
+            </View>
+          )}
+
+          {_.get(question, "postText", "") !== "" && (
+            <Text style={styles.questionText}>
+              {striptags(_.get(question, "postText", ""))}
+            </Text>
+          )}
+
+          {_.get(attempts, qIndex, []).length > 0 && (
+            <Button
+              title="Next Question"
+              onPress={() => setQIndex(qIndex + 1)}
+            />
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const renderChoice = (choices, isMulti: boolean) => {
     return (
       <>
-        <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
-        {_.get(topicData, "preTextBlock", "") != "" && (
-          <Text style={styles.topicText}>
-            {striptags(_.get(topicData, "preTextBlock", ""))}
-          </Text>
-        )}
-        <WebView
-          source={{
-            uri: `https://fast.wistia.com/embed/medias/${_.get(
-              topicData,
-              "asset",
-              ""
-            )}`,
-          }}
-          style={{ marginTop: 20, height: 200 }}
-        />
-
-        {_.get(topicData, "body", "") != "" && (
-          <>
-            <Text style={styles.topicTitle}>Description</Text>
-            <Text style={styles.topicText}>
-              {striptags(_.get(topicData, "body", ""))}
-            </Text>
-          </>
-        )}
+        {choices.map((choice, idx: number) => (
+          <Pressable onPress={() => saveAttempt(choice.value, isMulti)}>
+            <View
+              key={choice.choiceId}
+              style={{
+                ...styles.choiceBox,
+                ...(_.get(attempts, qIndex, []).length > 0 &&
+                _.get(attempts, qIndex, []).includes(choice.value)
+                  ? choice.correct
+                    ? styles.correctBox
+                    : styles.incorrectBox
+                  : []),
+              }}
+            >
+              <Text style={styles.answerTextBold}>
+                {String.fromCharCode(65 + idx)}.
+              </Text>
+              <Text style={styles.answerText}>
+                {_.isEmpty(choice.altText) ? choice.value : choice.altText}
+              </Text>
+            </View>
+          </Pressable>
+        ))}
       </>
     );
   };
 
-  const renderText = () => (
-    <>
-      <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
-      <Text style={styles.topicText}>
-        {striptags(_.get(topicData, "body", ""))}
-      </Text>
-    </>
-  );
-
-  return (
-    <>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
-      >
-        <View>
-          <View style={{ ...styles.row, padding: 8, paddingTop: 40 }}>
+  const renderQuizInfo = () => (
+    <View style={styles.row}>
+      {isTimeBound && (
+        <View
+          style={{
+            ...styles.quizBox,
+            width: isAttemptBound ? "49%" : "100%",
+          }}
+        >
+          <View style={{ ...styles.row, justifyContent: "flex-start" }}>
             <MaterialCommunityIcons
-              name="chevron-left"
-              size={36}
+              name="timer-sand-complete"
+              size={24}
               color="#374151"
-              onPress={() =>
-                navigation.navigate("ContentDetails", {
-                  cid: _.get(route, "params.cid", ""),
-                })
-              }
+              style={styles.quizBoxIcon}
             />
-            <Text
-              style={styles.backBtn}
-              onPress={() =>
-                navigation.navigate("ContentDetails", {
-                  cid: _.get(route, "params.cid", ""),
-                })
-              }
-            >
-              Back
-            </Text>
-          </View>
-
-          <View style={styles.courseHeading}>
-            <View style={{ ...styles.row, paddingTop: 0 }}>
-              <Text style={styles.courseTitle}>
-                {_.get(route, "params.course", "")}
+            <View>
+              <Text style={styles.prenote}>Time Limit</Text>
+              <Text style={styles.boldnote}>
+                {getFormattedTime(props.quiz.timeLimitInSeconds)}
               </Text>
             </View>
           </View>
         </View>
+      )}
 
-        <View style={styles.slide}>
-          <View style={styles.row}>
-            <Text style={styles.sectionTitle}>
-              {_.get(route, "params.section", "")} /
-            </Text>
-            <Text style={styles.lessonTitle}>
-              {_.get(route, "params.lesson", "")}
-            </Text>
-          </View>
-          <View style={styles.sectionProgress}>
-            <Animated.View
-              style={
-                ([StyleSheet.absoluteFill],
-                {
-                  backgroundColor: "#3B1FA3",
-                  width: `${_.get(route, "params.progress", 0)}%`,
-                  borderRadius: 16,
-                })
-              }
-            />
-          </View>
-          {loading && (
-            <View style={styles.searching}>
-              <Text style={styles.searchingText}>Loading data </Text>
-              <Loader size={50} />
-            </View>
-          )}
-          {!loading && <View style={styles.topicPage}>{renderPage()}</View>}
-        </View>
-      </ScrollView>
-      {!loading && (
+      {isAttemptBound && (
         <View
           style={{
-            ...styles.row,
-            ...styles.pagingBox,
-            justifyContent: "space-between",
+            ...styles.quizBox,
+            width: isTimeBound ? "49%" : "100%",
           }}
         >
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={36}
-            color={topicIndex === 0 ? "#FFFFFF" : "#3B1FA3"}
-            style={topicIndex === 0 ? styles.pageBtnDisabled : styles.pageBtn}
-            onPress={() => {
-              if (topicIndex > 0) {
-                setTopicIndex(topicIndex - 1);
-              }
-            }}
-          />
-
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={36}
-            color={
-              _.get(route, "params.topics.length", 1) - 1 > topicIndex
-                ? "#3B1FA3"
-                : "#FFFFFF"
-            }
-            style={
-              _.get(route, "params.topics.length", 1) - 1 > topicIndex
-                ? styles.pageBtn
-                : styles.pageBtnDisabled
-            }
-            onPress={() => {
-              if (_.get(route, "params.topics.length", 1) - 1 > topicIndex) {
-                setTopicIndex(topicIndex + 1);
-              }
-            }}
-          />
+          <View style={{ ...styles.row, justifyContent: "flex-start" }}>
+            <MaterialCommunityIcons
+              name="arrow-up-right"
+              size={24}
+              color="#374151"
+              style={styles.quizBoxIcon}
+            />
+            <View>
+              <Text style={styles.prenote}>Attempts left</Text>
+              <Text style={styles.boldnote}>{props.quiz.maxAttempts}</Text>
+            </View>
+          </View>
         </View>
       )}
-    </>
+    </View>
+  );
+
+  const getFormattedTime = (t: number) => {
+    let suffix: string = "seconds";
+    if (t >= 60) {
+      t = Math.round(t / 60);
+      suffix = "minutes";
+    }
+    if (t >= 60) {
+      t = Math.round(t / 60);
+      suffix = "hours";
+    }
+    if (t >= 24) {
+      t = Math.round(t / 24);
+      suffix = "days";
+    }
+
+    return `${t} ${suffix}`;
+  };
+
+  const isTimeBound: boolean = _.get(props, "quiz.timeLimitInSeconds", 0) > 0;
+  const isAttemptBound: boolean = _.get(props, "quiz.maxAttempts", 0) > 0;
+
+  return (
+    <View>
+      {qIndex === 0 && (
+        <>
+          <Text style={styles.heading}>
+            {_.get(props, "quiz.title", "Quiz")}
+          </Text>
+          {!_.isEmpty(_.get(props, "quiz.startMessage", "")) && (
+            <Text style={styles.startMessage}>
+              {striptags(props.quiz.startMessage)}
+            </Text>
+          )}
+
+          {renderQuizInfo()}
+
+          {_.get(props, "quiz.questions.length", 0) > 0 && (
+            <Button title="Start Quiz" onPress={() => setQIndex(1)} />
+          )}
+        </>
+      )}
+
+      {qIndex > 0 && renderQuestion()}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   row: {
-    backgroundColor: "#fff",
     display: "flex",
     flexDirection: "row",
-  },
-  backBtn: {
-    paddingTop: 7,
-    marginLeft: 0,
-  },
-  courseHeading: {
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FFFFFF",
-  },
-  courseTitle: {
-    color: "#3B1FA3",
-    fontFamily: "Poppins_700Bold",
-    fontSize: 16,
-    lineHeight: 24,
-    padding: 16,
-    paddingLeft: 24,
-    paddingRight: 24,
-  },
-
-  slide: {
-    marginTop: 16,
-    backgroundColor: "#FFFFFF",
-    padding: 24,
-  },
-
-  sectionTitle: {
-    color: "#1F2937",
-    fontFamily: "Inter_700Bold",
-    fontSiz: 14,
-    paddingRight: 5,
-  },
-
-  lessonTitle: {
-    color: "#3B1FA3",
-    fontFamily: "Inter_700Bold",
-    fontSiz: 14,
-  },
-
-  sectionProgress: {
-    marginTop: 15,
-    marginBottom: 15,
-    height: 8,
-    flexDirection: "row",
-    backgroundColor: "#D1D5DB",
-    borderRadius: 16,
-  },
-
-  searching: {
-    margin: 32,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 10,
-    paddingBottom: 20,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
   },
-
-  searchingText: {
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    color: "#ffffff",
+  heading: {
     fontFamily: "Poppins_700Bold",
-    padding: 20,
-  },
-
-  topicPage: {
+    fontSize: 20,
+    textAlign: "center",
     padding: 8,
   },
-
-  topicTitle: {
-    color: "#1F2937",
-    fontFamily: "Inter_700Bold",
-    fontSiz: 14,
-    paddingRight: 5,
+  startMessage: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 16,
+    textAlign: "center",
+    color: "#6B7280",
+    paddingBottom: 10,
   },
 
-  topicText: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 16,
-    lineHeight: 24,
+  quizBox: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    backgroundColor: "#FCFCFF",
+    padding: 10,
+  },
+
+  quizBoxIcon: {
+    borderWidth: 1,
+    padding: 3,
+    borderColor: "#E5E7EB",
+    borderRadius: 5,
+    backgroundColor: "#F3F4F6",
+    marginRight: 5,
+  },
+
+  prenote: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 10,
     color: "#6B7280",
   },
 
-  pagingBox: {
-    backgroundColor: "#3B1FA3",
-    padding: 24,
+  boldnote: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 14,
+    color: "#1F2937",
   },
 
-  pageBtnDisabled: {
-    borderRadius: 5,
+  questionBox: {
+    paddingTop: 20,
+  },
+
+  questionText: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 16,
+    color: "#6B7280",
+  },
+
+  questionTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 20,
+    color: "#1F2937",
+  },
+
+  choiceBox: {
+    padding: 16,
+    paddingLeft: 24,
+    paddingRight: 24,
+    backgroundColor: "#FCFCFF",
+    borderColor: "#E5E7EB",
     borderWidth: 1,
-    borderColor: "#FFFFFF",
-    padding: 5,
+    borderRadius: 10,
+    marginBottom: 16,
+    display: "flex",
+    flexDirection: "row",
   },
 
-  pageBtn: {
+  correctBox: {
+    borderColor: "#326D3C",
+    backgroundColor: "#326D3C22",
+  },
+
+  incorrectBox: {
+    borderColor: "#DC2626",
+    backgroundColor: "#DC262622",
+  },
+
+  textArea: {
+    borderColor: "#D1D5DB",
+    textAlignVertical: "top",
+    borderWidth: 1,
+    padding: 10,
     borderRadius: 5,
-    backgroundColor: "#FFFFFF",
-    padding: 5,
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+  },
+
+  answerText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+  },
+
+  answerTextBold: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 14,
+    paddingRight: 10,
   },
 });
 
