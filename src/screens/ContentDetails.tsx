@@ -33,6 +33,7 @@ type ContentDetailsScreenProps = StackNavigationProp<
 const ContentDetails = () => {
   const route = useRoute();
   const cid = _.get(route, "params.cid", "");
+  let backToRoute = _.get(route, "params.from", "Home");
   const navigation = useNavigation<ContentDetailsScreenProps>();
   const [content, setContent] = useState<contentListType>({
     course: [],
@@ -139,6 +140,7 @@ const ContentDetails = () => {
             lesson: lesson.title,
             progress: secProgress,
             topics: lesson.topics,
+            from: backToRoute,
           })
         }
       >
@@ -272,17 +274,21 @@ const ContentDetails = () => {
               size={32}
               color="#FFFFFF"
               style={styles.backIcon}
-              onPress={() => navigation.navigate("Home")}
+              onPress={() => navigation.navigate(backToRoute)}
             />
             <Text
               style={styles.backBtn}
-              onPress={() => navigation.navigate("Home")}
+              onPress={() => navigation.navigate(backToRoute)}
             >
               Back
             </Text>
           </View>
           {!loading && <CustomReport />}
-          {!loading && <AboutCourse />}
+          {!loading && (
+            <ScrollView style={{ height: 150 }}>
+              <AboutCourse />
+            </ScrollView>
+          )}
         </View>
 
         {loading && (

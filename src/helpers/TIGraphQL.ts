@@ -413,20 +413,16 @@ class TIGraphQL {
         updatedAt
         videoAsset
       }`,
-      QuizPage: `... on QuizPage {
+      quiz: `... on QuizPage {
         accessibilityAudioAsset
         accessibilityAudioAssetTitle
         accessibilityAudioAssetUrl
         allowToResume
-        catalogAsset
-        clientId
-        companyId
         completionTimeSeconds
         contentDescription
         contentEstimate
         contentTime
         continueAfterTimerExpires
-        createdAt
         displayAllHints
         displayAttemptNumbers
         editableByChildren
@@ -436,15 +432,83 @@ class TIGraphQL {
         indentationLevel
         instructorAssessment
         isGraded
-        lessonId
         maxAttempts
         minPassingPercent
         navigationDisabled
+        questions{
+          additionalContent
+          body
+          choices{
+            altText
+            asset
+            choiceId
+            correct
+            points
+            response
+            value
+          }
+          fileSubmissionAsset
+          gradedAsCorrect
+          hasChoices
+          isBooleanChoice
+          isEssay
+          isFileSubmission
+          isImageComparison
+          isLikert
+          isMultipleChoice
+          isOpenEnded
+          isSelectBoxes
+          isTable
+          mustSelectAllCorrectChoices
+          openEndedResponse
+          parentQuestion
+          placeholder
+          postText
+          postText2
+          preText
+          preText2
+          preselectedChoices{
+            choiceId
+          }
+          questionId
+          questionCategoryId
+          questionType
+          required
+          response
+          selectedChoice{
+            choiceId
+          }
+          shouldCheckAnswers
+          shouldDisplayOnResults
+          table{
+            headers{
+              locked
+              value
+              weight
+            }
+            rows{
+              locked
+              value
+              weight
+            }
+          }
+          tableResponse{
+            headers{
+              locked
+              value
+              weight
+            }
+            rows{
+              locked
+              value
+              weight
+            }
+          }
+          type
+        }
         passMessage
         preventProgression
         questionSkipEnabled
-        
-        
         showAnswerAfterPass
         startMessage
         timeLimitInSeconds
@@ -452,7 +516,6 @@ class TIGraphQL {
         timerEnabled
         title
         type
-        updatedAt
       }`,
       text: `... on TextPage {
         accessibilityAudioAsset

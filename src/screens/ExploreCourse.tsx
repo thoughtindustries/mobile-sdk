@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Animated } from "react-native";
 import _ from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Loader } from "../components";
+import { Loader, CourseQuiz } from "../components";
 import { RootStackParamList } from "../../types";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -28,6 +28,7 @@ const ExploreCourse = () => {
       id: "",
       type: "",
     });
+    //console.log(topic);
     setLoading(true);
     tiGql
       .fetchTopicPage(topic.id, topic.type)
@@ -42,10 +43,10 @@ const ExploreCourse = () => {
     ({
       video: renderVideo,
       text: renderText,
+      quiz: renderQuiz,
     }[_.get(topicData, "type", "text")]());
 
   const renderVideo = () => {
-    console.log(topicData);
     return (
       <>
         <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
@@ -85,6 +86,7 @@ const ExploreCourse = () => {
       </Text>
     </>
   );
+  const renderQuiz = () => <CourseQuiz quiz={topicData} />;
 
   return (
     <>
@@ -101,6 +103,7 @@ const ExploreCourse = () => {
               onPress={() =>
                 navigation.navigate("ContentDetails", {
                   cid: _.get(route, "params.cid", ""),
+                  from: _.get(route, "params.from", ""),
                 })
               }
             />
@@ -109,6 +112,7 @@ const ExploreCourse = () => {
               onPress={() =>
                 navigation.navigate("ContentDetails", {
                   cid: _.get(route, "params.cid", ""),
+                  from: _.get(route, "params.from", ""),
                 })
               }
             >

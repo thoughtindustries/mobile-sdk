@@ -13,6 +13,7 @@ import TopCategories from "./TopCategories";
 import Recommendation from "./Recommendation";
 import RecentCourses from "./RecentCourses";
 import ResourceControl from "./ResourceControl";
+import CourseQuiz from "./CourseQuiz";
 
 export {
   Button,
@@ -30,4 +31,5 @@ export {
   Recommendation,
   RecentCourses,
   ResourceControl,
+  CourseQuiz,
 };
