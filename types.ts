@@ -102,3 +102,10 @@ export type contentListType = {
   course: pageType[];
   progress: String[];
 };
+
+export type userRecentContentType = {
+  id: string;
+  title: string;
+  asset: string;
+  description: string;
+};

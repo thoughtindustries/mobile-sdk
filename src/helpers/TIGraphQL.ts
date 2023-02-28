@@ -1,7 +1,12 @@
 import axios from "axios";
 
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import { courseListType, pageType, contentListType } from "../../types";
+import {
+  courseListType,
+  pageType,
+  contentListType,
+  userRecentContentType,
+} from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
 
@@ -573,6 +578,34 @@ class TIGraphQL {
             reject(res.data.errors[0].message);
           } else {
             resolve(res.data.data.Pages[0]);
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  fetchRecentCourses(limit: number) {
+    const gql = {
+      query: `query UserRecentContent{
+          UserRecentContent(limit: ${limit}) {
+            id
+            title
+            description
+            asset  
+          }
+      }`,
+      variables: {},
+    };
+    return new Promise<userRecentContentType[]>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve(_.get(res, "data.data.UserRecentContent", []));
           }
         })
         .catch(reject);

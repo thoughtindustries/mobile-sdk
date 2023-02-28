@@ -1,26 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ImageBackground } from "react-native";
-import { truncate } from "lodash";
+import _ from "lodash";
+import striptags from "striptags";
+import tiGql from "../helpers/TIGraphQL";
+import { userRecentContentType } from "../../types";
 
-let bannerText: string =
-  "You need a way to manage your customer relationships, and contacts. You will learn how to build a customized database that will allow you to document and store customer data, look up prior orders, and generate reports such as product price lists, order totals and customer satisfaction.";
-bannerText = truncate(bannerText, { length: 70 });
+const Banner = () => {
+  const [featured, setFeatured] = useState<userRecentContentType[]>([]);
 
-const Banner = () => (
-  <View style={styles.bannerContainer}>
-    <ImageBackground
-      source={require("../../assets/dashboard-banner.png")}
-      resizeMode="cover"
-      imageStyle={{ borderRadius: 8 }}
-    >
-      <View style={styles.bannerArea}>
-        <Text style={styles.bannerTitle}>Become a Master: </Text>
-        <Text style={styles.bannerTitle}>Sales Database</Text>
-        <Text style={styles.bannerText}>{bannerText}</Text>
-      </View>
-    </ImageBackground>
-  </View>
-);
+  const fetchFeaturedCourses = () => {
+    tiGql.fetchRecentCourses(1).then(setFeatured);
+  };
+
+  useEffect(fetchFeaturedCourses, []);
+
+  return (
+    <View style={styles.bannerContainer}>
+      <ImageBackground
+        source={{ uri: _.get(featured, "0.asset", "") }}
+        resizeMode="cover"
+        imageStyle={{ borderRadius: 8 }}
+      >
+        <View style={styles.bannerArea}>
+          <Text style={styles.bannerTitle}>
+            {_.get(featured, "0.title", "")}
+          </Text>
+          <Text style={styles.bannerText}>
+            {_.truncate(striptags(_.get(featured, "0.description", "")), {
+              length: 70,
+            })}
+          </Text>
+        </View>
+      </ImageBackground>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   bannerContainer: {
