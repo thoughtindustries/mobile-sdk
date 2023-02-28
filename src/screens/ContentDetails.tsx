@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import _ from "lodash";
+import { get, last, intersection } from "lodash";
 import { Loader } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -32,8 +32,8 @@ type ContentDetailsScreenProps = StackNavigationProp<
 
 const ContentDetails = () => {
   const route = useRoute();
-  const cid = _.get(route, "params.cid", "");
-  let backToRoute = _.get(route, "params.from", "Home");
+  const cid = get(route, "params.cid", "");
+  let backToRoute = get(route, "params.from", "Home");
   const navigation = useNavigation<ContentDetailsScreenProps>();
   const [content, setContent] = useState<contentListType>({
     course: [],
@@ -54,8 +54,8 @@ const ContentDetails = () => {
   useEffect(fetchContentDetails, [cid]);
 
   const getLastViewedSection = () => {
-    let secreads = _.get(content, "course.sections", []).filter(isSectionRead);
-    return _.get(_.last(secreads), "id", "");
+    let secreads = get(content, "course.sections", []).filter(isSectionRead);
+    return get(last(secreads), "id", "");
   };
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const ContentDetails = () => {
     if (lastId != "") {
       setActiveSection(lastId);
     } else {
-      setActiveSection(_.get(content, "course.sections[0].id", ""));
+      setActiveSection(get(content, "course.sections[0].id", ""));
     }
   }, [content]);
 
@@ -71,15 +71,15 @@ const ContentDetails = () => {
     <View style={styles.reportRow}>
       <View style={styles.reportRightBox}>
         <Text style={styles.courseTitle}>
-          {_.get(content, "course.title", "Course")}
+          {get(content, "course.title", "Course")}
         </Text>
         <Text style={styles.courseAuthor}>
-          By {_.get(content, "course.courseGroup.authors", []).join(",")}
+          By {get(content, "course.courseGroup.authors", []).join(",")}
         </Text>
       </View>
-      {_.get(content, "course.courseGroup.asset", "") !== "" && (
+      {get(content, "course.courseGroup.asset", "") !== "" && (
         <Image
-          source={{ uri: _.get(content, "course.courseGroup.asset", "") }}
+          source={{ uri: get(content, "course.courseGroup.asset", "") }}
           style={styles.recentImage}
         />
       )}
@@ -91,7 +91,7 @@ const ContentDetails = () => {
       <View style={styles.aboutSection}>
         <Text style={styles.courseSubTitle}>About this Course</Text>
         <Text style={styles.courseDesc}>
-          {_.get(content, "course.courseGroup.description", "")}
+          {get(content, "course.courseGroup.description", "")}
         </Text>
       </View>
     </>
@@ -126,7 +126,7 @@ const ContentDetails = () => {
     secProgress: number
   ) => {
     const lessonRead =
-      _.intersection(
+      intersection(
         content.progress,
         lesson.topics.map((t: { id: string }) => t.id)
       ).length > 0;
@@ -135,7 +135,7 @@ const ContentDetails = () => {
         onPress={() =>
           navigation.navigate("ExploreCourse", {
             cid: cid,
-            course: _.get(content, "course.title", ""),
+            course: get(content, "course.title", ""),
             section: section,
             lesson: lesson.title,
             progress: secProgress,
@@ -167,10 +167,10 @@ const ContentDetails = () => {
     );
   };
 
-  const isSectionRead = (sec) => {
+  const isSectionRead = (sec: { id: string; title: string; lessons: [] }) => {
     return sec.lessons.filter(
       (lesson: { topics: { id: string }[] }) =>
-        _.intersection(
+        intersection(
           content.progress,
           lesson.topics.map((t) => t.id)
         ).length > 0
@@ -224,7 +224,7 @@ const ContentDetails = () => {
   const SectionList = () => {
     return (
       <View style={styles.sectionList}>
-        {_.get(content, "course.sections", []).map(SectionView)}
+        {get(content, "course.sections", []).map(SectionView)}
       </View>
     );
   };
@@ -235,9 +235,9 @@ const ContentDetails = () => {
 
   const FloatingContainer = () => {
     const secId = getLastViewedSection();
-    let sec: any = _.get(content, "course.sections[0]", {});
+    let sec: any = get(content, "course.sections[0]", {});
     if (secId != "") {
-      sec = _.get(content, "course.sections", []).find(
+      sec = get(content, "course.sections", []).find(
         (s: { id: string }) => s.id === secId
       );
     }
@@ -245,10 +245,8 @@ const ContentDetails = () => {
       <View style={styles.floatingFooter}>
         <View style={styles.FlotingText}>
           <Text style={styles.ftextItem}>UP NEXT</Text>
-          <Text style={styles.fsection}>{_.get(sec, "title", "")}</Text>
-          <Text style={styles.ftopic}>
-            {_.get(sec, "lessons[0].title", "")}
-          </Text>
+          <Text style={styles.fsection}>{get(sec, "title", "")}</Text>
+          <Text style={styles.ftopic}>{get(sec, "lessons[0].title", "")}</Text>
         </View>
         <TouchableOpacity
           style={styles.button}
