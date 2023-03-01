@@ -140,19 +140,26 @@ const ExploreCatalog = () => {
         </View>
       )}
       {!pageVars.searching && courses.length > 0 && (
-        <FlatList
-          data={filteredCourses()}
-          renderItem={({ item }) => <CourseItem data={item} />}
-          onEndReached={fetchCourses}
-          onEndReachedThreshold={0.5}
-          // Unused styling
-          style={styles.listStyle}
-          ListEmptyComponent={
-            <Text style={styles.noRecords}>
-              No records found, try using other filters.
-            </Text>
-          }
-        />
+        <View>
+          <Text
+            style={{ ...styles.courseTitle, marginTop: 10, marginLeft: 15 }}
+          >
+            Results ({_.padStart(filteredCourses().length.toString(), 2, "0")})
+          </Text>
+          <FlatList
+            data={filteredCourses()}
+            renderItem={({ item }) => <CourseItem data={item} />}
+            onEndReached={fetchCourses}
+            onEndReachedThreshold={0.5}
+            // Unused styling
+            style={styles.listStyle}
+            ListEmptyComponent={
+              <Text style={styles.noRecords}>
+                No records found, try using other filters.
+              </Text>
+            }
+          />
+        </View>
       )}
     </View>
   );
@@ -215,6 +222,7 @@ const styles = StyleSheet.create({
   },
 
   searching: {
+    marginTop: 20,
     backgroundColor: "#3B1FA3",
     borderRadius: 10,
     paddingBottom: 20,

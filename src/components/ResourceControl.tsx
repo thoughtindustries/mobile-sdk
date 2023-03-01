@@ -12,9 +12,12 @@ import _ from "lodash";
 
 import { SelectList } from "react-native-dropdown-select-list";
 
-const ResourceControl = (props: { data: topicType[] }) => {
+const ResourceControl = (props: {
+  data: topicType[];
+  variant: number;
+  onChange: (a: number) => void;
+}) => {
   const [show, setShow] = useState<boolean>(false);
-  const [variant, setVariant] = useState<number>(0);
 
   const ResourceModal = () => {
     const getOption = (lang: { label: string }, idx: number) => ({
@@ -43,7 +46,7 @@ const ResourceControl = (props: { data: topicType[] }) => {
       const resource: {
         pdfAssetUrl: string;
         pdfAssetSecondaryUrl: string;
-      } = _.get(props, `data.languages.${variant}`, {
+      } = _.get(props, `data.languages.${props.variant}`, {
         pdfAssetUrl: "",
         pdfAssetSecondaryUrl: "",
       });
@@ -78,10 +81,10 @@ const ResourceControl = (props: { data: topicType[] }) => {
           </View>
 
           <SelectList
-            setSelected={setVariant}
+            setSelected={props.onChange}
             defaultOption={getOption(
-              _.get(props, `data.languages.${variant}`, { label: "" }),
-              variant
+              _.get(props, `data.languages.${props.variant}`, { label: "" }),
+              props.variant
             )}
             search={false}
             data={_.get(props, "data.languages", []).map(getOption)}
