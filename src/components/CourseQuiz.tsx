@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TextInput,
-  ScrollView,
-  Animated,
-} from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
 import { Button } from "../components";
-import _ from "lodash";
+import {
+  get,
+  filter,
+  includes,
+  set,
+  isUndefined,
+  remove,
+  isEmpty,
+} from "lodash";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -17,46 +17,44 @@ interface CourseQuizProps {
   quiz: any;
 }
 
-const CourseQuiz = (props: CourseQuizProps) => {
+const CourseQuiz = ({ quiz }: CourseQuizProps) => {
   const [qIndex, setQIndex] = useState<number>(5);
   const [attempts, setAttempts] = useState<string[]>([]);
 
-  //useEffect(() => console.log(JSON.stringify(props.quiz)), []);
-
-  const saveAttempt = (ans: string, isMulti: boolean) => {
-    let tmp = [...attempts];
+  const saveAttempt = (answer: string, isMulti: boolean) => {
+    let temp = [...attempts];
 
     if (isMulti) {
-      let ary: string[] = [];
-      if (_.includes(_.get(tmp, qIndex, []), ans)) {
-        ary = _.filter(_.get(tmp, qIndex, []), (a) => a !== ans);
+      let answers: string[] = [];
+      if (includes(get(temp, qIndex, []), answer)) {
+        answers = filter(get(temp, qIndex, []), (a) => a !== answer);
       } else {
-        ary.push(ans);
+        answers.push(answer);
       }
-      _.set(tmp, qIndex, ary);
+      set(temp, qIndex, answers);
     } else {
-      if (!_.isUndefined(tmp[qIndex]) && tmp[qIndex] === ans) {
-        _.remove(tmp, (v, idx) => idx === qIndex);
+      if (!isUndefined(temp[qIndex]) && temp[qIndex] === answer) {
+        remove(temp, (v, idx) => idx === qIndex);
       } else {
-        _.set(tmp, qIndex, ans);
+        set(temp, qIndex, answer);
       }
     }
-    setAttempts([...tmp]);
+    setAttempts([...temp]);
   };
 
   const renderQuestion = () => {
-    const question = _.get(props, `quiz.questions.${qIndex - 1}`, {});
+    const question = get(quiz, `quiz.questions.${qIndex - 1}`, {});
     return (
       <View>
         {attempts.length === 0 && renderQuizInfo()}
         <View style={styles.questionBox}>
-          {_.get(question, "preText", "") !== "" && (
+          {get(question, "preText", "") !== "" && (
             <Text style={styles.questionText}>
-              {striptags(_.get(question, "preText", ""))}
+              {striptags(get(question, "preText", ""))}
             </Text>
           )}
           <Text style={styles.questionTitle}>
-            {striptags(_.get(question, "body", ""))}
+            {striptags(get(question, "body", ""))}
           </Text>
 
           {question.type === "multipleChoice" && (
@@ -75,7 +73,7 @@ const CourseQuiz = (props: CourseQuizProps) => {
             <View style={{ marginTop: 16 }}>
               <TextInput
                 onChangeText={(txt) => saveAttempt(txt, false)}
-                defaultValue={_.get(attempts, qIndex, "")}
+                defaultValue={get(attempts, qIndex, "")}
                 style={styles.textArea}
                 multiline={true}
                 numberOfLines={6}
@@ -84,13 +82,13 @@ const CourseQuiz = (props: CourseQuizProps) => {
             </View>
           )}
 
-          {_.get(question, "postText", "") !== "" && (
+          {get(question, "postText", "") !== "" && (
             <Text style={styles.questionText}>
-              {striptags(_.get(question, "postText", ""))}
+              {striptags(get(question, "postText", ""))}
             </Text>
           )}
 
-          {_.get(attempts, qIndex, []).length > 0 && (
+          {get(attempts, qIndex, []).length > 0 && (
             <Button
               title="Next Question"
               onPress={() => setQIndex(qIndex + 1)}
@@ -110,8 +108,8 @@ const CourseQuiz = (props: CourseQuizProps) => {
               key={choice.choiceId}
               style={{
                 ...styles.choiceBox,
-                ...(_.get(attempts, qIndex, []).length > 0 &&
-                _.get(attempts, qIndex, []).includes(choice.value)
+                ...(get(attempts, qIndex, []).length > 0 &&
+                get(attempts, qIndex, []).includes(choice.value)
                   ? choice.correct
                     ? styles.correctBox
                     : styles.incorrectBox
@@ -122,7 +120,7 @@ const CourseQuiz = (props: CourseQuizProps) => {
                 {String.fromCharCode(65 + idx)}.
               </Text>
               <Text style={styles.answerText}>
-                {_.isEmpty(choice.altText) ? choice.value : choice.altText}
+                {isEmpty(choice.altText) ? choice.value : choice.altText}
               </Text>
             </View>
           </Pressable>
@@ -150,7 +148,7 @@ const CourseQuiz = (props: CourseQuizProps) => {
             <View>
               <Text style={styles.prenote}>Time Limit</Text>
               <Text style={styles.boldnote}>
-                {getFormattedTime(props.quiz.timeLimitInSeconds)}
+                {getFormattedTime(quiz.timeLimitInSeconds)}
               </Text>
             </View>
           </View>
@@ -173,7 +171,7 @@ const CourseQuiz = (props: CourseQuizProps) => {
             />
             <View>
               <Text style={styles.prenote}>Attempts left</Text>
-              <Text style={styles.boldnote}>{props.quiz.maxAttempts}</Text>
+              <Text style={styles.boldnote}>{quiz.maxAttempts}</Text>
             </View>
           </View>
         </View>
@@ -199,25 +197,23 @@ const CourseQuiz = (props: CourseQuizProps) => {
     return `${t} ${suffix}`;
   };
 
-  const isTimeBound: boolean = _.get(props, "quiz.timeLimitInSeconds", 0) > 0;
-  const isAttemptBound: boolean = _.get(props, "quiz.maxAttempts", 0) > 0;
+  const isTimeBound: boolean = get(quiz, "quiz.timeLimitInSeconds", 0) > 0;
+  const isAttemptBound: boolean = get(quiz, "quiz.maxAttempts", 0) > 0;
 
   return (
     <View>
       {qIndex === 0 && (
         <>
-          <Text style={styles.heading}>
-            {_.get(props, "quiz.title", "Quiz")}
-          </Text>
-          {!_.isEmpty(_.get(props, "quiz.startMessage", "")) && (
+          <Text style={styles.heading}>{get(quiz, "quiz.title", "Quiz")}</Text>
+          {!isEmpty(get(quiz, "quiz.startMessage", "")) && (
             <Text style={styles.startMessage}>
-              {striptags(props.quiz.startMessage)}
+              {striptags(quiz.startMessage)}
             </Text>
           )}
 
           {renderQuizInfo()}
 
-          {_.get(props, "quiz.questions.length", 0) > 0 && (
+          {get(quiz, "quiz.questions.length", 0) > 0 && (
             <Button title="Start Quiz" onPress={() => setQIndex(1)} />
           )}
         </>

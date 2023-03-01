@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { View, Text, StyleSheet, ScrollView, Animated } from "react-native";
-import _ from "lodash";
+import { get } from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Loader, CourseQuiz } from "../components";
@@ -24,7 +24,7 @@ const ExploreCourse = () => {
   const route = useRoute();
 
   const fetchTopic = () => {
-    const topic = _.get(route, `params.topics.${topicIndex}`, {
+    const topic = get(route, `params.topics.${topicIndex}`, {
       id: "",
       type: "",
     });
@@ -44,20 +44,20 @@ const ExploreCourse = () => {
       video: renderVideo,
       text: renderText,
       quiz: renderQuiz,
-    }[_.get(topicData, "type", "text")]());
+    }[get(topicData, "type", "text")]());
 
   const renderVideo = () => {
     return (
       <>
-        <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
-        {_.get(topicData, "preTextBlock", "") != "" && (
+        <Text style={styles.topicTitle}>{get(topicData, "title", "")}</Text>
+        {get(topicData, "preTextBlock", "") != "" && (
           <Text style={styles.topicText}>
-            {striptags(_.get(topicData, "preTextBlock", ""))}
+            {striptags(get(topicData, "preTextBlock", ""))}
           </Text>
         )}
         <WebView
           source={{
-            uri: `https://fast.wistia.com/embed/medias/${_.get(
+            uri: `https://fast.wistia.com/embed/medias/${get(
               topicData,
               "asset",
               ""
@@ -66,11 +66,11 @@ const ExploreCourse = () => {
           style={{ marginTop: 20, height: 200 }}
         />
 
-        {_.get(topicData, "body", "") != "" && (
+        {get(topicData, "body", "") != "" && (
           <>
             <Text style={styles.topicTitle}>Description</Text>
             <Text style={styles.topicText}>
-              {striptags(_.get(topicData, "body", ""))}
+              {striptags(get(topicData, "body", ""))}
             </Text>
           </>
         )}
@@ -80,9 +80,9 @@ const ExploreCourse = () => {
 
   const renderText = () => (
     <>
-      <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
+      <Text style={styles.topicTitle}>{get(topicData, "title", "")}</Text>
       <Text style={styles.topicText}>
-        {striptags(_.get(topicData, "body", ""))}
+        {striptags(get(topicData, "body", ""))}
       </Text>
     </>
   );
@@ -102,8 +102,8 @@ const ExploreCourse = () => {
               color="#374151"
               onPress={() =>
                 navigation.navigate("ContentDetails", {
-                  cid: _.get(route, "params.cid", ""),
-                  from: _.get(route, "params.from", ""),
+                  cid: get(route, "params.cid", ""),
+                  from: get(route, "params.from", ""),
                 })
               }
             />
@@ -111,8 +111,8 @@ const ExploreCourse = () => {
               style={styles.backBtn}
               onPress={() =>
                 navigation.navigate("ContentDetails", {
-                  cid: _.get(route, "params.cid", ""),
-                  from: _.get(route, "params.from", ""),
+                  cid: get(route, "params.cid", ""),
+                  from: get(route, "params.from", ""),
                 })
               }
             >
@@ -123,7 +123,7 @@ const ExploreCourse = () => {
           <View style={styles.courseHeading}>
             <View style={{ ...styles.row, paddingTop: 0 }}>
               <Text style={styles.courseTitle}>
-                {_.get(route, "params.course", "")}
+                {get(route, "params.course", "")}
               </Text>
             </View>
           </View>
@@ -132,10 +132,10 @@ const ExploreCourse = () => {
         <View style={styles.slide}>
           <View style={styles.row}>
             <Text style={styles.sectionTitle}>
-              {_.get(route, "params.section", "")} /
+              {get(route, "params.section", "")} /
             </Text>
             <Text style={styles.lessonTitle}>
-              {_.get(route, "params.lesson", "")}
+              {get(route, "params.lesson", "")}
             </Text>
           </View>
           <View style={styles.sectionProgress}>
@@ -144,7 +144,7 @@ const ExploreCourse = () => {
                 ([StyleSheet.absoluteFill],
                 {
                   backgroundColor: "#3B1FA3",
-                  width: `${_.get(route, "params.progress", 0)}%`,
+                  width: `${get(route, "params.progress", 0)}%`,
                   borderRadius: 16,
                 })
               }
@@ -183,17 +183,17 @@ const ExploreCourse = () => {
             name="chevron-right"
             size={36}
             color={
-              _.get(route, "params.topics.length", 1) - 1 > topicIndex
+              get(route, "params.topics.length", 1) - 1 > topicIndex
                 ? "#3B1FA3"
                 : "#FFFFFF"
             }
             style={
-              _.get(route, "params.topics.length", 1) - 1 > topicIndex
+              get(route, "params.topics.length", 1) - 1 > topicIndex
                 ? styles.pageBtn
                 : styles.pageBtnDisabled
             }
             onPress={() => {
-              if (_.get(route, "params.topics.length", 1) - 1 > topicIndex) {
+              if (get(route, "params.topics.length", 1) - 1 > topicIndex) {
                 setTopicIndex(topicIndex + 1);
               }
             }}
