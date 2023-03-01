@@ -1,3 +1,8 @@
+# React Native Mobile SDK
+
+## About
+This repository contains code for the Thought Industries Mobile SDK. You can use this SDK as a starting point for creating a mobile app powered by the Thought Industries' APIs.
+
 ## Getting Started
 ### Requirements:
 [Expo Go](https://expo.dev/client) should be downloaded onto your mobile device.
