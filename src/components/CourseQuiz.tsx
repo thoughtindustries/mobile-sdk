@@ -18,7 +18,7 @@ interface CourseQuizProps {
 }
 
 const CourseQuiz = ({ quiz }: CourseQuizProps) => {
-  const [qIndex, setQIndex] = useState<number>(5);
+  const [qIndex, setQIndex] = useState<number>(0);
   const [attempts, setAttempts] = useState<string[]>([]);
 
   const saveAttempt = (answer: string, isMulti: boolean) => {
@@ -43,7 +43,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
   };
 
   const renderQuestion = () => {
-    const question = get(quiz, `quiz.questions.${qIndex - 1}`, {});
+    const question = get(quiz, `questions.${qIndex - 1}`, {});
     return (
       <View>
         {attempts.length === 0 && renderQuizInfo()}
@@ -197,15 +197,15 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
     return `${t} ${suffix}`;
   };
 
-  const isTimeBound: boolean = get(quiz, "quiz.timeLimitInSeconds", 0) > 0;
-  const isAttemptBound: boolean = get(quiz, "quiz.maxAttempts", 0) > 0;
+  const isTimeBound: boolean = get(quiz, "imeLimitInSeconds", 0) > 0;
+  const isAttemptBound: boolean = get(quiz, "maxAttempts", 0) > 0;
 
   return (
     <View>
       {qIndex === 0 && (
         <>
-          <Text style={styles.heading}>{get(quiz, "quiz.title", "Quiz")}</Text>
-          {!isEmpty(get(quiz, "quiz.startMessage", "")) && (
+          <Text style={styles.heading}>{get(quiz, "title", "Quiz")}</Text>
+          {!isEmpty(get(quiz, "startMessage", "")) && (
             <Text style={styles.startMessage}>
               {striptags(quiz.startMessage)}
             </Text>
@@ -213,7 +213,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
 
           {renderQuizInfo()}
 
-          {get(quiz, "quiz.questions.length", 0) > 0 && (
+          {get(quiz, "questions.length", 0) > 0 && (
             <Button title="Start Quiz" onPress={() => setQIndex(1)} />
           )}
         </>
