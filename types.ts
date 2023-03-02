@@ -67,7 +67,7 @@ export type courseListType = {
   asset: string;
   authors?: string[];
   title: string;
-  displayCourse?: string;
+  displayCourse: string;
   contentTypeLabel?: string;
   progress?: Float;
   isOffline?: boolean;

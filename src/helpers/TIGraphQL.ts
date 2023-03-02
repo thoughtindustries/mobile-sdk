@@ -57,42 +57,49 @@ class TIGraphQL {
   }
 
   fetchCourses(params: {
-    sortBy: string;
-    sortDir: string;
-    duration: string;
-    difficulty: string;
-    tag: string;
-    page: number;
+    sortBy?: string;
+    sortDir?: string;
+    duration?: string;
+    difficulty?: string;
+    tag?: string;
+    page?: number;
   }): Promise<courseListType[]> {
     let gql1 = `query CatalogContent(
       $page: Int!,
       $sortColumn: SortColumn,
-      $sortDirection: SortDirection`;
+      $sortDirection: SortDirection,
+      $contentTypes: [String!]`;
 
     let gql2 = `page: $page,
       sortColumn: $sortColumn,
       sortDirection: $sortDirection
+      contentTypes: $contentTypes
       `;
 
     let vars: {
       [key: string]: string | number | string[];
     } = {
-      page: params.page,
-      sortColumn: params.sortBy,
-      sortDirection: params.sortDir,
+      page: _.get(params, "page", 1),
+      sortColumn: _.get(params, "sortBy", "title"),
+      sortDirection: _.get(params, "sortDir", "asc"),
     };
 
-    if (!_.isEmpty(params.tag)) {
+    vars["contentTypes"] = ["Course"];
+
+    if (!_.isEmpty(_.get(params, "tag", ""))) {
       gql1 = `${gql1},
       $query: String`;
 
       gql2 = `${gql2},
       query: $query`;
 
-      vars["query"] = `tags:${params.tag}`;
+      vars["query"] = `tags:${_.get(params, "tag", "")}`;
     }
 
-    if (!_.isEmpty(params.duration) || !_.isEmpty(params.difficulty)) {
+    if (
+      !_.isEmpty(_.get(params, "duration", "")) ||
+      !_.isEmpty(_.get(params, "difficulty", ""))
+    ) {
       gql1 = `${gql1},
       $labels: [String!],
       $values: [String!]`;
@@ -104,14 +111,14 @@ class TIGraphQL {
       vars["labels"] = [];
       vars["values"] = [];
 
-      if (!_.isEmpty(params.duration)) {
+      if (!_.isEmpty(_.get(params, "duration", ""))) {
         vars["labels"].push("Duration");
-        vars["values"].push(params.duration);
+        vars["values"].push(_.get(params, "duration", ""));
       }
 
-      if (!_.isEmpty(params.difficulty)) {
+      if (!_.isEmpty(_.get(params, "difficulty", ""))) {
         vars["labels"].push("Level of Difficulty");
-        vars["values"].push(params.difficulty);
+        vars["values"].push(_.get(params, "difficulty", ""));
       }
     }
 
@@ -122,6 +129,7 @@ class TIGraphQL {
           ${gql2}
         ) {
           contentItems {
+            id
             asset
             authors
             title
@@ -147,9 +155,9 @@ class TIGraphQL {
   }
 
   myLearnings(params: {
-    sortBy: string;
-    sortDir: string;
-    tag: string;
+    sortBy?: string;
+    sortDir?: string;
+    tag?: string;
   }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
     let gql1 = `query MyLearning(
       $sortColumn: SortColumn,
@@ -162,18 +170,18 @@ class TIGraphQL {
     let vars: {
       [key: string]: string | number | string[];
     } = {
-      sortColumn: params.sortBy,
-      sortDirection: params.sortDir,
+      sortColumn: _.get(params, "sortBy", "title"),
+      sortDirection: _.get(params, "sortDir", "asc"),
     };
 
-    if (!_.isEmpty(params.tag)) {
+    if (!_.isEmpty(_.get(params, "tag", ""))) {
       gql1 = `${gql1},
       $query: String`;
 
       gql2 = `${gql2},
       query: $query`;
 
-      vars["query"] = `tags:${params.tag}`;
+      vars["query"] = `tags:${_.get(params, "tag", "")}`;
     }
 
     const gql = {

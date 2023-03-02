@@ -13,12 +13,11 @@ import {
 
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
-import { courseListType, filtersType } from "../../types";
+import { courseListType, filtersType, RootStackParamList } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
 import dbObj from "../helpers/Db";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
