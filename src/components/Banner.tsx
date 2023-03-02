@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ImageBackground } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  Pressable,
+} from "react-native";
 import _ from "lodash";
 import striptags from "striptags";
 import tiGql from "../helpers/TIGraphQL";
-import { userRecentContentType } from "../../types";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList, userRecentContentType } from "../../types";
+
+type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Banner = () => {
+  const navigation = useNavigation<HomeScreenProps>();
   const [featured, setFeatured] = useState<userRecentContentType[]>([]);
 
   const fetchFeaturedCourses = () => {
@@ -15,24 +26,33 @@ const Banner = () => {
   useEffect(fetchFeaturedCourses, []);
 
   return (
-    <View style={styles.bannerContainer}>
-      <ImageBackground
-        source={{ uri: _.get(featured, "0.asset", "") }}
-        resizeMode="cover"
-        imageStyle={{ borderRadius: 8 }}
-      >
-        <View style={styles.bannerArea}>
-          <Text style={styles.bannerTitle}>
-            {_.get(featured, "0.title", "")}
-          </Text>
-          <Text style={styles.bannerText}>
-            {_.truncate(striptags(_.get(featured, "0.description", "")), {
-              length: 70,
-            })}
-          </Text>
-        </View>
-      </ImageBackground>
-    </View>
+    <Pressable
+      onPress={() =>
+        navigation.navigate("ContentDetails", {
+          cid: _.get(featured, "0.id", ""),
+          from: "Home",
+        })
+      }
+    >
+      <View style={styles.bannerContainer}>
+        <ImageBackground
+          source={{ uri: _.get(featured, "0.asset", "") }}
+          resizeMode="cover"
+          imageStyle={{ borderRadius: 8 }}
+        >
+          <View style={styles.bannerArea}>
+            <Text style={styles.bannerTitle}>
+              {_.get(featured, "0.title", "")}
+            </Text>
+            <Text style={styles.bannerText}>
+              {_.truncate(striptags(_.get(featured, "0.description", "")), {
+                length: 70,
+              })}
+            </Text>
+          </View>
+        </ImageBackground>
+      </View>
+    </Pressable>
   );
 };
 

@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import _ from "lodash";
 import striptags from "striptags";
 import tiGql from "../helpers/TIGraphQL";
-import { userRecentContentType } from "../../types";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList, userRecentContentType } from "../../types";
+
+type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
+  const navigation = useNavigation<HomeScreenProps>();
   const [courses, setCourses] = useState<userRecentContentType[]>([]);
 
   const fetchRecentCourses = () => {
@@ -21,23 +33,32 @@ const RecentCourses = () => {
       </View>
       <ScrollView horizontal={true} style={styles.courseContainer}>
         {courses.map((course, idx) => (
-          <View key={idx} style={styles.recContentBox}>
-            <View style={styles.courseThumbnail}>
-              <Image
-                key={idx}
-                source={{ uri: course.asset }}
-                style={{ width: "100%", height: "100%" }}
-              />
+          <Pressable
+            onPress={() =>
+              navigation.navigate("ContentDetails", {
+                cid: course.id,
+                from: "Home",
+              })
+            }
+          >
+            <View key={idx} style={styles.recContentBox}>
+              <View style={styles.courseThumbnail}>
+                <Image
+                  key={idx}
+                  source={{ uri: course.asset }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </View>
+              <View style={styles.contentArea}>
+                <Text style={styles.recCourseTitle}>{course.title}</Text>
+                <Text style={styles.courseDes}>
+                  {_.truncate(striptags(course.description), {
+                    length: 100,
+                  })}
+                </Text>
+              </View>
             </View>
-            <View style={styles.contentArea}>
-              <Text style={styles.recCourseTitle}>{course.title}</Text>
-              <Text style={styles.courseDes}>
-                {_.truncate(striptags(course.description), {
-                  length: 100,
-                })}
-              </Text>
-            </View>
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
