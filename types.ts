@@ -91,7 +91,7 @@ export type pageType = {
 };
 
 export type filtersType = {
-  sortBy: string;
+  sortBy?: string;
   sortDir: string;
   duration: string;
   difficulty: string;

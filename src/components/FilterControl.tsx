@@ -26,6 +26,15 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
     tag: "",
   });
 
+  const hasFilterApplied = () => {
+    let applied = 0;
+    applied += filters.duration !== "" ? 1 : 0;
+    applied += filters.difficulty !== "" ? 1 : 0;
+    applied += filters.tag !== "" ? 1 : 0;
+
+    return applied;
+  };
+
   const clearFilter = () => {
     const flts: filtersType = {
       ...filters,
@@ -151,6 +160,11 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
           color="#232323"
         />
       </Pressable>
+      {hasFilterApplied() > 0 && (
+        <View style={styles.hasFilter}>
+          <Text style={styles.filterCount}>{hasFilterApplied()}</Text>
+        </View>
+      )}
       {show && <CourseFilter />}
     </>
   );
@@ -249,6 +263,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "Inter_700Bold",
     borderRadius: 5,
+  },
+
+  hasFilter: {
+    height: 24,
+    width: 24,
+    borderRadius: 24,
+    backgroundColor: "#3B1FA3",
+    marginLeft: -15,
+    marginTop: -5,
+  },
+
+  filterCount: {
+    textAlign: "center",
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    lineHeight: 24,
+    color: "#ffffff",
   },
 });
 
