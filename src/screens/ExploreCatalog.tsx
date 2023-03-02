@@ -139,13 +139,17 @@ const ExploreCatalog = () => {
           <Loader size={50} />
         </View>
       )}
+      {!pageVars.searching && (
+        <Text style={{ ...styles.courseTitle, marginTop: 10, marginLeft: 15 }}>
+          Results (
+          {filteredCourses().length > 0
+            ? _.padStart(filteredCourses().length.toString(), 2, "0")
+            : 0}
+          )
+        </Text>
+      )}
       {!pageVars.searching && courses.length > 0 && (
         <View>
-          <Text
-            style={{ ...styles.courseTitle, marginTop: 10, marginLeft: 15 }}
-          >
-            Results ({_.padStart(filteredCourses().length.toString(), 2, "0")})
-          </Text>
           <FlatList
             data={filteredCourses()}
             renderItem={({ item }) => <CourseItem data={item} />}
