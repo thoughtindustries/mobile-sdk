@@ -310,17 +310,9 @@ const MyLearnings = () => {
   };
 
   const ProgressBar = (props: { percent: Float }) => (
-    <View style={styles.progressBar}>
-      <Animated.View
-        style={
-          ([StyleSheet.absoluteFill],
-          {
-            backgroundColor: "#3B1FA3",
-            width: `${props.percent}%`,
-            borderRadius: 16,
-          })
-        }
-      />
+    <View>
+      <View style={styles.progressBar}></View>
+      <View style={{ ...styles.progressStrip, width: `${props.percent}%` }} />
     </View>
   );
 
@@ -641,13 +633,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#E5E7EB",
     backgroundColor: "#F5F5F7",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
 
   contentRightBox: {
     flexGrow: 1,
-    padding: 20,
-    paddingRight: 10,
+    minHeight: 100,
+    margin: 20,
+    marginRight: 20,
+    maxWidth: "70%",
   },
 
   cTypeRow: {
@@ -703,6 +698,7 @@ const styles = StyleSheet.create({
   searching: {
     backgroundColor: "#3B1FA3",
     borderRadius: 10,
+    marginTop: 20,
     paddingBottom: 20,
     display: "flex",
     flexDirection: "column",
@@ -740,9 +736,15 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 20,
     flexDirection: "row",
-    width: "100%",
     backgroundColor: "#D1D5DB",
-    borderRadius: 16,
+    borderRadius: 10,
+  },
+
+  progressStrip: {
+    position: "absolute",
+    height: 20,
+    backgroundColor: "#3B1FA3",
+    borderRadius: 10,
   },
 });
 
