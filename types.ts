@@ -109,3 +109,13 @@ export type userRecentContentType = {
   asset: string;
   description: string;
 };
+
+export type questionChoice = {
+  altText?: string;
+  asset?: string;
+  choiceId?: string;
+  correct?: boolean;
+  points?: number;
+  response?: string;
+  value: string;
+};
