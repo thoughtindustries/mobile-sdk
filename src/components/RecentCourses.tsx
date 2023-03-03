@@ -28,39 +28,43 @@ const RecentCourses = () => {
 
   return (
     <View>
-      <View style={styles.courseBox}>
-        <Text style={styles.heading}>Recently Launched Courses</Text>
-      </View>
-      <ScrollView horizontal={true} style={styles.courseContainer}>
-        {courses.map((course, idx) => (
-          <Pressable
-            onPress={() =>
-              navigation.navigate("ContentDetails", {
-                cid: course.id,
-                from: "Home",
-              })
-            }
-          >
-            <View key={idx} style={styles.recContentBox}>
-              <View style={styles.courseThumbnail}>
-                <Image
-                  key={idx}
-                  source={{ uri: course.asset }}
-                  style={{ width: "100%", height: "100%" }}
-                />
+      {courses.length > 0 && (
+        <View style={styles.courseBox}>
+          <Text style={styles.heading}>Recently Launched Courses</Text>
+        </View>
+      )}
+      {courses.length > 0 && (
+        <ScrollView horizontal={true} style={styles.courseContainer}>
+          {courses.map((course, idx) => (
+            <Pressable
+              onPress={() =>
+                navigation.navigate("ContentDetails", {
+                  cid: course.id,
+                  from: "Home",
+                })
+              }
+            >
+              <View key={idx} style={styles.recContentBox}>
+                <View style={styles.courseThumbnail}>
+                  <Image
+                    key={idx}
+                    source={{ uri: course.asset }}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </View>
+                <View style={styles.contentArea}>
+                  <Text style={styles.recCourseTitle}>{course.title}</Text>
+                  <Text style={styles.courseDes}>
+                    {_.truncate(striptags(course.description), {
+                      length: 100,
+                    })}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.contentArea}>
-                <Text style={styles.recCourseTitle}>{course.title}</Text>
-                <Text style={styles.courseDes}>
-                  {_.truncate(striptags(course.description), {
-                    length: 100,
-                  })}
-                </Text>
-              </View>
-            </View>
-          </Pressable>
-        ))}
-      </ScrollView>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
