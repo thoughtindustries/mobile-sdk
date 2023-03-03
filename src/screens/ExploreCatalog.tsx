@@ -155,8 +155,6 @@ const ExploreCatalog = () => {
             renderItem={({ item }) => <CourseItem data={item} />}
             onEndReached={fetchCourses}
             onEndReachedThreshold={0.5}
-            // Unused styling
-            style={styles.listStyle}
             ListEmptyComponent={
               <Text style={styles.noRecords}>
                 No records found, try using other filters.
