@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TextInput, StyleSheet, Pressable } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { isEmpty } from "lodash";
 
 interface SearchBarProps {
   searchText: string;
@@ -20,9 +21,20 @@ const Searchbar = ({ searchText, onSearch }: SearchBarProps) => {
         style={styles.searchbox}
         placeholder="Search by Title, Instructor or Tag"
       />
-      <Pressable onPress={() => onSearch(searchText)} style={styles.magnify}>
-        <MaterialCommunityIcons name="magnify" size={22} color="#232323" />
-      </Pressable>
+      {isEmpty(searchText) && (
+        <Pressable onPress={() => onSearch(searchText)} style={styles.magnify}>
+          <MaterialCommunityIcons name="magnify" size={22} color="#232323" />
+        </Pressable>
+      )}
+      {!isEmpty(searchText) && (
+        <Pressable onPress={() => onSearch("")} style={styles.magnify}>
+          <MaterialCommunityIcons
+            name="close-circle-outline"
+            size={22}
+            color="#232323"
+          />
+        </Pressable>
+      )}
     </View>
   );
 };

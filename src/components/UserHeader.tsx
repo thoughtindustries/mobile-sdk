@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Image, View, Text, StyleSheet } from "react-native";
 import Utils from "../helpers/Utils";
-import { get } from "lodash";
+import _ from "lodash";
 import { UserDetailType } from "../../types";
 
 const UserHeader = () => {
@@ -10,11 +10,18 @@ const UserHeader = () => {
   useEffect(() => {
     Utils.fetch("udata").then(setUdata);
   }, []);
+
+  const profilePic = _.get(udata, "asset", "");
   return (
     <View style={styles.container}>
-      <Image source={require("../../assets/user.png")} />
+      {_.isEmpty(profilePic) && (
+        <Image source={require("../../assets/user.png")} />
+      )}
+      {!_.isEmpty(profilePic) && (
+        <Image source={{ uri: profilePic }} style={styles.profilePic} />
+      )}
       <Text style={styles.name}>
-        Hi, {get(udata, "firstName", "")} {get(udata, "lastName", "")}
+        Hi, {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
       </Text>
     </View>
   );
@@ -34,6 +41,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     fontSize: 20,
     lineHeight: 30,
+  },
+  profilePic: {
+    width: 40,
+    height: 40,
+    borderRadius: 40,
   },
 });
 

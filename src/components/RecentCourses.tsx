@@ -1,43 +1,30 @@
-import React from "react";
-import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  StyleSheet,
+  Pressable,
+} from "react-native";
+import _ from "lodash";
+import striptags from "striptags";
+import tiGql from "../helpers/TIGraphQL";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList, userRecentContentType } from "../../types";
+
+type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
-  const rececntLaunchCourse: {
-    thumbnail: string;
-    coursename: string;
-    description: string;
-  }[] = [
-    {
-      thumbnail: "https://placebear.com/640/360",
-      coursename: "Course Name1",
-      description:
-        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
-    },
-    {
-      thumbnail: "https://placebear.com/640/360",
-      coursename: "Course Name2",
-      description:
-        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
-    },
-    {
-      thumbnail: "https://placebear.com/640/360",
-      coursename: "Course Name2",
-      description:
-        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
-    },
-    {
-      thumbnail: "https://placebear.com/640/360",
-      coursename: "Course Name2",
-      description:
-        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
-    },
-    {
-      thumbnail: "https://placebear.com/640/360",
-      coursename: "Course Name2",
-      description:
-        "Lorem ipsum dolor sit amet consectetur elit. Architecto accusantium praesentium eius, ut atque fuga culpa sequi.",
-    },
-  ];
+  const navigation = useNavigation<HomeScreenProps>();
+  const [courses, setCourses] = useState<userRecentContentType[]>([]);
+
+  const fetchRecentCourses = () => {
+    tiGql.fetchRecentCourses(5).then(setCourses);
+  };
+
+  useEffect(fetchRecentCourses, []);
 
   return (
     <View>
@@ -45,20 +32,33 @@ const RecentCourses = () => {
         <Text style={styles.heading}>Recently Launched Courses</Text>
       </View>
       <ScrollView horizontal={true} style={styles.courseContainer}>
-        {rececntLaunchCourse.map((course, idx) => (
-          <View key={idx} style={styles.recContentBox}>
-            <View style={styles.courseThumbnail}>
-              <Image
-                key={idx}
-                source={{ uri: course.thumbnail }}
-                style={{ width: "100%", height: "100%" }}
-              />
+        {courses.map((course, idx) => (
+          <Pressable
+            onPress={() =>
+              navigation.navigate("ContentDetails", {
+                cid: course.id,
+                from: "Home",
+              })
+            }
+          >
+            <View key={idx} style={styles.recContentBox}>
+              <View style={styles.courseThumbnail}>
+                <Image
+                  key={idx}
+                  source={{ uri: course.asset }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </View>
+              <View style={styles.contentArea}>
+                <Text style={styles.recCourseTitle}>{course.title}</Text>
+                <Text style={styles.courseDes}>
+                  {_.truncate(striptags(course.description), {
+                    length: 100,
+                  })}
+                </Text>
+              </View>
             </View>
-            <View style={styles.contentArea}>
-              <Text style={styles.recCourseTitle}>{course.coursename}</Text>
-              <Text style={styles.courseDes}>{course.description}</Text>
-            </View>
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     fontWeight: "700",
     fontSize: 16,
-    lineHeight: 50,
+    paddingBottom: 10,
   },
   courseDes: {
     color: "#6B7280",

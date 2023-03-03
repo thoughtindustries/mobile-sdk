@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
+import { courseListType, RootStackParamList } from "../../types";
 import {
   View,
   Text,
@@ -10,45 +10,47 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
+import tiGql from "../helpers/TIGraphQL";
+
+import _ from "lodash";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
+  const [courses, setCourses] = useState<courseListType[]>([]);
   const navigation = useNavigation<HomeScreenProps>();
-  const recommendedCourse: { thumbnail: string; coursename: string }[] = [
-    {
-      thumbnail: "https://loremflickr.com/640/360",
-      coursename: "Course Name1",
-    },
-    {
-      thumbnail: "https://loremflickr.com/640/360",
-      coursename: "Course Name2",
-    },
-    {
-      thumbnail: "https://loremflickr.com/640/360",
-      coursename: "Course Name2",
-    },
-    {
-      thumbnail: "https://loremflickr.com/640/360",
-      coursename: "Course Name2",
-    },
-    {
-      thumbnail: "https://loremflickr.com/640/360",
-      coursename: "Course Name2",
-    },
-  ];
+
+  const fetchRecommendedCourses = () => {
+    let mycourses: String[] = [];
+    tiGql
+      .myLearnings({})
+      .then((res) => {
+        mycourses = res.items
+          .filter((c) => c.contentTypeLabel === "Course")
+          .map((c) => c.id);
+      })
+      .then(() => tiGql.fetchCourses({}))
+      .then((res) => {
+        setCourses(res.filter((c) => !mycourses.includes(c.displayCourse)));
+      });
+  };
+
+  useEffect(fetchRecommendedCourses, []);
+
+  useEffect(() => console.log(courses), [courses]);
+
   return (
     <View>
       <View style={styles.courseBox}>
         <Text style={styles.heading}>Recommendations</Text>
       </View>
       <ScrollView horizontal={true} style={styles.courseContainer}>
-        {recommendedCourse.map((course, idx) => (
+        {courses.map((course, idx) => (
           <TouchableOpacity
             key={idx}
             onPress={() =>
               navigation.navigate("ContentDetails", {
-                cid: "b9645873-39c6-455e-ba0b-7f15934245c7",
+                cid: course.displayCourse,
                 from: "Home",
               })
             }
@@ -56,13 +58,13 @@ const Recommendation = () => {
             <View style={styles.recContentBox}>
               <ImageBackground
                 key={idx}
-                source={{ uri: course.thumbnail }}
+                source={{ uri: course.asset }}
                 resizeMode="cover"
                 style={{ borderRadius: 10 }}
                 imageStyle={{ borderRadius: 8 }}
               >
                 <View style={styles.bannerArea}>
-                  <Text style={styles.courseTitle}>{course.coursename}</Text>
+                  <Text style={styles.courseTitle}>{course.title}</Text>
                 </View>
               </ImageBackground>
             </View>

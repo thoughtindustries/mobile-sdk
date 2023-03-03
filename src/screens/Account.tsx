@@ -13,7 +13,7 @@ import { TI_API_INSTANCE } from "@env";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../../types";
 import Utils from "../helpers/Utils";
-import { get } from "lodash";
+import _ from "lodash";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
 
@@ -25,19 +25,24 @@ const Account = () => {
     Utils.fetch("udata").then(setUdata);
   }, []);
 
+  const profilePic = _.get(udata, "asset", "");
+
   return (
     <View style={styles.container}>
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
-          <Image
-            source={require("../../assets/profile.png")}
-            style={styles.profileImage}
-          />
+          {_.isEmpty(profilePic) && (
+            <Image source={require("../../assets/profile.png")} />
+          )}
+          {!_.isEmpty(profilePic) && (
+            <Image source={{ uri: profilePic }} style={styles.profileImage} />
+          )}
+
           <Text style={styles.subtitle}>
-            {get(udata, "firstName", "")} {get(udata, "lastName", "")}
+            {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
           </Text>
-          <Text style={styles.userEmail}>{get(udata, "email", "")}</Text>
+          <Text style={styles.userEmail}>{_.get(udata, "email", "")}</Text>
 
           <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
             <Text style={styles.profileEdit}>Edit</Text>
@@ -135,6 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: 132,
     height: 132,
+    borderRadius: 132,
   },
   subtitle: {
     fontSize: 24,

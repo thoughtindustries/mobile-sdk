@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  ImageBackground,
+} from "react-native";
 import { Button } from "../components";
 import {
   get,
@@ -9,16 +16,20 @@ import {
   isUndefined,
   remove,
   isEmpty,
+  padStart,
 } from "lodash";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { questionChoice } from "../../types";
 
 interface CourseQuizProps {
   quiz: any;
 }
 
 const CourseQuiz = ({ quiz }: CourseQuizProps) => {
-  const [qIndex, setQIndex] = useState<number>(5);
+  console.log(JSON.stringify(quiz));
+  const [qIndex, setQIndex] = useState<number>(0);
+  const [showResult, setShowResult] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<string[]>([]);
 
   const saveAttempt = (answer: string, isMulti: boolean) => {
@@ -43,29 +54,79 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
   };
 
   const renderQuestion = () => {
-    const question = get(quiz, `quiz.questions.${qIndex - 1}`, {});
+    const question = get(quiz, `questions.${qIndex - 1}`, {});
+
+    const preText = () => (
+      <>
+        {get(question, "preText", "") !== "" && (
+          <Text style={styles.questionText}>
+            {striptags(get(question, "preText", ""))}
+          </Text>
+        )}
+      </>
+    );
+
+    const questionBody = () => (
+      <Text style={styles.questionTitle}>
+        {striptags(get(question, "body", ""))}
+      </Text>
+    );
+
+    const postText = () => (
+      <>
+        {get(question, "postText", "") !== "" && (
+          <Text style={styles.questionText}>
+            {striptags(get(question, "postText", ""))}
+          </Text>
+        )}
+      </>
+    );
+
+    const questionEssay = () => {
+      return (
+        <>
+          <View
+            style={{
+              ...styles.choiceBox,
+              flexDirection: "column",
+              marginTop: 10,
+            }}
+          >
+            <Text style={styles.subTitle}>Content to Review</Text>
+            <Text style={styles.essayText}>
+              {striptags(get(question, "body", ""))}
+            </Text>
+          </View>
+
+          {!isEmpty(get(question, "additionalContent", "")) && (
+            <View style={{ ...styles.choiceBox, flexDirection: "column" }}>
+              <Text style={styles.subTitle}>Additional Content</Text>
+              <Text style={styles.essayText}>
+                {striptags(get(question, "additionalContent", ""))}
+              </Text>
+            </View>
+          )}
+        </>
+      );
+    };
+
     return (
       <View>
         {attempts.length === 0 && renderQuizInfo()}
         <View style={styles.questionBox}>
-          {get(question, "preText", "") !== "" && (
-            <Text style={styles.questionText}>
-              {striptags(get(question, "preText", ""))}
-            </Text>
-          )}
-          <Text style={styles.questionTitle}>
-            {striptags(get(question, "body", ""))}
-          </Text>
+          {preText()}
+          {question.type !== "essay" && questionBody()}
+          {question.type === "essay" && questionEssay()}
 
           {question.type === "multipleChoice" && (
             <View style={{ marginTop: 16 }}>
-              {renderChoice(question.choices, true)}
+              {renderChoice(question.choices, true, question.type)}
             </View>
           )}
 
           {question.type === "booleanChoice" && (
             <View style={{ marginTop: 16 }}>
-              {renderChoice(question.choices, false)}
+              {renderChoice(question.choices, false, question.type)}
             </View>
           )}
 
@@ -82,27 +143,65 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
             </View>
           )}
 
-          {get(question, "postText", "") !== "" && (
-            <Text style={styles.questionText}>
-              {striptags(get(question, "postText", ""))}
-            </Text>
+          {question.type === "imageComparison" && (
+            <View style={{ marginTop: 16 }}>
+              {renderChoice(question.choices, false, question.type)}
+            </View>
           )}
 
-          {get(attempts, qIndex, []).length > 0 && (
-            <Button
-              title="Next Question"
-              onPress={() => setQIndex(qIndex + 1)}
-            />
+          {question.type === "fileSubmission" && (
+            <View style={{ marginTop: 16 }}>
+              <Button
+                title="Upload File"
+                mode={2}
+                onPress={() => setQIndex(qIndex + 1)}
+              />
+            </View>
+          )}
+
+          {qIndex < quiz.questions.length && (
+            <View
+              style={
+                quiz.questionSkipEnabled && get(attempts, qIndex, []).length > 0
+                  ? styles.row
+                  : {}
+              }
+            >
+              {quiz.questionSkipEnabled && (
+                <Button
+                  title="Skip Question"
+                  mode={2}
+                  onPress={() => setQIndex(qIndex + 1)}
+                />
+              )}
+
+              {get(attempts, qIndex, []).length > 0 && (
+                <Button
+                  title="Next Question"
+                  onPress={() => setQIndex(qIndex + 1)}
+                />
+              )}
+            </View>
+          )}
+
+          {postText()}
+
+          {qIndex >= quiz.questions.length && (
+            <Button title="See Results" onPress={() => setShowResult(true)} />
           )}
         </View>
       </View>
     );
   };
 
-  const renderChoice = (choices, isMulti: boolean) => {
+  const renderChoice = (
+    choices: questionChoice[],
+    isMulti: boolean,
+    type: string
+  ) => {
     return (
       <>
-        {choices.map((choice, idx: number) => (
+        {choices.map((choice: questionChoice, idx: number) => (
           <Pressable onPress={() => saveAttempt(choice.value, isMulti)}>
             <View
               key={choice.choiceId}
@@ -114,14 +213,33 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
                     ? styles.correctBox
                     : styles.incorrectBox
                   : []),
+                ...(type === "imageComparison" ? styles.imageComparison : {}),
               }}
             >
-              <Text style={styles.answerTextBold}>
-                {String.fromCharCode(65 + idx)}.
-              </Text>
-              <Text style={styles.answerText}>
-                {isEmpty(choice.altText) ? choice.value : choice.altText}
-              </Text>
+              {type !== "imageComparison" && (
+                <Text style={styles.answerTextBold}>
+                  {String.fromCharCode(65 + idx)}.
+                </Text>
+              )}
+              {type === "imageComparison" && (
+                <ImageBackground
+                  source={{ uri: get(choice, "asset", "") }}
+                  resizeMode="cover"
+                  style={{ height: 100, width: "100%", marginBottom: 10 }}
+                />
+              )}
+              <View>
+                <Text style={styles.answerText}>
+                  {isEmpty(choice.altText) ? choice.value : choice.altText}
+                </Text>
+
+                {get(attempts, qIndex, []).includes(choice.value) &&
+                  !isEmpty(choice.response) && (
+                    <Text style={styles.responseText}>
+                      {striptags(get(choice, "response", ""))}
+                    </Text>
+                  )}
+              </View>
             </View>
           </Pressable>
         ))}
@@ -197,15 +315,76 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
     return `${t} ${suffix}`;
   };
 
-  const isTimeBound: boolean = get(quiz, "quiz.timeLimitInSeconds", 0) > 0;
-  const isAttemptBound: boolean = get(quiz, "quiz.maxAttempts", 0) > 0;
+  const getFormattedClock = (t: number) => {
+    let tm: { s: number; m: number; h: number } = { s: t, m: 0, h: 0 };
+    if (t >= 60) {
+      tm.s = t % 60;
+      tm.m = Math.floor(t / 60);
+      t = tm.m;
+    }
+    if (t >= 60) {
+      tm.m = t % 60;
+      tm.h = Math.floor(t / 60);
+      t = tm.h;
+    }
+    if (t >= 60) {
+      tm.h = Math.round(t / 60);
+    }
+
+    let ts: string = "";
+
+    if (tm.h > 0) {
+      ts += padStart(tm.h.toString(), 2, "0") + ":";
+    }
+
+    ts += padStart(tm.m.toString(), 2, "0") + ":";
+    ts += padStart(tm.s.toString(), 2, "0");
+    return ts;
+  };
+
+  const renderResult = () => {
+    return (
+      <View style={styles.questionBox}>
+        <Text style={styles.heading}>Quiz Results</Text>
+
+        <View style={{ ...styles.row, marginLeft: -20 }}>
+          <View style={styles.resultBox}>
+            <Text style={styles.resultNote}>Suggested Time per Question</Text>
+            <Text style={styles.essayText}>
+              {getFormattedClock(quiz.timePerQuestionInSeconds)}
+            </Text>
+          </View>
+          <View style={styles.resultBox}>
+            <Text style={styles.resultNote}>Average Time per Question</Text>
+            <Text style={styles.essayText}>{getFormattedClock(10)}</Text>
+          </View>
+        </View>
+
+        <View style={{ ...styles.row, marginLeft: -20 }}>
+          <View style={styles.resultBox}>
+            <Text style={styles.resultNote}>Time Limit</Text>
+            <Text style={styles.essayText}>
+              {getFormattedClock(quiz.timeLimitInSeconds)}
+            </Text>
+          </View>
+          <View style={styles.resultBox}>
+            <Text style={styles.resultNote}>Total Time</Text>
+            <Text style={styles.essayText}>{getFormattedClock(130)}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const isTimeBound: boolean = get(quiz, "imeLimitInSeconds", 0) > 0;
+  const isAttemptBound: boolean = get(quiz, "maxAttempts", 0) > 0;
 
   return (
     <View>
       {qIndex === 0 && (
         <>
-          <Text style={styles.heading}>{get(quiz, "quiz.title", "Quiz")}</Text>
-          {!isEmpty(get(quiz, "quiz.startMessage", "")) && (
+          <Text style={styles.heading}>{get(quiz, "title", "Quiz")}</Text>
+          {!isEmpty(get(quiz, "startMessage", "")) && (
             <Text style={styles.startMessage}>
               {striptags(quiz.startMessage)}
             </Text>
@@ -213,13 +392,15 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
 
           {renderQuizInfo()}
 
-          {get(quiz, "quiz.questions.length", 0) > 0 && (
+          {get(quiz, "questions.length", 0) > 0 && (
             <Button title="Start Quiz" onPress={() => setQIndex(1)} />
           )}
         </>
       )}
 
-      {qIndex > 0 && renderQuestion()}
+      {qIndex > 0 && !showResult && renderQuestion()}
+
+      {showResult && renderResult()}
     </View>
   );
 };
@@ -290,6 +471,12 @@ const styles = StyleSheet.create({
     color: "#1F2937",
   },
 
+  subTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 16,
+    color: "#6B7280",
+  },
+
   choiceBox: {
     padding: 16,
     paddingLeft: 24,
@@ -301,6 +488,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     display: "flex",
     flexDirection: "row",
+  },
+
+  imageComparison: {
+    flexDirection: "column",
+    paddingLeft: 16,
+    paddingRight: 16,
   },
 
   correctBox: {
@@ -332,6 +525,36 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     fontSize: 14,
     paddingRight: 10,
+  },
+
+  responseText: {
+    marginTop: 5,
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    color: "#6B7280",
+  },
+
+  essayText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    color: "#1F2937",
+  },
+
+  resultBox: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    backgroundColor: "#FCFCFF",
+    padding: 5,
+    width: "50%",
+    margin: 5,
+  },
+
+  resultNote: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 10,
+    color: "#6B7280",
+    flexGrow: 0,
   },
 });
 
