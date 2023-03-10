@@ -10,10 +10,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import tiGql from "../helpers/TIGraphQL";
 import WebView from "react-native-webview";
 
-type ExploreCourseProps = StackNavigationProp<
-  RootStackParamList,
-  "ExploreCourse"
->;
+type ExploreCourseProps = StackNavigationProp<RootStackParamList, "ExploreCourse">;
 
 const ExploreCourse = () => {
   const navigation = useNavigation<ExploreCourseProps>();
@@ -50,18 +47,10 @@ const ExploreCourse = () => {
     return (
       <>
         <Text style={styles.topicTitle}>{get(topicData, "title", "")}</Text>
-        {get(topicData, "preTextBlock", "") != "" && (
-          <Text style={styles.topicText}>
-            {striptags(get(topicData, "preTextBlock", ""))}
-          </Text>
-        )}
+        {get(topicData, "preTextBlock", "") != "" && <Text style={styles.topicText}>{striptags(get(topicData, "preTextBlock", ""))}</Text>}
         <WebView
           source={{
-            uri: `https://fast.wistia.com/embed/medias/${get(
-              topicData,
-              "asset",
-              ""
-            )}`,
+            uri: `https://fast.wistia.com/embed/medias/${get(topicData, "asset", "")}`,
           }}
           style={{ marginTop: 20, height: 200 }}
         />
@@ -69,9 +58,7 @@ const ExploreCourse = () => {
         {get(topicData, "body", "") != "" && (
           <>
             <Text style={styles.topicTitle}>Description</Text>
-            <Text style={styles.topicText}>
-              {striptags(get(topicData, "body", ""))}
-            </Text>
+            <Text style={styles.topicText}>{striptags(get(topicData, "body", ""))}</Text>
           </>
         )}
       </>
@@ -81,19 +68,14 @@ const ExploreCourse = () => {
   const renderText = () => (
     <>
       <Text style={styles.topicTitle}>{get(topicData, "title", "")}</Text>
-      <Text style={styles.topicText}>
-        {striptags(get(topicData, "body", ""))}
-      </Text>
+      <Text style={styles.topicText}>{striptags(get(topicData, "body", ""))}</Text>
     </>
   );
-  const renderQuiz = () => <CourseQuiz quiz={topicData} />;
+  const renderQuiz = () => <CourseQuiz quiz={topicData} courseid={get(route, "params.cid", "")} />;
 
   return (
     <>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[0]}>
         <View>
           <View style={{ ...styles.row, padding: 8, paddingTop: 40 }}>
             <MaterialCommunityIcons
@@ -122,21 +104,15 @@ const ExploreCourse = () => {
 
           <View style={styles.courseHeading}>
             <View style={{ ...styles.row, paddingTop: 0 }}>
-              <Text style={styles.courseTitle}>
-                {get(route, "params.course", "")}
-              </Text>
+              <Text style={styles.courseTitle}>{get(route, "params.course", "")}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.slide}>
           <View style={styles.row}>
-            <Text style={styles.sectionTitle}>
-              {get(route, "params.section", "")} /
-            </Text>
-            <Text style={styles.lessonTitle}>
-              {get(route, "params.lesson", "")}
-            </Text>
+            <Text style={styles.sectionTitle}>{get(route, "params.section", "")} /</Text>
+            <Text style={styles.lessonTitle}>{get(route, "params.lesson", "")}</Text>
           </View>
           <View style={styles.sectionProgress}>
             <Animated.View
@@ -182,16 +158,8 @@ const ExploreCourse = () => {
           <MaterialCommunityIcons
             name="chevron-right"
             size={36}
-            color={
-              get(route, "params.topics.length", 1) - 1 > topicIndex
-                ? "#3B1FA3"
-                : "#FFFFFF"
-            }
-            style={
-              get(route, "params.topics.length", 1) - 1 > topicIndex
-                ? styles.pageBtn
-                : styles.pageBtnDisabled
-            }
+            color={get(route, "params.topics.length", 1) - 1 > topicIndex ? "#3B1FA3" : "#FFFFFF"}
+            style={get(route, "params.topics.length", 1) - 1 > topicIndex ? styles.pageBtn : styles.pageBtnDisabled}
             onPress={() => {
               if (get(route, "params.topics.length", 1) - 1 > topicIndex) {
                 setTopicIndex(topicIndex + 1);

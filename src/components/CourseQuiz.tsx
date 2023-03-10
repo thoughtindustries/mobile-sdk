@@ -1,36 +1,27 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TextInput,
-  ImageBackground,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, TextInput, ImageBackground } from "react-native";
 import { Button } from "../components";
-import {
-  get,
-  filter,
-  includes,
-  set,
-  isUndefined,
-  remove,
-  isEmpty,
-  padStart,
-} from "lodash";
+import { get, filter, includes, set, isUndefined, remove, isEmpty, padStart } from "lodash";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { questionChoice } from "../../types";
+import tiGql from "../helpers/TIGraphQL";
 
 interface CourseQuizProps {
+  courseid: string;
   quiz: any;
 }
 
-const CourseQuiz = ({ quiz }: CourseQuizProps) => {
-  console.log(JSON.stringify(quiz));
+const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   const [qIndex, setQIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<string[]>([]);
+  const [attemptId, setAttemptId] = useState<string>("");
+
+  const startQuiz = () => {
+    tiGql.createAssessmentAttempt(courseid, quiz.id).then(setAttemptId);
+    setQIndex(1);
+  };
 
   const saveAttempt = (answer: string, isMulti: boolean) => {
     let temp = [...attempts];
@@ -57,29 +48,13 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
     const question = get(quiz, `questions.${qIndex - 1}`, {});
 
     const preText = () => (
-      <>
-        {get(question, "preText", "") !== "" && (
-          <Text style={styles.questionText}>
-            {striptags(get(question, "preText", ""))}
-          </Text>
-        )}
-      </>
+      <>{get(question, "preText", "") !== "" && <Text style={styles.questionText}>{striptags(get(question, "preText", ""))}</Text>}</>
     );
 
-    const questionBody = () => (
-      <Text style={styles.questionTitle}>
-        {striptags(get(question, "body", ""))}
-      </Text>
-    );
+    const questionBody = () => <Text style={styles.questionTitle}>{striptags(get(question, "body", ""))}</Text>;
 
     const postText = () => (
-      <>
-        {get(question, "postText", "") !== "" && (
-          <Text style={styles.questionText}>
-            {striptags(get(question, "postText", ""))}
-          </Text>
-        )}
-      </>
+      <>{get(question, "postText", "") !== "" && <Text style={styles.questionText}>{striptags(get(question, "postText", ""))}</Text>}</>
     );
 
     const questionEssay = () => {
@@ -93,17 +68,13 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
             }}
           >
             <Text style={styles.subTitle}>Content to Review</Text>
-            <Text style={styles.essayText}>
-              {striptags(get(question, "body", ""))}
-            </Text>
+            <Text style={styles.essayText}>{striptags(get(question, "body", ""))}</Text>
           </View>
 
           {!isEmpty(get(question, "additionalContent", "")) && (
             <View style={{ ...styles.choiceBox, flexDirection: "column" }}>
               <Text style={styles.subTitle}>Additional Content</Text>
-              <Text style={styles.essayText}>
-                {striptags(get(question, "additionalContent", ""))}
-              </Text>
+              <Text style={styles.essayText}>{striptags(get(question, "additionalContent", ""))}</Text>
             </View>
           )}
         </>
@@ -118,17 +89,9 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
           {question.type !== "essay" && questionBody()}
           {question.type === "essay" && questionEssay()}
 
-          {question.type === "multipleChoice" && (
-            <View style={{ marginTop: 16 }}>
-              {renderChoice(question.choices, true, question.type)}
-            </View>
-          )}
+          {question.type === "multipleChoice" && <View style={{ marginTop: 16 }}>{renderChoice(question.choices, true, question.type)}</View>}
 
-          {question.type === "booleanChoice" && (
-            <View style={{ marginTop: 16 }}>
-              {renderChoice(question.choices, false, question.type)}
-            </View>
-          )}
+          {question.type === "booleanChoice" && <View style={{ marginTop: 16 }}>{renderChoice(question.choices, false, question.type)}</View>}
 
           {(question.type === "openEnded" || question.type === "essay") && (
             <View style={{ marginTop: 16 }}>
@@ -143,62 +106,31 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
             </View>
           )}
 
-          {question.type === "imageComparison" && (
-            <View style={{ marginTop: 16 }}>
-              {renderChoice(question.choices, false, question.type)}
-            </View>
-          )}
+          {question.type === "imageComparison" && <View style={{ marginTop: 16 }}>{renderChoice(question.choices, false, question.type)}</View>}
 
-          {question.type === "fileSubmission" && (
+          {/*question.type === "fileSubmission" && (
             <View style={{ marginTop: 16 }}>
-              <Button
-                title="Upload File"
-                mode={2}
-                onPress={() => setQIndex(qIndex + 1)}
-              />
+              <Button title="Upload File" mode={2} onPress={() => setQIndex(qIndex + 1)} />
             </View>
-          )}
+          )*/}
 
           {qIndex < quiz.questions.length && (
-            <View
-              style={
-                quiz.questionSkipEnabled && get(attempts, qIndex, []).length > 0
-                  ? styles.row
-                  : {}
-              }
-            >
-              {quiz.questionSkipEnabled && (
-                <Button
-                  title="Skip Question"
-                  mode={2}
-                  onPress={() => setQIndex(qIndex + 1)}
-                />
-              )}
+            <View style={quiz.questionSkipEnabled && get(attempts, qIndex, []).length > 0 ? styles.row : {}}>
+              {quiz.questionSkipEnabled && <Button title="Skip Question" mode={2} onPress={() => setQIndex(qIndex + 1)} />}
 
-              {get(attempts, qIndex, []).length > 0 && (
-                <Button
-                  title="Next Question"
-                  onPress={() => setQIndex(qIndex + 1)}
-                />
-              )}
+              {get(attempts, qIndex, []).length > 0 && <Button title="Next Question" onPress={() => setQIndex(qIndex + 1)} />}
             </View>
           )}
 
           {postText()}
 
-          {qIndex >= quiz.questions.length && (
-            <Button title="See Results" onPress={() => setShowResult(true)} />
-          )}
+          {qIndex >= quiz.questions.length && <Button title="See Results" onPress={() => setShowResult(true)} />}
         </View>
       </View>
     );
   };
 
-  const renderChoice = (
-    choices: questionChoice[],
-    isMulti: boolean,
-    type: string
-  ) => {
+  const renderChoice = (choices: questionChoice[], isMulti: boolean, type: string) => {
     return (
       <>
         {choices.map((choice: questionChoice, idx: number) => (
@@ -207,8 +139,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
               key={choice.choiceId}
               style={{
                 ...styles.choiceBox,
-                ...(get(attempts, qIndex, []).length > 0 &&
-                get(attempts, qIndex, []).includes(choice.value)
+                ...(get(attempts, qIndex, []).length > 0 && get(attempts, qIndex, []).includes(choice.value)
                   ? choice.correct
                     ? styles.correctBox
                     : styles.incorrectBox
@@ -216,11 +147,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
                 ...(type === "imageComparison" ? styles.imageComparison : {}),
               }}
             >
-              {type !== "imageComparison" && (
-                <Text style={styles.answerTextBold}>
-                  {String.fromCharCode(65 + idx)}.
-                </Text>
-              )}
+              {type !== "imageComparison" && <Text style={styles.answerTextBold}>{String.fromCharCode(65 + idx)}.</Text>}
               {type === "imageComparison" && (
                 <ImageBackground
                   source={{ uri: get(choice, "asset", "") }}
@@ -229,16 +156,11 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
                 />
               )}
               <View>
-                <Text style={styles.answerText}>
-                  {isEmpty(choice.altText) ? choice.value : choice.altText}
-                </Text>
+                <Text style={styles.answerText}>{isEmpty(choice.altText) ? choice.value : choice.altText}</Text>
 
-                {get(attempts, qIndex, []).includes(choice.value) &&
-                  !isEmpty(choice.response) && (
-                    <Text style={styles.responseText}>
-                      {striptags(get(choice, "response", ""))}
-                    </Text>
-                  )}
+                {get(attempts, qIndex, []).includes(choice.value) && !isEmpty(choice.response) && (
+                  <Text style={styles.responseText}>{striptags(get(choice, "response", ""))}</Text>
+                )}
               </View>
             </View>
           </Pressable>
@@ -257,17 +179,10 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
           }}
         >
           <View style={{ ...styles.row, justifyContent: "flex-start" }}>
-            <MaterialCommunityIcons
-              name="timer-sand-complete"
-              size={24}
-              color="#374151"
-              style={styles.quizBoxIcon}
-            />
+            <MaterialCommunityIcons name="timer-sand-complete" size={24} color="#374151" style={styles.quizBoxIcon} />
             <View>
               <Text style={styles.prenote}>Time Limit</Text>
-              <Text style={styles.boldnote}>
-                {getFormattedTime(quiz.timeLimitInSeconds)}
-              </Text>
+              <Text style={styles.boldnote}>{getFormattedTime(quiz.timeLimitInSeconds)}</Text>
             </View>
           </View>
         </View>
@@ -281,12 +196,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
           }}
         >
           <View style={{ ...styles.row, justifyContent: "flex-start" }}>
-            <MaterialCommunityIcons
-              name="arrow-up-right"
-              size={24}
-              color="#374151"
-              style={styles.quizBoxIcon}
-            />
+            <MaterialCommunityIcons name="arrow-up-right" size={24} color="#374151" style={styles.quizBoxIcon} />
             <View>
               <Text style={styles.prenote}>Attempts left</Text>
               <Text style={styles.boldnote}>{quiz.maxAttempts}</Text>
@@ -350,9 +260,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
         <View style={{ ...styles.row, marginLeft: -20 }}>
           <View style={styles.resultBox}>
             <Text style={styles.resultNote}>Suggested Time per Question</Text>
-            <Text style={styles.essayText}>
-              {getFormattedClock(quiz.timePerQuestionInSeconds)}
-            </Text>
+            <Text style={styles.essayText}>{getFormattedClock(quiz.timePerQuestionInSeconds)}</Text>
           </View>
           <View style={styles.resultBox}>
             <Text style={styles.resultNote}>Average Time per Question</Text>
@@ -363,9 +271,7 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
         <View style={{ ...styles.row, marginLeft: -20 }}>
           <View style={styles.resultBox}>
             <Text style={styles.resultNote}>Time Limit</Text>
-            <Text style={styles.essayText}>
-              {getFormattedClock(quiz.timeLimitInSeconds)}
-            </Text>
+            <Text style={styles.essayText}>{getFormattedClock(quiz.timeLimitInSeconds)}</Text>
           </View>
           <View style={styles.resultBox}>
             <Text style={styles.resultNote}>Total Time</Text>
@@ -384,17 +290,11 @@ const CourseQuiz = ({ quiz }: CourseQuizProps) => {
       {qIndex === 0 && (
         <>
           <Text style={styles.heading}>{get(quiz, "title", "Quiz")}</Text>
-          {!isEmpty(get(quiz, "startMessage", "")) && (
-            <Text style={styles.startMessage}>
-              {striptags(quiz.startMessage)}
-            </Text>
-          )}
+          {!isEmpty(get(quiz, "startMessage", "")) && <Text style={styles.startMessage}>{striptags(quiz.startMessage)}</Text>}
 
           {renderQuizInfo()}
 
-          {get(quiz, "questions.length", 0) > 0 && (
-            <Button title="Start Quiz" onPress={() => setQIndex(1)} />
-          )}
+          {get(quiz, "questions.length", 0) > 0 && <Button title="Start Quiz" onPress={startQuiz} />}
         </>
       )}
 
