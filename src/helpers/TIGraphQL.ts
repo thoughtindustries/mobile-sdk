@@ -1,12 +1,7 @@
 import axios from "axios";
 
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import {
-  courseListType,
-  pageType,
-  contentListType,
-  userRecentContentType,
-} from "../../types";
+import { courseListType, pageType, contentListType, userRecentContentType } from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
 
@@ -96,10 +91,7 @@ class TIGraphQL {
       vars["query"] = `tags:${_.get(params, "tag", "")}`;
     }
 
-    if (
-      !_.isEmpty(_.get(params, "duration", "")) ||
-      !_.isEmpty(_.get(params, "difficulty", ""))
-    ) {
+    if (!_.isEmpty(_.get(params, "duration", "")) || !_.isEmpty(_.get(params, "difficulty", ""))) {
       gql1 = `${gql1},
       $labels: [String!],
       $values: [String!]`;
@@ -154,11 +146,7 @@ class TIGraphQL {
     });
   }
 
-  myLearnings(params: {
-    sortBy?: string;
-    sortDir?: string;
-    tag?: string;
-  }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
+  myLearnings(params: { sortBy?: string; sortDir?: string; tag?: string }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
     let gql1 = `query MyLearning(
       $sortColumn: SortColumn,
       $sortDirection: SortDirection`;
@@ -304,9 +292,7 @@ class TIGraphQL {
             reject(res.data.errors[0].message);
           } else {
             gql2.variables.identifiers = _.flattenDeep(
-              _.map(res.data.data.CourseById.sections, (s) =>
-                _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id))
-              )
+              _.map(res.data.data.CourseById.sections, (s) => _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id)))
             );
           }
         })
@@ -388,11 +374,7 @@ class TIGraphQL {
           if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
-            content.progress = _.get(
-              res,
-              "data.data.PagesCompletedByCourse",
-              []
-            ).map((pc: { id: String }) => pc.id);
+            content.progress = _.get(res, "data.data.PagesCompletedByCourse", []).map((pc: { id: String }) => pc.id);
             resolve(content);
           }
         })
@@ -614,6 +596,46 @@ class TIGraphQL {
             reject(_.get(res, "data.errors.0.message", ""));
           } else {
             resolve(_.get(res, "data.data.UserRecentContent", []));
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  createAssessmentAttempt(courseId: string, topicId: string) {
+    const gql = {
+      query: `query LoadAssessmentAttemptWithQuestions(
+        $courseId: ID,
+        $id: ID!,
+        $topicType: AssessmentTopicType!
+      ) {
+        LoadAssessmentAttemptWithQuestions(
+          courseId: $courseId,
+          id: $id,
+          topicType:$topicType
+        ) {
+          id
+          status
+          grade
+        }
+      }`,
+      variables: {
+        courseId: courseId,
+        id: topicId,
+        topicType: "quiz",
+      },
+    };
+
+    return new Promise<string>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve(_.get(res, "data.data.LoadAssessmentAttemptWithQuestions.id", ""));
           }
         })
         .catch(reject);

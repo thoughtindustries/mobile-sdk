@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-} from "react-native";
+import { View, Text, Modal, StyleSheet, Pressable, ScrollView } from "react-native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -56,7 +49,7 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
 
   const CourseFilter = () => {
     return (
-      <Modal transparent={false} visible={true}>
+      <Modal transparent={false} visible={show}>
         <View style={styles.filterContainer}>
           <Text style={styles.filterHeading}>Filters</Text>
 
@@ -64,21 +57,13 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
             <Text style={styles.filterTitle}>Sort By</Text>
             <View style={styles.row}>
               <Text
-                style={
-                  filters.sortDir === "asc"
-                    ? styles.sortDirSelected
-                    : styles.sortDir
-                }
+                style={filters.sortDir === "asc" ? styles.sortDirSelected : styles.sortDir}
                 onPress={() => setFilters({ ...filters, sortDir: "asc" })}
               >
                 A-Z
               </Text>
               <Text
-                style={
-                  filters.sortDir === "desc"
-                    ? styles.sortDirSelected
-                    : styles.sortDir
-                }
+                style={filters.sortDir === "desc" ? styles.sortDirSelected : styles.sortDir}
                 onPress={() => setFilters({ ...filters, sortDir: "desc" })}
               >
                 Z-A
@@ -154,18 +139,14 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
   return (
     <>
       <Pressable style={styles.filterbtn} onPress={() => setShow(true)}>
-        <MaterialCommunityIcons
-          name="filter-variant"
-          size={25}
-          color="#232323"
-        />
+        <MaterialCommunityIcons name="filter-variant" size={25} color="#232323" />
       </Pressable>
       {hasFilterApplied() > 0 && (
         <View style={styles.hasFilter}>
           <Text style={styles.filterCount}>{hasFilterApplied()}</Text>
         </View>
       )}
-      {show && <CourseFilter />}
+      <CourseFilter />
     </>
   );
 };
