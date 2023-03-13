@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Animated } from "react-native";
-import _ from "lodash";
+import { get } from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Loader } from "../components";
+import { Loader, CourseQuiz } from "../components";
 import { RootStackParamList } from "../../types";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import tiGql from "../helpers/TIGraphQL";
 import WebView from "react-native-webview";
 
-type ExploreCourseProps = StackNavigationProp<
-  RootStackParamList,
-  "ExploreCourse"
->;
+type ExploreCourseProps = StackNavigationProp<RootStackParamList, "ExploreCourse">;
 
 const ExploreCourse = () => {
   const navigation = useNavigation<ExploreCourseProps>();
@@ -24,10 +21,11 @@ const ExploreCourse = () => {
   const route = useRoute();
 
   const fetchTopic = () => {
-    const topic = _.get(route, `params.topics.${topicIndex}`, {
+    const topic = get(route, `params.topics.${topicIndex}`, {
       id: "",
       type: "",
     });
+    //console.log(topic);
     setLoading(true);
     tiGql
       .fetchTopicPage(topic.id, topic.type)
@@ -42,35 +40,25 @@ const ExploreCourse = () => {
     ({
       video: renderVideo,
       text: renderText,
-    }[_.get(topicData, "type", "text")]());
+      quiz: renderQuiz,
+    }[get(topicData, "type", "text")]());
 
   const renderVideo = () => {
-    console.log(topicData);
     return (
       <>
-        <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
-        {_.get(topicData, "preTextBlock", "") != "" && (
-          <Text style={styles.topicText}>
-            {striptags(_.get(topicData, "preTextBlock", ""))}
-          </Text>
-        )}
+        <Text style={styles.topicTitle}>{get(topicData, "title", "")}</Text>
+        {get(topicData, "preTextBlock", "") != "" && <Text style={styles.topicText}>{striptags(get(topicData, "preTextBlock", ""))}</Text>}
         <WebView
           source={{
-            uri: `https://fast.wistia.com/embed/medias/${_.get(
-              topicData,
-              "asset",
-              ""
-            )}`,
+            uri: `https://fast.wistia.com/embed/medias/${get(topicData, "asset", "")}`,
           }}
           style={{ marginTop: 20, height: 200 }}
         />
 
-        {_.get(topicData, "body", "") != "" && (
+        {get(topicData, "body", "") != "" && (
           <>
             <Text style={styles.topicTitle}>Description</Text>
-            <Text style={styles.topicText}>
-              {striptags(_.get(topicData, "body", ""))}
-            </Text>
+            <Text style={styles.topicText}>{striptags(get(topicData, "body", ""))}</Text>
           </>
         )}
       </>
@@ -79,19 +67,15 @@ const ExploreCourse = () => {
 
   const renderText = () => (
     <>
-      <Text style={styles.topicTitle}>{_.get(topicData, "title", "")}</Text>
-      <Text style={styles.topicText}>
-        {striptags(_.get(topicData, "body", ""))}
-      </Text>
+      <Text style={styles.topicTitle}>{get(topicData, "title", "")}</Text>
+      <Text style={styles.topicText}>{striptags(get(topicData, "body", ""))}</Text>
     </>
   );
+  const renderQuiz = () => <CourseQuiz quiz={topicData} courseid={get(route, "params.cid", "")} />;
 
   return (
     <>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[0]}>
         <View>
           <View style={{ ...styles.row, padding: 8, paddingTop: 40 }}>
             <MaterialCommunityIcons
@@ -100,7 +84,8 @@ const ExploreCourse = () => {
               color="#374151"
               onPress={() =>
                 navigation.navigate("ContentDetails", {
-                  cid: _.get(route, "params.cid", ""),
+                  cid: get(route, "params.cid", ""),
+                  from: get(route, "params.from", ""),
                 })
               }
             />
@@ -108,7 +93,8 @@ const ExploreCourse = () => {
               style={styles.backBtn}
               onPress={() =>
                 navigation.navigate("ContentDetails", {
-                  cid: _.get(route, "params.cid", ""),
+                  cid: get(route, "params.cid", ""),
+                  from: get(route, "params.from", ""),
                 })
               }
             >
@@ -118,21 +104,15 @@ const ExploreCourse = () => {
 
           <View style={styles.courseHeading}>
             <View style={{ ...styles.row, paddingTop: 0 }}>
-              <Text style={styles.courseTitle}>
-                {_.get(route, "params.course", "")}
-              </Text>
+              <Text style={styles.courseTitle}>{get(route, "params.course", "")}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.slide}>
           <View style={styles.row}>
-            <Text style={styles.sectionTitle}>
-              {_.get(route, "params.section", "")} /
-            </Text>
-            <Text style={styles.lessonTitle}>
-              {_.get(route, "params.lesson", "")}
-            </Text>
+            <Text style={styles.sectionTitle}>{get(route, "params.section", "")} /</Text>
+            <Text style={styles.lessonTitle}>{get(route, "params.lesson", "")}</Text>
           </View>
           <View style={styles.sectionProgress}>
             <Animated.View
@@ -140,7 +120,7 @@ const ExploreCourse = () => {
                 ([StyleSheet.absoluteFill],
                 {
                   backgroundColor: "#3B1FA3",
-                  width: `${_.get(route, "params.progress", 0)}%`,
+                  width: `${get(route, "params.progress", 0)}%`,
                   borderRadius: 16,
                 })
               }
@@ -178,18 +158,10 @@ const ExploreCourse = () => {
           <MaterialCommunityIcons
             name="chevron-right"
             size={36}
-            color={
-              _.get(route, "params.topics.length", 1) - 1 > topicIndex
-                ? "#3B1FA3"
-                : "#FFFFFF"
-            }
-            style={
-              _.get(route, "params.topics.length", 1) - 1 > topicIndex
-                ? styles.pageBtn
-                : styles.pageBtnDisabled
-            }
+            color={get(route, "params.topics.length", 1) - 1 > topicIndex ? "#3B1FA3" : "#FFFFFF"}
+            style={get(route, "params.topics.length", 1) - 1 > topicIndex ? styles.pageBtn : styles.pageBtnDisabled}
             onPress={() => {
-              if (_.get(route, "params.topics.length", 1) - 1 > topicIndex) {
+              if (get(route, "params.topics.length", 1) - 1 > topicIndex) {
                 setTopicIndex(topicIndex + 1);
               }
             }}

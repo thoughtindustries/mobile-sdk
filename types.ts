@@ -20,6 +20,7 @@ export type RootStackParamList = {
   Home: undefined;
   ContentDetails: {
     cid: string;
+    from: string;
   };
   ProfileEdit: undefined;
   ExploreCourse: {
@@ -29,6 +30,7 @@ export type RootStackParamList = {
     lesson: string;
     progress: number;
     topics?: [];
+    from: string;
   };
 };
 
@@ -65,7 +67,7 @@ export type courseListType = {
   asset: string;
   authors?: string[];
   title: string;
-  displayCourse?: string;
+  displayCourse: string;
   contentTypeLabel?: string;
   progress?: Float;
   isOffline?: boolean;
@@ -89,7 +91,7 @@ export type pageType = {
 };
 
 export type filtersType = {
-  sortBy: string;
+  sortBy?: string;
   sortDir: string;
   duration: string;
   difficulty: string;
@@ -99,4 +101,21 @@ export type filtersType = {
 export type contentListType = {
   course: pageType[];
   progress: String[];
+};
+
+export type userRecentContentType = {
+  id: string;
+  title: string;
+  asset: string;
+  description: string;
+};
+
+export type questionChoice = {
+  altText?: string;
+  asset?: string;
+  choiceId?: string;
+  correct?: boolean;
+  points?: number;
+  response?: string;
+  value: string;
 };

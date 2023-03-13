@@ -26,6 +26,7 @@ const CourseDetails = () => {
     languages: [],
     videoAsset: "",
   });
+  const [variant, setVariant] = useState<number>(0);
   const [fullBody, setFullBody] = useState<Boolean>(false);
   const [showResources, setShowResources] = useState<Boolean>(false);
   let cid = _.get(route, "params.cid", "");
@@ -98,9 +99,13 @@ const CourseDetails = () => {
 
           <View style={styles.articleHeading}>
             <View style={{ ...styles.row, paddingTop: 0 }}>
-              <ResourceControl data={content} />
+              <ResourceControl
+                data={content}
+                variant={variant}
+                onChange={setVariant}
+              />
               <Text style={styles.headingText}>
-                {_.get(content, "languages[0].label", "Article Title")}
+                {_.get(content, `languages[${variant}].label`, "Article Title")}
               </Text>
             </View>
           </View>
@@ -110,17 +115,25 @@ const CourseDetails = () => {
         <View style={{ padding: 20 }}>
           {_.get(route, "params.contentTypeLabel", "Article") == "Article" && (
             <Text style={styles.articleDetails}>
-              {striptags(_.get(content, "languages[0].body", ""))}
+              {striptags(_.get(content, `languages[${variant}].body`, ""))}
             </Text>
           )}
           {_.get(route, "params.contentTypeLabel", "Video") == "Video" &&
             _.get(content, "videoAsset", "na") !== "na" && (
               <>
                 <Text style={styles.title}>
-                  {_.get(content, "languages[0].title", "Article Title")}
+                  {_.get(
+                    content,
+                    `languages[${variant}].title`,
+                    "Article Title"
+                  )}
                 </Text>
                 <Text style={styles.subtitle}>
-                  {_.get(content, "languages[0].subtitle", "Article Title")}
+                  {_.get(
+                    content,
+                    `languages[${variant}].subtitle`,
+                    "Article Title"
+                  )}
                 </Text>
                 <WebView
                   source={{
@@ -131,22 +144,25 @@ const CourseDetails = () => {
 
                 <Text style={styles.articleDetails}>
                   {_.truncate(
-                    striptags(_.get(content, "languages[0].body", "")),
+                    striptags(_.get(content, `languages[${variant}].body`, "")),
                     {
                       length: 120,
                     }
                   )}
                 </Text>
 
-                {_.get(content, "languages[0].externalUrlCallToAction", "") !==
-                  "" && (
+                {_.get(
+                  content,
+                  `languages[${variant}].externalUrlCallToAction`,
+                  ""
+                ) !== "" && (
                   <Button
                     title="View More"
                     onPress={() =>
                       Linking.openURL(
                         _.get(
                           content,
-                          "languages[0].externalUrlCallToAction",
+                          `languages[${variant}].externalUrlCallToAction`,
                           ""
                         )
                       )
@@ -156,7 +172,9 @@ const CourseDetails = () => {
 
                 <Text style={styles.articleDetails}>
                   {_.truncate(
-                    striptags(_.get(content, "languages[0].copyright", "")),
+                    striptags(
+                      _.get(content, `languages[${variant}].copyright`, "")
+                    ),
                     {
                       length: 100,
                     }

@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-} from "react-native";
+import { View, Text, Modal, StyleSheet, Pressable, ScrollView } from "react-native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
@@ -25,6 +18,15 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
     difficulty: "",
     tag: "",
   });
+
+  const hasFilterApplied = () => {
+    let applied = 0;
+    applied += filters.duration !== "" ? 1 : 0;
+    applied += filters.difficulty !== "" ? 1 : 0;
+    applied += filters.tag !== "" ? 1 : 0;
+
+    return applied;
+  };
 
   const clearFilter = () => {
     const flts: filtersType = {
@@ -47,7 +49,7 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
 
   const CourseFilter = () => {
     return (
-      <Modal transparent={false} visible={true}>
+      <Modal transparent={false} visible={show}>
         <View style={styles.filterContainer}>
           <Text style={styles.filterHeading}>Filters</Text>
 
@@ -55,21 +57,13 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
             <Text style={styles.filterTitle}>Sort By</Text>
             <View style={styles.row}>
               <Text
-                style={
-                  filters.sortDir === "asc"
-                    ? styles.sortDirSelected
-                    : styles.sortDir
-                }
+                style={filters.sortDir === "asc" ? styles.sortDirSelected : styles.sortDir}
                 onPress={() => setFilters({ ...filters, sortDir: "asc" })}
               >
                 A-Z
               </Text>
               <Text
-                style={
-                  filters.sortDir === "desc"
-                    ? styles.sortDirSelected
-                    : styles.sortDir
-                }
+                style={filters.sortDir === "desc" ? styles.sortDirSelected : styles.sortDir}
                 onPress={() => setFilters({ ...filters, sortDir: "desc" })}
               >
                 Z-A
@@ -145,13 +139,14 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
   return (
     <>
       <Pressable style={styles.filterbtn} onPress={() => setShow(true)}>
-        <MaterialCommunityIcons
-          name="filter-variant"
-          size={25}
-          color="#232323"
-        />
+        <MaterialCommunityIcons name="filter-variant" size={25} color="#232323" />
       </Pressable>
-      {show && <CourseFilter />}
+      {hasFilterApplied() > 0 && (
+        <View style={styles.hasFilter}>
+          <Text style={styles.filterCount}>{hasFilterApplied()}</Text>
+        </View>
+      )}
+      <CourseFilter />
     </>
   );
 };
@@ -249,6 +244,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "Inter_700Bold",
     borderRadius: 5,
+  },
+
+  hasFilter: {
+    height: 24,
+    width: 24,
+    borderRadius: 24,
+    backgroundColor: "#3B1FA3",
+    marginLeft: -15,
+    marginTop: -5,
+  },
+
+  filterCount: {
+    textAlign: "center",
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    lineHeight: 24,
+    color: "#ffffff",
   },
 });
 

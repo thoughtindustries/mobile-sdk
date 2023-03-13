@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import { courseListType, pageType, contentListType } from "../../types";
+import { courseListType, pageType, contentListType, userRecentContentType } from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
 
@@ -52,42 +52,46 @@ class TIGraphQL {
   }
 
   fetchCourses(params: {
-    sortBy: string;
-    sortDir: string;
-    duration: string;
-    difficulty: string;
-    tag: string;
-    page: number;
+    sortBy?: string;
+    sortDir?: string;
+    duration?: string;
+    difficulty?: string;
+    tag?: string;
+    page?: number;
   }): Promise<courseListType[]> {
     let gql1 = `query CatalogContent(
       $page: Int!,
       $sortColumn: SortColumn,
-      $sortDirection: SortDirection`;
+      $sortDirection: SortDirection,
+      $contentTypes: [String!]`;
 
     let gql2 = `page: $page,
       sortColumn: $sortColumn,
       sortDirection: $sortDirection
+      contentTypes: $contentTypes
       `;
 
     let vars: {
       [key: string]: string | number | string[];
     } = {
-      page: params.page,
-      sortColumn: params.sortBy,
-      sortDirection: params.sortDir,
+      page: _.get(params, "page", 1),
+      sortColumn: _.get(params, "sortBy", "title"),
+      sortDirection: _.get(params, "sortDir", "asc"),
     };
 
-    if (!_.isEmpty(params.tag)) {
+    vars["contentTypes"] = ["Course"];
+
+    if (!_.isEmpty(_.get(params, "tag", ""))) {
       gql1 = `${gql1},
       $query: String`;
 
       gql2 = `${gql2},
       query: $query`;
 
-      vars["query"] = `tags:${params.tag}`;
+      vars["query"] = `tags:${_.get(params, "tag", "")}`;
     }
 
-    if (!_.isEmpty(params.duration) || !_.isEmpty(params.difficulty)) {
+    if (!_.isEmpty(_.get(params, "duration", "")) || !_.isEmpty(_.get(params, "difficulty", ""))) {
       gql1 = `${gql1},
       $labels: [String!],
       $values: [String!]`;
@@ -99,14 +103,14 @@ class TIGraphQL {
       vars["labels"] = [];
       vars["values"] = [];
 
-      if (!_.isEmpty(params.duration)) {
+      if (!_.isEmpty(_.get(params, "duration", ""))) {
         vars["labels"].push("Duration");
-        vars["values"].push(params.duration);
+        vars["values"].push(_.get(params, "duration", ""));
       }
 
-      if (!_.isEmpty(params.difficulty)) {
+      if (!_.isEmpty(_.get(params, "difficulty", ""))) {
         vars["labels"].push("Level of Difficulty");
-        vars["values"].push(params.difficulty);
+        vars["values"].push(_.get(params, "difficulty", ""));
       }
     }
 
@@ -117,6 +121,7 @@ class TIGraphQL {
           ${gql2}
         ) {
           contentItems {
+            id
             asset
             authors
             title
@@ -141,11 +146,7 @@ class TIGraphQL {
     });
   }
 
-  myLearnings(params: {
-    sortBy: string;
-    sortDir: string;
-    tag: string;
-  }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
+  myLearnings(params: { sortBy?: string; sortDir?: string; tag?: string }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
     let gql1 = `query MyLearning(
       $sortColumn: SortColumn,
       $sortDirection: SortDirection`;
@@ -157,18 +158,18 @@ class TIGraphQL {
     let vars: {
       [key: string]: string | number | string[];
     } = {
-      sortColumn: params.sortBy,
-      sortDirection: params.sortDir,
+      sortColumn: _.get(params, "sortBy", "title"),
+      sortDirection: _.get(params, "sortDir", "asc"),
     };
 
-    if (!_.isEmpty(params.tag)) {
+    if (!_.isEmpty(_.get(params, "tag", ""))) {
       gql1 = `${gql1},
       $query: String`;
 
       gql2 = `${gql2},
       query: $query`;
 
-      vars["query"] = `tags:${params.tag}`;
+      vars["query"] = `tags:${_.get(params, "tag", "")}`;
     }
 
     const gql = {
@@ -291,9 +292,7 @@ class TIGraphQL {
             reject(res.data.errors[0].message);
           } else {
             gql2.variables.identifiers = _.flattenDeep(
-              _.map(res.data.data.CourseById.sections, (s) =>
-                _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id))
-              )
+              _.map(res.data.data.CourseById.sections, (s) => _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id)))
             );
           }
         })
@@ -375,11 +374,7 @@ class TIGraphQL {
           if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
-            content.progress = _.get(
-              res,
-              "data.data.PagesCompletedByCourse",
-              []
-            ).map((pc: { id: String }) => pc.id);
+            content.progress = _.get(res, "data.data.PagesCompletedByCourse", []).map((pc: { id: String }) => pc.id);
             resolve(content);
           }
         })
@@ -388,7 +383,6 @@ class TIGraphQL {
   }
 
   fetchTopicPage(tid: string, type: string) {
-    console.log(tid, type);
     const gqlAry: { [key: string]: string } = {
       ArticlePage: `... on ArticlePage {
         accessibilityAudioAsset
@@ -413,20 +407,16 @@ class TIGraphQL {
         updatedAt
         videoAsset
       }`,
-      QuizPage: `... on QuizPage {
+      quiz: `... on QuizPage {
         accessibilityAudioAsset
         accessibilityAudioAssetTitle
         accessibilityAudioAssetUrl
         allowToResume
-        catalogAsset
-        clientId
-        companyId
         completionTimeSeconds
         contentDescription
         contentEstimate
         contentTime
         continueAfterTimerExpires
-        createdAt
         displayAllHints
         displayAttemptNumbers
         editableByChildren
@@ -436,15 +426,83 @@ class TIGraphQL {
         indentationLevel
         instructorAssessment
         isGraded
-        lessonId
         maxAttempts
         minPassingPercent
         navigationDisabled
+        questions{
+          additionalContent
+          body
+          choices{
+            altText
+            asset
+            choiceId
+            correct
+            points
+            response
+            value
+          }
+          fileSubmissionAsset
+          gradedAsCorrect
+          hasChoices
+          isBooleanChoice
+          isEssay
+          isFileSubmission
+          isImageComparison
+          isLikert
+          isMultipleChoice
+          isOpenEnded
+          isSelectBoxes
+          isTable
+          mustSelectAllCorrectChoices
+          openEndedResponse
+          parentQuestion
+          placeholder
+          postText
+          postText2
+          preText
+          preText2
+          preselectedChoices{
+            choiceId
+          }
+          questionId
+          questionCategoryId
+          questionType
+          required
+          response
+          selectedChoice{
+            choiceId
+          }
+          shouldCheckAnswers
+          shouldDisplayOnResults
+          table{
+            headers{
+              locked
+              value
+              weight
+            }
+            rows{
+              locked
+              value
+              weight
+            }
+          }
+          tableResponse{
+            headers{
+              locked
+              value
+              weight
+            }
+            rows{
+              locked
+              value
+              weight
+            }
+          }
+          type
+        }
         passMessage
         preventProgression
         questionSkipEnabled
-        
-        
         showAnswerAfterPass
         startMessage
         timeLimitInSeconds
@@ -452,7 +510,6 @@ class TIGraphQL {
         timerEnabled
         title
         type
-        updatedAt
       }`,
       text: `... on TextPage {
         accessibilityAudioAsset
@@ -510,6 +567,161 @@ class TIGraphQL {
             reject(res.data.errors[0].message);
           } else {
             resolve(res.data.data.Pages[0]);
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  fetchRecentCourses(limit: number) {
+    const gql = {
+      query: `query UserRecentContent{
+          UserRecentContent(limit: ${limit}) {
+            id
+            title
+            description
+            asset  
+          }
+      }`,
+      variables: {},
+    };
+    return new Promise<userRecentContentType[]>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve(_.get(res, "data.data.UserRecentContent", []));
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  createAssessmentAttempt(courseId: string, topicId: string) {
+    const gql = {
+      query: `query LoadAssessmentAttemptWithQuestions(
+        $courseId: ID,
+        $id: ID!,
+        $topicType: AssessmentTopicType!
+      ) {
+        LoadAssessmentAttemptWithQuestions(
+          courseId: $courseId,
+          id: $id,
+          topicType:$topicType
+        ) {
+          id
+          status
+          grade
+        }
+      }`,
+      variables: {
+        courseId: courseId,
+        id: topicId,
+        topicType: "quiz",
+      },
+    };
+    return new Promise<string>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve(_.get(res, "data.data.LoadAssessmentAttemptWithQuestions.id", ""));
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  saveAssessmentAttempt(attemptId: string, qbody: string, msacc: boolean, selectedChoice: { value: string; correct: boolean }) {
+    const gql = {
+      query: `mutation UpdateAssessmentAttempt(
+        $activeQuestion: QuestionInput,
+        $assessmentAttempt: AssessmentAttemptInput
+      ) {
+        UpdateAssessmentAttempt(
+          activeQuestion: $activeQuestion,
+          assessmentAttempt: $assessmentAttempt
+        ) {
+            id
+            grade
+        }
+      }`,
+      variables: {
+        assessmentAttempt: {
+          id: attemptId,
+          status: "started",
+        },
+        activeQuestion: {
+          body: qbody,
+          mustSelectAllCorrectChoices: msacc,
+          selectedChoice: {
+            value: selectedChoice.value,
+            correct: selectedChoice.correct,
+          },
+        },
+      },
+    };
+
+    return new Promise<string>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve(_.get(res, "data.data.UpdateAssessmentAttempt.id", ""));
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  submitAssessmentAttempt(attemptId: string) {
+    const gql = {
+      query: `mutation UpdateAssessmentAttempt(
+        $assessmentAttempt: AssessmentAttemptInput
+      ) {
+        UpdateAssessmentAttempt(
+          assessmentAttempt: $assessmentAttempt
+        ) {
+            id
+            grade
+            answeredQuestionsCount
+            correctQuestionsCount
+        }
+      }`,
+      variables: {
+        assessmentAttempt: {
+          id: attemptId,
+          status: "finished",
+        },
+      },
+    };
+
+    return new Promise<{ grade: number; answered: number; correct: number }>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve({
+              grade: _.get(res, "data.data.UpdateAssessmentAttempt.grade", 0),
+              answered: _.get(res, "data.data.UpdateAssessmentAttempt.answeredQuestionsCount", 0),
+              correct: _.get(res, "data.data.UpdateAssessmentAttempt.correctQuestionsCount", 0),
+            });
           }
         })
         .catch(reject);

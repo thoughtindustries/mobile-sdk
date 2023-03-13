@@ -3,7 +3,7 @@ import {
   View,
   Text,
   Image,
-  TextInput,
+  Pressable,
   StyleSheet,
   FlatList,
 } from "react-native";
@@ -12,8 +12,15 @@ import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../../types";
+
+type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
 const ExploreCatalog = () => {
+  const navigation = useNavigation<ExploreCatalogProps>();
+  const route = useRoute();
   const [filters, setFilters] = useState<filtersType>({
     sortBy: "title",
     sortDir: "asc",
@@ -82,22 +89,31 @@ const ExploreCatalog = () => {
 
   const CourseItem = (props: { data: courseListType }) => {
     return (
-      <View style={styles.courseRow}>
-        <View style={styles.courseLeftBox}>
-          <Text style={styles.courseTitle}>{props.data.title}</Text>
-          {_.get(props, "data.authors.length", 0) > 0 && (
-            <Text style={styles.courseAuthor}>
-              By {_.get(props, "data.authors", []).join(",")}
-            </Text>
+      <Pressable
+        onPress={() =>
+          navigation.navigate("ContentDetails", {
+            cid: _.get(props, "data.displayCourse", ""),
+            from: "Explore",
+          })
+        }
+      >
+        <View style={styles.courseRow}>
+          <View style={styles.courseLeftBox}>
+            <Text style={styles.courseTitle}>{props.data.title}</Text>
+            {_.get(props, "data.authors.length", 0) > 0 && (
+              <Text style={styles.courseAuthor}>
+                By {_.get(props, "data.authors", []).join(",")}
+              </Text>
+            )}
+          </View>
+          {_.get(props, "data.asset", "na") !== "na" && (
+            <Image
+              source={{ uri: props.data.asset }}
+              style={styles.courseImage}
+            />
           )}
         </View>
-        {_.get(props, "data.asset", "na") !== "na" && (
-          <Image
-            source={{ uri: props.data.asset }}
-            style={styles.courseImage}
-          />
-        )}
-      </View>
+      </Pressable>
     );
   };
 
@@ -123,19 +139,29 @@ const ExploreCatalog = () => {
           <Loader size={50} />
         </View>
       )}
+      {!pageVars.searching && (
+        <Text style={{ ...styles.courseTitle, marginTop: 10, marginLeft: 15 }}>
+          Results (
+          {filteredCourses().length > 0
+            ? _.padStart(filteredCourses().length.toString(), 2, "0")
+            : 0}
+          )
+        </Text>
+      )}
       {!pageVars.searching && courses.length > 0 && (
-        <FlatList
-          data={filteredCourses()}
-          renderItem={({ item }) => <CourseItem data={item} />}
-          onEndReached={fetchCourses}
-          onEndReachedThreshold={0.5}
-          style={styles.listStyle}
-          ListEmptyComponent={
-            <Text style={styles.noRecords}>
-              No records found, try using other filters.
-            </Text>
-          }
-        />
+        <View>
+          <FlatList
+            data={filteredCourses()}
+            renderItem={({ item }) => <CourseItem data={item} />}
+            onEndReached={fetchCourses}
+            onEndReachedThreshold={0.5}
+            ListEmptyComponent={
+              <Text style={styles.noRecords}>
+                No records found, try using other filters.
+              </Text>
+            }
+          />
+        </View>
       )}
     </View>
   );
@@ -198,6 +224,7 @@ const styles = StyleSheet.create({
   },
 
   searching: {
+    marginTop: 20,
     backgroundColor: "#3B1FA3",
     borderRadius: 10,
     paddingBottom: 20,
