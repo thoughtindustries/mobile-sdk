@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput, ImageBackground } from "react-native";
-import { Button } from "../components";
-import { get, filter, includes, set, isUndefined, remove, isEmpty, padStart } from "lodash";
+import { Button, Loader } from "../components";
+import { get, filter, includes, set, isUndefined, remove, isEmpty, padStart, isArray } from "lodash";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { questionChoice } from "../../types";
 import tiGql from "../helpers/TIGraphQL";
+import { VictoryPie } from "victory-native";
 
 interface CourseQuizProps {
   courseid: string;
@@ -13,10 +14,12 @@ interface CourseQuizProps {
 }
 
 const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [qIndex, setQIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<string[]>([]);
   const [attemptId, setAttemptId] = useState<string>("");
+  const [result, setResult] = useState<{ grade: number; answered: number; correct: number }>({ grade: 0, answered: 0, correct: 0 });
 
   const startQuiz = () => {
     tiGql.createAssessmentAttempt(courseid, quiz.id).then(setAttemptId);
@@ -41,7 +44,40 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
         set(temp, qIndex, answer);
       }
     }
+
     setAttempts([...temp]);
+  };
+
+  const goNextQuestion = () => {
+    let question = quiz.questions[qIndex - 1];
+    let answer = attempts[qIndex];
+    answer = isArray(answer) ? answer[0] : answer;
+
+    let choice = get(question, "choices", []).filter((c: { value: string }) => c.value === answer);
+    setLoading(true);
+    tiGql
+      .saveAssessmentAttempt(attemptId, question.body, question.mustSelectAllCorrectChoices, {
+        value: answer,
+        correct: get(choice, "0.correct", false),
+      })
+      .then(() => {
+        if (qIndex < quiz.questions.length) {
+          setLoading(false);
+          setQIndex(qIndex + 1);
+        } else {
+          submitQuiz();
+        }
+      });
+  };
+
+  const submitQuiz = () => {
+    setLoading(true);
+    tiGql
+      .submitAssessmentAttempt(attemptId)
+      .then(({ grade, answered, correct }) => setResult({ grade: grade, answered: answered, correct: correct }))
+      .then(() => setLoading(false))
+      .then(() => setShowResult(true))
+      .catch(console.log);
   };
 
   const renderQuestion = () => {
@@ -118,13 +154,13 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
             <View style={quiz.questionSkipEnabled && get(attempts, qIndex, []).length > 0 ? styles.row : {}}>
               {quiz.questionSkipEnabled && <Button title="Skip Question" mode={2} onPress={() => setQIndex(qIndex + 1)} />}
 
-              {get(attempts, qIndex, []).length > 0 && <Button title="Next Question" onPress={() => setQIndex(qIndex + 1)} />}
+              {get(attempts, qIndex, []).length > 0 && <Button title="Next Question" onPress={goNextQuestion} />}
             </View>
           )}
 
           {postText()}
 
-          {qIndex >= quiz.questions.length && <Button title="See Results" onPress={() => setShowResult(true)} />}
+          {qIndex >= quiz.questions.length && <Button title="See Results" onPress={goNextQuestion} />}
         </View>
       </View>
     );
@@ -254,10 +290,53 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
   const renderResult = () => {
     return (
-      <View style={styles.questionBox}>
+      <View>
         <Text style={styles.heading}>Quiz Results</Text>
 
-        <View style={{ ...styles.row, marginLeft: -20 }}>
+        <View style={styles.chartBox}>
+          <VictoryPie
+            data={[
+              { y: Math.round((result.correct * 100) / quiz.questions.length) },
+              { y: Math.round(((result.answered - result.correct) * 100) / quiz.questions.length) },
+              { y: Math.round(((quiz.questions.length - result.answered) * 100) / quiz.questions.length) },
+            ]}
+            width={250}
+            height={250}
+            innerRadius={87}
+            colorScale={["#326D3C", "#DC2626", "#D1D5DB"]}
+            style={{
+              labels: {
+                display: "none",
+              },
+            }}
+          />
+
+          <View style={{ position: "absolute", top: "33%" }}>
+            <Text style={styles.midTextTitle}>{result.grade}%</Text>
+            <View>
+              <Text style={styles.midTextNote}>
+                {result.correct}/{quiz.questions.length} Correct
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ ...styles.row, width: "100%", justifyContent: "space-between", padding: 10, paddingBottom: 20 }}>
+            <View style={styles.row}>
+              <View style={{ ...styles.dot, backgroundColor: "#326D3C" }} />
+              <Text>Correct</Text>
+            </View>
+            <View style={styles.row}>
+              <View style={{ ...styles.dot, backgroundColor: "#DC2626" }} />
+              <Text>Incorrect</Text>
+            </View>
+            <View style={styles.row}>
+              <View style={{ ...styles.dot, backgroundColor: "#D1D5DB" }} />
+              <Text>Unanswered</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ ...styles.row, marginLeft: -10 }}>
           <View style={styles.resultBox}>
             <Text style={styles.resultNote}>Suggested Time per Question</Text>
             <Text style={styles.essayText}>{getFormattedClock(quiz.timePerQuestionInSeconds)}</Text>
@@ -268,7 +347,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
           </View>
         </View>
 
-        <View style={{ ...styles.row, marginLeft: -20 }}>
+        <View style={{ ...styles.row, marginLeft: -10 }}>
           <View style={styles.resultBox}>
             <Text style={styles.resultNote}>Time Limit</Text>
             <Text style={styles.essayText}>{getFormattedClock(quiz.timeLimitInSeconds)}</Text>
@@ -287,7 +366,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
   return (
     <View>
-      {qIndex === 0 && (
+      {!loading && qIndex === 0 && (
         <>
           <Text style={styles.heading}>{get(quiz, "title", "Quiz")}</Text>
           {!isEmpty(get(quiz, "startMessage", "")) && <Text style={styles.startMessage}>{striptags(quiz.startMessage)}</Text>}
@@ -298,9 +377,16 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
         </>
       )}
 
-      {qIndex > 0 && !showResult && renderQuestion()}
+      {!loading && qIndex > 0 && !showResult && renderQuestion()}
 
-      {showResult && renderResult()}
+      {loading && (
+        <View style={styles.searching}>
+          <Text style={styles.searchingText}>Loading results </Text>
+          <Loader size={50} />
+        </View>
+      )}
+
+      {!loading && showResult && renderResult()}
     </View>
   );
 };
@@ -455,6 +541,54 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#6B7280",
     flexGrow: 0,
+  },
+
+  searching: {
+    margin: 32,
+    backgroundColor: "#3B1FA3",
+    borderRadius: 10,
+    paddingBottom: 20,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  searchingText: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    color: "#ffffff",
+    fontFamily: "Poppins_700Bold",
+    padding: 20,
+  },
+
+  chartBox: {
+    alignItems: "center",
+    borderRadius: 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+  },
+
+  midTextTitle: {
+    marginLeft: 13,
+    fontFamily: "Poppins_700Bold",
+    fontSize: 24,
+    color: "#1F2937",
+  },
+
+  midTextNote: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    color: "#000000aa",
+  },
+
+  dot: {
+    borderRadius: 10,
+    width: 10,
+    height: 10,
+    marginLeft: 10,
+    marginRight: 5,
   },
 });
 
