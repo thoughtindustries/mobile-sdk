@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput, ImageBackground } from "react-native";
-import { Button } from "../components";
-import { get, filter, includes, set, isUndefined, remove, isEmpty, padStart } from "lodash";
+import { Button, Loader } from "../components";
+import { get, filter, includes, set, isUndefined, remove, isEmpty, padStart, isArray } from "lodash";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { questionChoice } from "../../types";
@@ -13,10 +13,12 @@ interface CourseQuizProps {
 }
 
 const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [qIndex, setQIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<string[]>([]);
   const [attemptId, setAttemptId] = useState<string>("");
+  const [result, setResult] = useState<{ grade: number; answered: number; correct: number }>({ grade: 0, answered: 0, correct: 0 });
 
   const startQuiz = () => {
     tiGql.createAssessmentAttempt(courseid, quiz.id).then(setAttemptId);
@@ -41,7 +43,34 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
         set(temp, qIndex, answer);
       }
     }
+
     setAttempts([...temp]);
+  };
+
+  const goNextQuestion = () => {
+    let question = quiz.questions[qIndex - 1];
+    let answer = attempts[qIndex];
+    answer = isArray(answer) ? answer[0] : answer;
+
+    let choice = get(question, "choices", []).filter((c: { value: string }) => c.value === answer);
+
+    tiGql
+      .saveAssessmentAttempt(attemptId, question.body, question.mustSelectAllCorrectChoices, {
+        value: answer,
+        correct: get(choice, "0.correct", false),
+      })
+      .then(console.log);
+    setQIndex(qIndex + 1);
+  };
+
+  const submitQuiz = () => {
+    setLoading(true);
+    tiGql
+      .submitAssessmentAttempt(attemptId)
+      .then(({ grade, answered, correct }) => setResult({ grade: grade, answered: answered, correct: correct }))
+      .then(() => setLoading(false))
+      .then(() => setShowResult(true))
+      .catch(console.log);
   };
 
   const renderQuestion = () => {
@@ -118,13 +147,13 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
             <View style={quiz.questionSkipEnabled && get(attempts, qIndex, []).length > 0 ? styles.row : {}}>
               {quiz.questionSkipEnabled && <Button title="Skip Question" mode={2} onPress={() => setQIndex(qIndex + 1)} />}
 
-              {get(attempts, qIndex, []).length > 0 && <Button title="Next Question" onPress={() => setQIndex(qIndex + 1)} />}
+              {get(attempts, qIndex, []).length > 0 && <Button title="Next Question" onPress={goNextQuestion} />}
             </View>
           )}
 
           {postText()}
 
-          {qIndex >= quiz.questions.length && <Button title="See Results" onPress={() => setShowResult(true)} />}
+          {qIndex >= quiz.questions.length && <Button title="See Results" onPress={submitQuiz} />}
         </View>
       </View>
     );
@@ -287,7 +316,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
   return (
     <View>
-      {qIndex === 0 && (
+      {!loading && qIndex === 0 && (
         <>
           <Text style={styles.heading}>{get(quiz, "title", "Quiz")}</Text>
           {!isEmpty(get(quiz, "startMessage", "")) && <Text style={styles.startMessage}>{striptags(quiz.startMessage)}</Text>}
@@ -298,9 +327,16 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
         </>
       )}
 
-      {qIndex > 0 && !showResult && renderQuestion()}
+      {!loading && qIndex > 0 && !showResult && renderQuestion()}
 
-      {showResult && renderResult()}
+      {loading && (
+        <View style={styles.searching}>
+          <Text style={styles.searchingText}>Loading results </Text>
+          <Loader size={50} />
+        </View>
+      )}
+
+      {!loading && showResult && renderResult()}
     </View>
   );
 };
@@ -455,6 +491,26 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#6B7280",
     flexGrow: 0,
+  },
+
+  searching: {
+    margin: 32,
+    backgroundColor: "#3B1FA3",
+    borderRadius: 10,
+    paddingBottom: 20,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  searchingText: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    color: "#ffffff",
+    fontFamily: "Poppins_700Bold",
+    padding: 20,
   },
 });
 

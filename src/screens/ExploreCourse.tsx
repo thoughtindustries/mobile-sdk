@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Animated } from "react-native";
 import { get } from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";

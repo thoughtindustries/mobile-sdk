@@ -383,7 +383,6 @@ class TIGraphQL {
   }
 
   fetchTopicPage(tid: string, type: string) {
-    console.log(tid, type);
     const gqlAry: { [key: string]: string } = {
       ArticlePage: `... on ArticlePage {
         accessibilityAudioAsset
@@ -625,7 +624,6 @@ class TIGraphQL {
         topicType: "quiz",
       },
     };
-
     return new Promise<string>((resolve, reject) => {
       let headers: { headers: { authToken: string } };
       this.headers()
@@ -636,6 +634,94 @@ class TIGraphQL {
             reject(_.get(res, "data.errors.0.message", ""));
           } else {
             resolve(_.get(res, "data.data.LoadAssessmentAttemptWithQuestions.id", ""));
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  saveAssessmentAttempt(attemptId: string, qbody: string, msacc: boolean, selectedChoice: { value: string; correct: boolean }) {
+    const gql = {
+      query: `mutation UpdateAssessmentAttempt(
+        $activeQuestion: QuestionInput,
+        $assessmentAttempt: AssessmentAttemptInput
+      ) {
+        UpdateAssessmentAttempt(
+          activeQuestion: $activeQuestion,
+          assessmentAttempt: $assessmentAttempt
+        ) {
+            id
+            grade
+        }
+      }`,
+      variables: {
+        assessmentAttempt: {
+          id: attemptId,
+          status: "started",
+        },
+        activeQuestion: {
+          body: qbody,
+          mustSelectAllCorrectChoices: msacc,
+          selectedChoice: {
+            value: selectedChoice.value,
+            correct: selectedChoice.correct,
+          },
+        },
+      },
+    };
+
+    return new Promise<string>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve(_.get(res, "data.data.UpdateAssessmentAttempt.id", ""));
+          }
+        })
+        .catch(reject);
+    });
+  }
+
+  submitAssessmentAttempt(attemptId: string) {
+    const gql = {
+      query: `mutation UpdateAssessmentAttempt(
+        $assessmentAttempt: AssessmentAttemptInput
+      ) {
+        UpdateAssessmentAttempt(
+          assessmentAttempt: $assessmentAttempt
+        ) {
+            id
+            grade
+            answeredQuestionsCount
+            correctQuestionsCount
+        }
+      }`,
+      variables: {
+        assessmentAttempt: {
+          id: attemptId,
+          status: "finished",
+        },
+      },
+    };
+
+    return new Promise<{ grade: number; answered: number; correct: number }>((resolve, reject) => {
+      let headers: { headers: { authToken: string } };
+      this.headers()
+        .then((h) => (headers = h))
+        .then(() => axios.post(this.gurl, gql, headers))
+        .then((res) => {
+          if (_.get(res, "data.errors.length", 0) > 0) {
+            reject(_.get(res, "data.errors.0.message", ""));
+          } else {
+            resolve({
+              grade: _.get(res, "data.data.UpdateAssessmentAttempt.grade", 0),
+              answered: _.get(res, "data.data.UpdateAssessmentAttempt.answeredQuestionsCount", 0),
+              correct: _.get(res, "data.data.UpdateAssessmentAttempt.correctQuestionsCount", 0),
+            });
           }
         })
         .catch(reject);
