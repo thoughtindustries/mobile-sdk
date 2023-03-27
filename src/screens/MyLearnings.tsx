@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: 14,
     lineHeight: 24,
-    padding: 8,
+    padding: 4,
   },
 
   catTitleSelected: {

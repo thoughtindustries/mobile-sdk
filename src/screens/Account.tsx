@@ -73,7 +73,7 @@ const Account = () => {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => Utils.logMeOut(navigation)}>
-          <Text style={styles.profileEdit}>Logout</Text>
+          <Text style={styles.profileEdit}>Log out</Text>
         </TouchableOpacity>
       </View>
     </View>
