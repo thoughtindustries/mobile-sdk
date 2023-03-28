@@ -30,6 +30,16 @@ type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
 const Login = () => {
   const navigation = useNavigation<LoginScreenProps>();
+  const [showPassword, setShowpPassword] = useState<boolean>(false);
+  const [formValidation, setFormValidation] = useState<{
+    email?: string;
+    password?: string;
+  }>({
+    email: "",
+    password: "",
+  });
+  const [loginMutation, { loading }] = useLoginMutation();
+  const [error, setError] = useState<string>("");
   const [credentials, setCredentials] = useState<{
     email: string;
     password: string;
@@ -38,23 +48,105 @@ const Login = () => {
     password: "",
   });
 
-  const [isPasswordSecure, setIsPasswordSecure] = useState<boolean>(true);
-  const [inlineMsg, setInlineMsg] = useState<any>({ field: "", message: "" });
-  const [loginMutation, { loading }] = useLoginMutation();
-  const [error, setError] = useState<string>("");
+  const handleChange = (field: string, value: string) => {
+    if (field === "email") {
+      setFormValidation({
+        email: "",
+        password: formValidation.password,
+      });
+      setCredentials({ ...credentials, email: value });
+    } else {
+      setCredentials({ ...credentials, password: value });
+      setFormValidation({
+        email: formValidation.email,
+        password: "",
+      });
+    }
+  };
 
-  const onSignIn = async () => {
-    try {
-      const { data } = await loginMutation({
-        variables: { email: credentials.email, password: credentials.password },
+  const formValidated = () => {
+    const emailRegex =
+      /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+    if (
+      credentials.email === "" ||
+      (credentials.email !== "" &&
+        !emailRegex.test(credentials.email) &&
+        (credentials.password === "" || credentials.password.length < 6))
+    ) {
+      setFormValidation({
+        email: "Please enter a valid email address.",
+        password:
+          "Please enter a password that is at least six characters long.",
       });
 
-      const token = data?.Login;
-      await SecureStore.setItemAsync("token", token || "");
+      return false;
+    }
 
-      navigation.navigate("HomeScreen");
+    if (
+      credentials.email === "" ||
+      (credentials.email !== "" && !emailRegex.test(credentials.email))
+    ) {
+      setFormValidation({
+        email: "Please enter a valid email address.",
+        password: "",
+      });
+
+      return false;
+    }
+
+    if (credentials.password === "" || credentials.password.length < 6) {
+      setFormValidation({
+        email: "",
+        password:
+          "Please enter a password that is at least six characters long.",
+      });
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const onSignIn = async () => {
+    setError("");
+    try {
+      if (formValidated()) {
+        const { data } = await loginMutation({
+          variables: {
+            email: credentials.email,
+            password: credentials.password,
+          },
+        });
+
+        const token = data?.Login;
+        await SecureStore.setItemAsync("token", token || "");
+
+        navigation.navigate("HomeScreen");
+      }
     } catch ({ message }) {
-      setError(message);
+      if (message === "401 Unauthorized") {
+        setError("Invalid email or password.");
+      }
+      if (message === "423 Locked") {
+        setError(
+          "Your account has been disabled. Please contact your account administrator."
+        );
+      }
+      if (message === "User Throttled") {
+        setError(
+          "You have made too many log in attempts. Please try again in 30 minutes."
+        );
+      }
+      if (message === "Password reset required") {
+        setError(
+          "To gain access to your account, you will have to reset your password. Please check your email to continue the password reset process. After resetting your password, you'll be able to login."
+        );
+      }
+      if (message === "Email verification required") {
+        setError(
+          "This account requires validation via email confirmation. An email has been sent to you with instructions to validate your email address. After you cofirm your account, you will be able to sign in and access your learning."
+        );
+      }
     }
     // const params: { email: string; password: string } = {
     //   email: credentials.email,
@@ -92,7 +184,16 @@ const Login = () => {
       )}
       {!loading && (
         <ScrollView>
-          {error !== "" && <ErrorModal message={error} />}
+          {error !== "" && (
+            <ErrorModal
+              error={error}
+              message={
+                "If you do not have an account you can register for a new one."
+              }
+              title={"Register for new account"}
+              route="Registration"
+            />
+          )}
           <View style={AppStyle.container}>
             <KeyboardAvoidingView
               keyboardVerticalOffset={5}
@@ -106,13 +207,11 @@ const Login = () => {
                 <Text style={AppStyle.label}>Email</Text>
                 <TextInput
                   textContentType="emailAddress"
-                  onChangeText={(value) => {
-                    setCredentials({ ...credentials, email: value });
-                  }}
+                  onChangeText={(value) => handleChange("email", value)}
                   placeholder="example@email.com"
                   defaultValue={credentials.email}
                   style={
-                    inlineMsg.field === "email"
+                    formValidation.email !== ""
                       ? { ...AppStyle.input, ...AppStyle.errorField }
                       : AppStyle.input
                   }
@@ -120,29 +219,40 @@ const Login = () => {
                   autoCorrect={false}
                   autoCapitalize="none"
                 />
-                <Text style={AppStyle.inlineError}>{inlineMsg.message}</Text>
+                <Text style={AppStyle.inlineError}>{formValidation.email}</Text>
                 <Text style={AppStyle.label}>Password</Text>
-                <View style={{ ...AppStyle.input, flexDirection: "row" }}>
+                <View
+                  style={
+                    formValidation.password !== ""
+                      ? {
+                          ...AppStyle.input,
+                          ...AppStyle.errorField,
+                          flexDirection: "row",
+                        }
+                      : { ...AppStyle.input, flexDirection: "row" }
+                  }
+                >
                   <TextInput
-                    secureTextEntry={isPasswordSecure}
-                    onChangeText={(value) => {
-                      setCredentials({ ...credentials, password: value });
-                    }}
+                    secureTextEntry={!showPassword}
+                    onChangeText={(value) => handleChange("password", value)}
                     defaultValue={credentials.password}
-                    placeholder="Enter your password here"
                     style={{ margin: 0, padding: 0, width: "93%" }}
+                    placeholder="Enter your password here"
                   />
                   <Pressable
-                    onPress={() => setIsPasswordSecure(!isPasswordSecure)}
+                    onPress={() => setShowpPassword(!showPassword)}
                     style={{ justifyContent: "center" }}
                   >
                     <MaterialCommunityIcons
-                      name={isPasswordSecure ? "eye-off" : "eye"}
+                      name={!showPassword ? "eye-off" : "eye"}
                       size={22}
                       color="#232323"
                     />
                   </Pressable>
                 </View>
+                <Text style={AppStyle.inlineError}>
+                  {formValidation.password}
+                </Text>
                 <Button title="Sign In" onPress={onSignIn} />
                 <Link
                   title="Forgot Password?"

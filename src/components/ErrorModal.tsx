@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Text, View, Pressable, StyleSheet } from "react-native";
+import Button from "./Button";
+import AppStyle from "../../AppStyle";
+import { useNavigation } from "@react-navigation/native";
 
 interface ErrorModalProps {
-  message: string | null;
+  error: string;
+  message: string;
+  title: string;
+  route: string | null;
 }
 
-const ErrorModal = ({ message }: ErrorModalProps) => {
-  const [show, setShow] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (message !== "") {
-      setShow(true);
-    }
-  }, []);
+const ErrorModal = ({ error, message, title, route }: ErrorModalProps) => {
+  const [show, setShow] = useState<boolean>(message !== "");
+  const navigation = useNavigation<any>();
 
   return (
     <Modal
@@ -25,12 +26,17 @@ const ErrorModal = ({ message }: ErrorModalProps) => {
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>{message}</Text>
-          <Pressable
-            style={[styles.button, styles.buttonClose]}
-            onPress={() => setShow(false)}
-          >
-            <Text style={styles.textStyle}>Hide Modal</Text>
+          <Text style={styles.error}>{error}</Text>
+          <Text style={styles.message}>{message}</Text>
+          <Button
+            title={title}
+            onPress={() => {
+              navigation.navigate(route);
+              setShow(false);
+            }}
+          />
+          <Pressable onPress={() => setShow(false)}>
+            <Text style={styles.modalClose}>Close</Text>
           </Pressable>
         </View>
       </View>
@@ -46,11 +52,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
-    margin: 20,
     backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
     alignItems: "center",
+    padding: 40,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -76,9 +81,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+  message: {
+    alignSelf: "flex-start",
+    maxWidth: "80%",
+  },
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+  },
+  modalClose: {
+    color: "#6B7280",
+    fontWeight: "700",
+  },
+  error: {
+    ...AppStyle.label,
+    alignSelf: "flex-start",
   },
 });
 
