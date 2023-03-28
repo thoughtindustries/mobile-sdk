@@ -14,6 +14,7 @@ import Recommendation from "./Recommendation";
 import RecentCourses from "./RecentCourses";
 import ResourceControl from "./ResourceControl";
 import CourseQuiz from "./CourseQuiz";
+import ErrorModal from "./ErrorModal";
 
 export {
   Button,
@@ -32,4 +33,5 @@ export {
   RecentCourses,
   ResourceControl,
   CourseQuiz,
+  ErrorModal,
 };

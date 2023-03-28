@@ -9,6 +9,8 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
+import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import { TI_API_INSTANCE, TI_API_KEY } from "@env";
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +41,11 @@ const App = () => {
       backgroundColor: "#F3F4F6",
       fontFamily: "Poppins_400Regular",
     },
+  });
+
+  const client = new ApolloClient({
+    uri: `${TI_API_INSTANCE}/helium?apiKey=${TI_API_KEY}`,
+    cache: new InMemoryCache(),
   });
 
   const opts = { headerShown: false };
@@ -76,9 +83,11 @@ const App = () => {
   );
 
   return (
-    <View style={wrapperStyle.container}>
-      <RouterContainer />
-    </View>
+    <ApolloProvider client={client}>
+      <View style={wrapperStyle.container}>
+        <RouterContainer />
+      </View>
+    </ApolloProvider>
   );
 };
 
