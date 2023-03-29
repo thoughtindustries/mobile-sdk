@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Linking,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Linking, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TI_API_INSTANCE } from "@env";
@@ -15,10 +8,21 @@ import { RootStackParamList } from "../../types";
 import Utils from "../helpers/Utils";
 import _ from "lodash";
 
+import GestureRecognizer from "react-native-swipe-gestures";
+
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
 
 const Account = () => {
   const navigation = useNavigation<AccountScreenProps>();
+
+  const onSwipe = (gestureName: string) => {
+    switch (gestureName) {
+      case "SWIPE_RIGHT":
+        navigation.navigate("My Learning");
+        break;
+    }
+  };
+
   const [udata, setUdata] = useState<boolean>(false);
 
   useEffect(() => {
@@ -28,16 +32,12 @@ const Account = () => {
   const profilePic = _.get(udata, "asset", "");
 
   return (
-    <View style={styles.container}>
+    <GestureRecognizer onSwipe={onSwipe} style={styles.container}>
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
-          {_.isEmpty(profilePic) && (
-            <Image source={require("../../assets/profile.png")} />
-          )}
-          {!_.isEmpty(profilePic) && (
-            <Image source={{ uri: profilePic }} style={styles.profileImage} />
-          )}
+          {_.isEmpty(profilePic) && <Image source={require("../../assets/profile.png")} />}
+          {!_.isEmpty(profilePic) && <Image source={{ uri: profilePic }} style={styles.profileImage} />}
 
           <Text style={styles.subtitle}>
             {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
@@ -52,31 +52,19 @@ const Account = () => {
       <View style={styles.settingInfo}>
         <Text style={styles.settingTitle}>Settings</Text>
 
-        <TouchableOpacity
-          onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}
-        >
+        <TouchableOpacity onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}>
           <View style={styles.resetBtn}>
-            <MaterialCommunityIcons
-              name={"eye-off"}
-              size={22}
-              color="#3B1FA3"
-              style={styles.eyeIcon}
-            />
+            <MaterialCommunityIcons name={"eye-off-outline"} size={22} color="#3B1FA3" style={styles.eyeIcon} />
             <Text style={styles.resetField}>Reset Password</Text>
-            <MaterialCommunityIcons
-              style={styles.settingIcon}
-              name={"chevron-right"}
-              size={25}
-              color="#232323"
-            />
+            <MaterialCommunityIcons style={styles.settingIcon} name={"chevron-right"} size={25} color="#232323" />
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => Utils.logMeOut(navigation)}>
-          <Text style={styles.profileEdit}>Logout</Text>
+          <Text style={styles.profileEdit}>Log out</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </GestureRecognizer>
   );
 };
 
