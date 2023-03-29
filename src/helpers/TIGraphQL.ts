@@ -126,6 +126,7 @@ class TIGraphQL {
             authors
             title
             displayCourse
+            contentTypeLabel
           }
         }
       }`,
