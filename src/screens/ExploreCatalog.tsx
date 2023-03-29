@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  Pressable,
-  StyleSheet,
-  FlatList,
-} from "react-native";
+import { View, Text, Image, Pressable, StyleSheet, FlatList } from "react-native";
 
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
@@ -16,11 +9,25 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
 
+import GestureRecognizer from "react-native-swipe-gestures";
+
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
 const ExploreCatalog = () => {
   const navigation = useNavigation<ExploreCatalogProps>();
   const route = useRoute();
+
+  const onSwipe = (gestureName: string) => {
+    switch (gestureName) {
+      case "SWIPE_RIGHT":
+        navigation.navigate("Home");
+        break;
+      case "SWIPE_LEFT":
+        navigation.navigate("My Learning");
+        break;
+    }
+  };
+
   const [filters, setFilters] = useState<filtersType>({
     sortBy: "title",
     sortDir: "asc",
@@ -38,10 +45,7 @@ const ExploreCatalog = () => {
   });
   const [fetchAgain, setFetchAgain] = useState(1);
 
-  const fetchCourses = (
-    isPaginated: Boolean = true,
-    page: number = pageVars.page + 1
-  ) => {
+  const fetchCourses = (isPaginated: Boolean = true, page: number = pageVars.page + 1) => {
     if (isPaginated && courses.length < 40) {
       return;
     }
@@ -65,9 +69,7 @@ const ExploreCatalog = () => {
         setCourses(isPaginated ? [...courses, ...data] : data);
       })
       .catch(console.log)
-      .finally(() =>
-        setPageVars({ ...pageVars, showFilter: false, searching: false })
-      );
+      .finally(() => setPageVars({ ...pageVars, showFilter: false, searching: false }));
   };
 
   useEffect(() => fetchCourses(false, 1), [fetchAgain]);
@@ -79,11 +81,7 @@ const ExploreCatalog = () => {
   };
 
   const filteredCourses = () => {
-    let data = courses.filter(
-      (c) =>
-        c.title.includes(pageVars.search) ||
-        _.get(c, "authors", []).join(",").includes(pageVars.search)
-    );
+    let data = courses.filter((c) => c.title.includes(pageVars.search) || _.get(c, "authors", []).join(",").includes(pageVars.search));
     return data;
   };
 
@@ -100,35 +98,21 @@ const ExploreCatalog = () => {
         <View style={styles.courseRow}>
           <View style={styles.courseLeftBox}>
             <Text style={styles.courseTitle}>{props.data.title}</Text>
-            {_.get(props, "data.authors.length", 0) > 0 && (
-              <Text style={styles.courseAuthor}>
-                By {_.get(props, "data.authors", []).join(",")}
-              </Text>
-            )}
+            {_.get(props, "data.authors.length", 0) > 0 && <Text style={styles.courseAuthor}>By {_.get(props, "data.authors", []).join(",")}</Text>}
           </View>
-          {_.get(props, "data.asset", "na") !== "na" && (
-            <Image
-              source={{ uri: props.data.asset }}
-              style={styles.courseImage}
-            />
-          )}
+          {_.get(props, "data.asset", "na") !== "na" && <Image source={{ uri: props.data.asset }} style={styles.courseImage} />}
         </View>
       </Pressable>
     );
   };
 
   return (
-    <View style={styles.page}>
+    <GestureRecognizer onSwipe={onSwipe} style={styles.page}>
       <Text style={styles.title}>Explore The Catalog</Text>
 
       <View style={styles.searchboxContainer}>
         <View style={{ flexGrow: 1 }}>
-          <Searchbar
-            searchText={pageVars.search}
-            onSearch={(str: string) =>
-              setPageVars({ ...pageVars, search: str })
-            }
-          />
+          <Searchbar searchText={pageVars.search} onSearch={(str: string) => setPageVars({ ...pageVars, search: str })} />
         </View>
         <FilterControl onFilter={onFilter} />
       </View>
@@ -141,11 +125,7 @@ const ExploreCatalog = () => {
       )}
       {!pageVars.searching && (
         <Text style={{ ...styles.courseTitle, marginTop: 10, marginLeft: 15 }}>
-          Results (
-          {filteredCourses().length > 0
-            ? _.padStart(filteredCourses().length.toString(), 2, "0")
-            : 0}
-          )
+          Results ({filteredCourses().length > 0 ? _.padStart(filteredCourses().length.toString(), 2, "0") : 0})
         </Text>
       )}
       {!pageVars.searching && courses.length > 0 && (
@@ -155,15 +135,11 @@ const ExploreCatalog = () => {
             renderItem={({ item }) => <CourseItem data={item} />}
             onEndReached={fetchCourses}
             onEndReachedThreshold={0.5}
-            ListEmptyComponent={
-              <Text style={styles.noRecords}>
-                No records found, try using other filters.
-              </Text>
-            }
+            ListEmptyComponent={<Text style={styles.noRecords}>No records found, try using other filters.</Text>}
           />
         </View>
       )}
-    </View>
+    </GestureRecognizer>
   );
 };
 
