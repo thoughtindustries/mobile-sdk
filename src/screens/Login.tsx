@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,16 +9,12 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
-import { Logo, Button, Link, ErrorModal } from "../components";
+import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TI_API_INSTANCE } from "@env";
-import validator from "validator";
-import { get } from "lodash";
-import tiGql from "../helpers/TIGraphQL";
 import tiApi from "../helpers/TIApi";
 import dbObj from "../helpers/Db";
-import Utils from "../helpers/Utils";
 import Success from "./Success";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -28,38 +24,37 @@ import * as SecureStore from "expo-secure-store";
 
 type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
+interface FormProps {
+  email: {
+    value: string;
+    error?: string;
+  };
+  password: {
+    value: string;
+    error?: string;
+  };
+}
+
 const Login = () => {
   const navigation = useNavigation<LoginScreenProps>();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
-  const [formValidation, setFormValidation] = useState<{
-    email?: string;
-    password?: string;
-  }>({
-    email: "",
-    password: "",
-  });
   const [loginMutation, { loading }] = useLoginMutation();
-  const [error, setError] = useState<string>("");
-  const [credentials, setCredentials] = useState<{
-    email: string;
-    password: string;
-  }>({
-    email: "",
-    password: "",
+  const [responseError, setResponseError] = useState<{
+    title: string;
+    message: string;
+  }>({ title: "", message: "" });
+  const [form, setForm] = useState<FormProps>({
+    email: { value: "", error: "" },
+    password: { value: "", error: "" },
   });
 
   const handleChange = (field: string, value: string) => {
     if (field === "email") {
-      setFormValidation({
-        email: "",
-        password: formValidation.password,
-      });
-      setCredentials({ ...credentials, email: value });
+      setForm({ ...form, email: { ...form.email, value: value, error: "" } });
     } else {
-      setCredentials({ ...credentials, password: value });
-      setFormValidation({
-        email: formValidation.email,
-        password: "",
+      setForm({
+        ...form,
+        password: { ...form.password, value: value, error: "" },
       });
     }
   };
@@ -67,114 +62,103 @@ const Login = () => {
   const formValidated = () => {
     const emailRegex =
       /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
-    if (
-      credentials.email === "" ||
-      (credentials.email !== "" &&
-        !emailRegex.test(credentials.email) &&
-        (credentials.password === "" || credentials.password.length < 6))
-    ) {
-      setFormValidation({
-        email: "Please enter a valid email address.",
-        password:
-          "Please enter a password that is at least six characters long.",
-      });
 
-      return false;
+    let updateForm = form;
+
+    if (form.email.value === "" || !emailRegex.test(form.email.value)) {
+      updateForm = {
+        ...updateForm,
+        email: {
+          ...updateForm.email,
+          error: "Please enter a valid email (example@gmail.com).",
+        },
+        password: {
+          ...updateForm.password,
+        },
+      };
     }
 
-    if (
-      credentials.email === "" ||
-      (credentials.email !== "" && !emailRegex.test(credentials.email))
-    ) {
-      setFormValidation({
-        email: "Please enter a valid email address.",
-        password: "",
-      });
-
-      return false;
+    if (form.password.value === "" || form.password.value.length < 6) {
+      updateForm = {
+        ...updateForm,
+        password: {
+          ...updateForm.password,
+          error:
+            "Please enter a password that is at least six characters long.",
+        },
+      };
     }
 
-    if (credentials.password === "" || credentials.password.length < 6) {
-      setFormValidation({
-        email: "",
-        password:
-          "Please enter a password that is at least six characters long.",
-      });
+    setForm(updateForm);
 
-      return false;
-    }
-
-    return true;
+    return updateForm.email.error === "" && updateForm.password.error === ""
+      ? true
+      : false;
   };
 
   const onSignIn = async () => {
-    setError("");
     try {
       if (formValidated()) {
+        // Login user
         const { data } = await loginMutation({
           variables: {
-            email: credentials.email,
-            password: credentials.password,
+            email: form.email.value,
+            password: form.password.value,
           },
         });
 
+        // Retrieve auth token and store
         const token = data?.Login;
         await SecureStore.setItemAsync("token", token || "");
 
+        // Query user's information and store
+        const userInfo = await tiApi.userDetails(form.email.value);
+        await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
+
+        // Look user id and store
+        const userId = await dbObj.userLookup(form.email.value);
+        await SecureStore.setItemAsync("userId", JSON.stringify(userId));
+
+        // Navigate to home screen
         navigation.navigate("HomeScreen");
       }
     } catch ({ message }) {
       if (message === "401 Unauthorized") {
-        setError("Invalid email or password.");
+        setResponseError({
+          title: "Invalid email or password.",
+          message:
+            "If you do not have an account you can register for a new one.",
+        });
       }
       if (message === "423 Locked") {
-        setError(
-          "Your account has been disabled. Please contact your account administrator."
-        );
+        setResponseError({
+          title: "Account Locked",
+          message:
+            "Your account has been disabled. Please contact your account administrator.",
+        });
       }
       if (message === "User Throttled") {
-        setError(
-          "You have made too many log in attempts. Please try again in 30 minutes."
-        );
+        setResponseError({
+          title: "Too Many Attemps",
+          message:
+            "You have made too many log in attempts. Please try again in 30 minutes.",
+        });
       }
       if (message === "Password reset required") {
-        setError(
-          "To gain access to your account, you will have to reset your password. Please check your email to continue the password reset process. After resetting your password, you'll be able to login."
-        );
+        setResponseError({
+          title: "Reset Required",
+          message:
+            "To gain access to your account, you will have to reset your password. Please check your email to continue the password reset process. After resetting your password, you'll be able to login.",
+        });
       }
       if (message === "Email verification required") {
-        setError(
-          "This account requires validation via email confirmation. An email has been sent to you with instructions to validate your email address. After you cofirm your account, you will be able to sign in and access your learning."
-        );
+        setResponseError({
+          title: "Verify Email",
+          message:
+            "This account requires validation via email confirmation. An email has been sent to you with instructions to validate your email address. After you cofirm your account, you will be able to sign in and access your learning.",
+        });
       }
     }
-    // const params: { email: string; password: string } = {
-    //   email: credentials.email,
-    //   password: credentials.password,
-    // };
-    // if (!validator.isEmail(params.email)) {
-    //   setInlineMsg({
-    //     field: "email",
-    //     message: `Please enter a valid email (example@gmail.com)`,
-    //   });
-    //   return false;
-    // }
-    // setProcessing(true);
-    // tiGql
-    //   .goLogin(params)
-    //   .then((token) => Utils.store("logintoken", { token: token })) //== got login token, save it locally
-    //   .then(() => tiApi.userDetails(params.email)) //== fetch user data of logged in user
-    //   .then((udata) => Utils.store("udata", udata)) //== save user data locally
-    //   .then(() => dbObj.userLookup(params.email))
-    //   .then((id: Number) => Utils.store("user_dbid", { id: id }))
-    //   .then(() => {
-    //     setProcessing(false);
-    //     navigation.navigate("HomeScreen");
-    //   }) //== navigate to home
-    //   .catch((err) => {
-    //     setProcessing(false);
-    //     setMessage({ info: "", error: get(err, "message", err) });
-    //   });
   };
 
   return (
@@ -184,14 +168,11 @@ const Login = () => {
       )}
       {!loading && (
         <ScrollView>
-          {error !== "" && (
-            <ErrorModal
-              error={error}
-              message={
-                "If you do not have an account you can register for a new one."
-              }
-              title={"Register for new account"}
-              route="Registration"
+          {responseError.title !== "" && (
+            <Message
+              title={responseError.title}
+              message={responseError.message}
+              onHide={() => setResponseError({ title: "", message: "" })}
             />
           )}
           <View style={AppStyle.container}>
@@ -209,9 +190,9 @@ const Login = () => {
                   textContentType="emailAddress"
                   onChangeText={(value) => handleChange("email", value)}
                   placeholder="example@email.com"
-                  defaultValue={credentials.email}
+                  defaultValue={form.email.value}
                   style={
-                    formValidation.email !== ""
+                    form.email.error !== ""
                       ? { ...AppStyle.input, ...AppStyle.errorField }
                       : AppStyle.input
                   }
@@ -219,11 +200,11 @@ const Login = () => {
                   autoCorrect={false}
                   autoCapitalize="none"
                 />
-                <Text style={AppStyle.inlineError}>{formValidation.email}</Text>
+                <Text style={AppStyle.inlineError}>{form.email.error}</Text>
                 <Text style={AppStyle.label}>Password</Text>
                 <View
                   style={
-                    formValidation.password !== ""
+                    form.password.error !== ""
                       ? {
                           ...AppStyle.input,
                           ...AppStyle.errorField,
@@ -235,7 +216,7 @@ const Login = () => {
                   <TextInput
                     secureTextEntry={!showPassword}
                     onChangeText={(value) => handleChange("password", value)}
-                    defaultValue={credentials.password}
+                    defaultValue={form.password.value}
                     style={{ margin: 0, padding: 0, width: "93%" }}
                     placeholder="Enter your password here"
                   />
@@ -250,9 +231,7 @@ const Login = () => {
                     />
                   </Pressable>
                 </View>
-                <Text style={AppStyle.inlineError}>
-                  {formValidation.password}
-                </Text>
+                <Text style={AppStyle.inlineError}>{form.password.error}</Text>
                 <Button title="Sign In" onPress={onSignIn} />
                 <Link
                   title="Forgot Password?"

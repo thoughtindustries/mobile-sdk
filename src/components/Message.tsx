@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import _ from "lodash";
 
 interface MessageProps {
-  type?: string;
   title?: string;
   message?: string;
   extraJSX?: JSX.Element;
@@ -11,25 +10,20 @@ interface MessageProps {
 }
 
 const Message = ({
-  type = "info",
   title = "",
   message = "",
   extraJSX = <></>,
-  onHide,
 }: MessageProps) => {
-  const icon: { success: NodeRequire; error: NodeRequire } = {
-    success: require("../../assets/success.png"),
-    error: require("../../assets/error.png"),
-  };
+  const [showModal, setShowModal] = useState<boolean>(title !== "");
 
   return (
-    <Modal animationType="slide" transparent={true} visible={true}>
+    <Modal animationType="fade" transparent={true} visible={showModal}>
       <View style={styles.modalContainer}>
         <View style={styles.modalDialog}>
           <Text style={styles.modalTitle}>{title}</Text>
           <Text style={styles.modalMessage}>{message}</Text>
           {extraJSX}
-          <TouchableOpacity onPress={onHide}>
+          <TouchableOpacity onPress={() => setShowModal(false)}>
             <Text style={styles.closeBtn}>Close</Text>
           </TouchableOpacity>
         </View>
