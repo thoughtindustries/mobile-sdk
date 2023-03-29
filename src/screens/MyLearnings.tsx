@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  FlatList,
-  ScrollView,
-  Animated,
-  Permission,
-  Pressable,
-} from "react-native";
+import { View, Text, Image, StyleSheet, FlatList, ScrollView, Animated, Permission, Pressable } from "react-native";
 
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
@@ -25,14 +15,24 @@ import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Permissions from "expo-permissions";
+import GestureRecognizer from "react-native-swipe-gestures";
 
-type MyLearningScreenProps = StackNavigationProp<
-  RootStackParamList,
-  "MyLearning"
->;
+type MyLearningScreenProps = StackNavigationProp<RootStackParamList, "MyLearning">;
 
 const MyLearnings = () => {
   const navigation = useNavigation<MyLearningScreenProps>();
+
+  const onSwipe = (gestureName: string) => {
+    switch (gestureName) {
+      case "SWIPE_RIGHT":
+        navigation.navigate("Explore");
+        break;
+      case "SWIPE_LEFT":
+        navigation.navigate("Account");
+        break;
+    }
+  };
+
   const [filters, setFilters] = useState<{
     sortBy: string;
     sortDir: string;
@@ -97,19 +97,17 @@ const MyLearnings = () => {
   };
   const seekPermission = (fileUri: string) => {
     let fname = "";
-    return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
-      (permissions) => {
-        if (!permissions.granted) {
-          throw "Permission denied";
-        } else {
-          MediaLibrary.createAssetAsync(fileUri).then((asset) => {
-            MediaLibrary.createAlbumAsync("Helium", asset, false).then(() => {
-              console.log("downloaded........", asset);
-            });
+    return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then((permissions) => {
+      if (!permissions.granted) {
+        throw "Permission denied";
+      } else {
+        MediaLibrary.createAssetAsync(fileUri).then((asset) => {
+          MediaLibrary.createAlbumAsync("Helium", asset, false).then(() => {
+            console.log("downloaded........", asset);
           });
-        }
+        });
       }
-    );
+    });
   };
 
   const offlineData = (course: courseListType, mode: boolean) => {
@@ -118,9 +116,7 @@ const MyLearnings = () => {
       .then(({ id }) => (user_id = id))
       .then(() => {
         if (mode) {
-          return saveAsset(course.asset).then(
-            (asset) => (course.asset = asset)
-          );
+          return saveAsset(course.asset).then((asset) => (course.asset = asset));
         } else {
           return dbObj.fetchAsset(user_id, course.id).then(deleteAsset);
         }
@@ -157,10 +153,7 @@ const MyLearnings = () => {
     });
   };
 
-  const fetchCourses = (
-    isPaginated: Boolean = true,
-    page: number = pageVars.page + 1
-  ) => {
+  const fetchCourses = (isPaginated: Boolean = true, page: number = pageVars.page + 1) => {
     if (isPaginated && courses.length < 40) {
       return;
     }
@@ -184,16 +177,12 @@ const MyLearnings = () => {
         setCourses(isPaginated ? [...courses, ...data] : data);
       })
       .catch(console.log)
-      .finally(() =>
-        setPageVars({ ...pageVars, showFilter: false, searching: false })
-      );
+      .finally(() => setPageVars({ ...pageVars, showFilter: false, searching: false }));
   };
 
   const fetchCourseProgresses = (items: courseListType[]) => {
     return new Promise<courseListType[]>((resolve, reject) => {
-      const cids = items
-        .filter((c) => c.contentTypeLabel === "Course")
-        .map((c) => c.id);
+      const cids = items.filter((c) => c.contentTypeLabel === "Course").map((c) => c.id);
       let idx: number = -1;
       const fetchCourseProgress = () => {
         if (cids.length <= ++idx) {
@@ -260,9 +249,7 @@ const MyLearnings = () => {
           }
         })
         .catch(console.log)
-        .finally(() =>
-          setPageVars({ ...pageVars, showFilter: false, searching: false })
-        );
+        .finally(() => setPageVars({ ...pageVars, showFilter: false, searching: false }));
     }
   };
   useEffect(() => fetchMyLearnings(), [fetchAgain]);
@@ -275,20 +262,14 @@ const MyLearnings = () => {
 
   const filteredContents = () => {
     if (tab === "Offline" || Utils.isOffline()) {
-      return content.items.filter(
-        (c) => c.title.includes(pageVars.search) && c.isOffline
-      );
+      return content.items.filter((c) => c.title.includes(pageVars.search) && c.isOffline);
     } else {
       return content.items.filter((c) => c.title.includes(pageVars.search));
     }
   };
 
   const filteredCourses = () => {
-    let data = courses.filter(
-      (c) =>
-        c.title.includes(pageVars.search) ||
-        c.authors.join(",").includes(pageVars.search)
-    );
+    let data = courses.filter((c) => c.title.includes(pageVars.search) || c.authors.join(",").includes(pageVars.search));
     return data;
   };
 
@@ -297,11 +278,7 @@ const MyLearnings = () => {
       <View style={styles.courseRow}>
         <View style={styles.courseLeftBox}>
           <Text style={styles.courseTitle}>{props.data.title}</Text>
-          {props.data.authors.length > 0 && (
-            <Text style={styles.courseAuthor}>
-              By {props.data.authors.join(",")}
-            </Text>
-          )}
+          {props.data.authors.length > 0 && <Text style={styles.courseAuthor}>By {props.data.authors.join(",")}</Text>}
         </View>
         <Image source={{ uri: props.data.asset }} style={styles.courseImage} />
       </View>
@@ -315,45 +292,31 @@ const MyLearnings = () => {
     </View>
   );
 
-  const ContentItem = (props: { data: courseListType }) => {
-    let imgurl = props.data.isOffline
-      ? getOfflineMedia(props.data.asset)
-      : props.data.asset;
+  const ContentItem = (props: { data: courseListType; isRecommended: boolean }) => {
+    let imgurl = props.data.isOffline ? getOfflineMedia(props.data.asset) : props.data.asset;
+
+    if (_.get(props, "data.contentTypeLabel", "Course") === "Class") {
+      _.set(props, "data.contentTypeLabel", "Course");
+    }
 
     return (
       <View style={styles.contentRow}>
-        {imgurl && (
-          <Image source={{ uri: imgurl }} style={styles.contentImage} />
-        )}
+        {imgurl && <Image source={{ uri: imgurl }} style={styles.contentImage} />}
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
               style={{
                 ...styles.contentTag,
-                ..._.get(
-                  styles,
-                  _.get(props, "data.contentTypeLabel", "Course"),
-                  {}
-                ),
+                ..._.get(styles, _.get(props, "data.contentTypeLabel", "Course"), {}),
               }}
             >
               {props.data.contentTypeLabel}
             </Text>
-            {props.data.isOffline !== true && (
-              <MaterialCommunityIcons
-                name="download"
-                size={22}
-                color="#232323"
-                onPress={() => offlineData(props.data, true)}
-              />
+            {props.data.isOffline !== true && !props.isRecommended && (
+              <MaterialCommunityIcons name="download" size={22} color="#232323" onPress={() => offlineData(props.data, true)} />
             )}
-            {props.data.isOffline == true && (
-              <MaterialCommunityIcons
-                name="close-circle-outline"
-                size={22}
-                color="#232323"
-                onPress={() => offlineData(props.data, false)}
-              />
+            {props.data.isOffline == true && !props.isRecommended && (
+              <MaterialCommunityIcons name="close-circle-outline" size={22} color="#232323" onPress={() => offlineData(props.data, false)} />
             )}
           </View>
           <Text
@@ -370,13 +333,11 @@ const MyLearnings = () => {
           >
             {props.data.title}
           </Text>
-          {props.data.contentTypeLabel === "Course" && (
+          {props.data.contentTypeLabel === "Course" && !props.isRecommended && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
                 <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>
-                  {_.get(props, "data.progress", 0)}%
-                </Text>
+                <Text style={styles.note}>{_.get(props, "data.progress", 0)}%</Text>
               </View>
               <ProgressBar percent={_.get(props, "data.progress", 0)} />
             </View>
@@ -399,9 +360,7 @@ const MyLearnings = () => {
             <Text
               style={{
                 ...styles.catTitle,
-                ...(tab === cat
-                  ? styles.catTitleSelected
-                  : styles.catTitleNormal),
+                ...(tab === cat ? styles.catTitleSelected : styles.catTitleNormal),
               }}
             >
               {cat}
@@ -419,10 +378,7 @@ const MyLearnings = () => {
         <View style={styles.contentRightBox}>
           <Text style={styles.courseTitle}>{content.recent[0].title}</Text>
         </View>
-        <Image
-          source={{ uri: content.recent[0].asset }}
-          style={styles.recentImage}
-        />
+        <Image source={{ uri: content.recent[0].asset }} style={styles.recentImage} />
       </View>
     </>
   );
@@ -430,22 +386,17 @@ const MyLearnings = () => {
   const RecommendedList = () => (
     <>
       <Text style={{ ...styles.note, paddingTop: 30 }}>
-        It's looking a bit empty right now, we know. But this is where you'll
-        find your most recent activity, Events, Completed Courses,
+        It's looking a bit empty right now, we know. But this is where you'll find your most recent activity, Events, Completed Courses,
         Certifications and Offline Downloaded Courses.{" "}
       </Text>
       <Text style={styles.title}>Recommended Learning</Text>
       <FlatList
         data={filteredCourses()}
-        renderItem={({ item }) => <CourseItem data={item} />}
+        renderItem={({ item }) => <ContentItem data={item} isRecommended={true} />}
         onEndReached={fetchCourses}
         onEndReachedThreshold={0.5}
-        style={styles.listStyle}
-        ListEmptyComponent={
-          <Text style={styles.noRecords}>
-            No records found, try using other filters.
-          </Text>
-        }
+        style={Utils.isOffline() ? styles.contentListStyleOffline : styles.contentListStyle}
+        ListEmptyComponent={<Text style={styles.noRecords}>No records found, try using other filters.</Text>}
       />
     </>
   );
@@ -453,22 +404,14 @@ const MyLearnings = () => {
   const ContentList = () => (
     <FlatList
       data={filteredContents()}
-      renderItem={({ item }) => <ContentItem data={item} />}
-      style={
-        Utils.isOffline()
-          ? styles.contentListStyleOffline
-          : styles.contentListStyle
-      }
-      ListEmptyComponent={
-        <Text style={styles.noRecords}>
-          No records found, try using other filters.
-        </Text>
-      }
+      renderItem={({ item }) => <ContentItem data={item} isRecommended={false} />}
+      style={Utils.isOffline() ? styles.contentListStyleOffline : styles.contentListStyle}
+      ListEmptyComponent={<Text style={styles.noRecords}>No records found, try using other filters.</Text>}
     />
   );
 
   return (
-    <View style={styles.page}>
+    <GestureRecognizer onSwipe={onSwipe} style={styles.page}>
       <Text style={styles.title}>My Learning</Text>
 
       {Utils.isOffline() === true && <ContentList />}
@@ -477,12 +420,7 @@ const MyLearnings = () => {
         <>
           <View style={styles.searchboxContainer}>
             <View style={{ flexGrow: 1 }}>
-              <Searchbar
-                searchText={pageVars.search}
-                onSearch={(str: string) =>
-                  setPageVars({ ...pageVars, search: str })
-                }
-              />
+              <Searchbar searchText={pageVars.search} onSearch={(str: string) => setPageVars({ ...pageVars, search: str })} />
             </View>
             <FilterControl onFilter={onFilter} />
           </View>
@@ -508,7 +446,7 @@ const MyLearnings = () => {
           )}
         </>
       )}
-    </View>
+    </GestureRecognizer>
   );
 };
 
