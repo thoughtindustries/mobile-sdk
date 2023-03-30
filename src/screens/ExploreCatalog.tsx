@@ -114,7 +114,7 @@ const ExploreCatalog = () => {
         <View style={{ flexGrow: 1 }}>
           <Searchbar searchText={pageVars.search} onSearch={(str: string) => setPageVars({ ...pageVars, search: str })} />
         </View>
-        <FilterControl onFilter={onFilter} />
+        <FilterControl onFilter={onFilter} navigation={navigation} />
       </View>
 
       {pageVars.searching && (
