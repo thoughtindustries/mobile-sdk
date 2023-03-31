@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { View, Text, Modal, StyleSheet, Pressable, ScrollView } from "react-native";
 
@@ -9,8 +9,12 @@ import Checkbox from "./Checkbox";
 
 import Utils from "../helpers/Utils";
 
-const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
+const FilterControl = (props: { onFilter(flts: filtersType): void; navigation: any }) => {
   const [show, setShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    props.navigation.setOptions({ tabBarStyle: { display: show ? "none" : "flex", height: 100 } });
+  }, [show]);
 
   const [filters, setFilters] = useState<filtersType>({
     sortDir: "asc",
@@ -49,90 +53,94 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
 
   const CourseFilter = () => {
     return (
-      <Modal transparent={false} visible={show}>
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterHeading}>Filters</Text>
+      <>
+        {show && (
+          <View style={{ position: "absolute", top: -70, left: 0, zIndex: 200, width: "100%" }}>
+            <View style={styles.filterContainer}>
+              <Text style={styles.filterHeading}>Filters</Text>
 
-          <View style={styles.filterBox}>
-            <Text style={styles.filterTitle}>Sort By</Text>
-            <View style={styles.row}>
-              <Text
-                style={filters.sortDir === "asc" ? styles.sortDirSelected : styles.sortDir}
-                onPress={() => setFilters({ ...filters, sortDir: "asc" })}
-              >
-                A-Z
-              </Text>
-              <Text
-                style={filters.sortDir === "desc" ? styles.sortDirSelected : styles.sortDir}
-                onPress={() => setFilters({ ...filters, sortDir: "desc" })}
-              >
-                Z-A
-              </Text>
+              <View style={styles.filterBox}>
+                <Text style={styles.filterTitle}>Sort By</Text>
+                <View style={styles.row}>
+                  <Text
+                    style={filters.sortDir === "asc" ? styles.sortDirSelected : styles.sortDir}
+                    onPress={() => setFilters({ ...filters, sortDir: "asc" })}
+                  >
+                    A-Z
+                  </Text>
+                  <Text
+                    style={filters.sortDir === "desc" ? styles.sortDirSelected : styles.sortDir}
+                    onPress={() => setFilters({ ...filters, sortDir: "desc" })}
+                  >
+                    Z-A
+                  </Text>
+                </View>
+              </View>
+
+              <ScrollView>
+                <View style={styles.filterBox}>
+                  <Text style={styles.filterTitle}>Duration</Text>
+                  {Utils.filterValues.duration.map((dur, idx) => (
+                    <Checkbox
+                      key={idx}
+                      title={dur}
+                      selected={filters.duration === dur}
+                      onPress={() =>
+                        setFilters({
+                          ...filters,
+                          duration: filters.duration === dur ? "" : dur,
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+                <View style={styles.filterBox}>
+                  <Text style={styles.filterTitle}>Difficulty Level</Text>
+                  {Utils.filterValues.difficulty.map((dif, idx) => (
+                    <Checkbox
+                      key={idx}
+                      title={dif}
+                      selected={filters.difficulty === dif}
+                      onPress={() =>
+                        setFilters({
+                          ...filters,
+                          difficulty: filters.difficulty === dif ? "" : dif,
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+                <View style={styles.filterBox}>
+                  <Text style={styles.filterTitle}>Tags</Text>
+                  {Utils.filterValues.tags.map((tag, idx) => (
+                    <Checkbox
+                      key={idx}
+                      title={tag}
+                      selected={filters.tag === tag}
+                      onPress={() =>
+                        setFilters({
+                          ...filters,
+                          tag: filters.tag === tag ? "" : tag,
+                        })
+                      }
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+
+              <View style={styles.row}>
+                <Pressable style={styles.clearbtn} onPress={clearFilter}>
+                  <Text style={styles.clearbtntxt}>Clear All</Text>
+                </Pressable>
+
+                <Pressable style={styles.applybtn} onPress={applyFilter}>
+                  <Text style={styles.applybtntxt}>Apply Filter</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-
-          <ScrollView>
-            <View style={styles.filterBox}>
-              <Text style={styles.filterTitle}>Duration</Text>
-              {Utils.filterValues.duration.map((dur, idx) => (
-                <Checkbox
-                  key={idx}
-                  title={dur}
-                  selected={filters.duration === dur}
-                  onPress={() =>
-                    setFilters({
-                      ...filters,
-                      duration: filters.duration === dur ? "" : dur,
-                    })
-                  }
-                />
-              ))}
-            </View>
-            <View style={styles.filterBox}>
-              <Text style={styles.filterTitle}>Difficulty Level</Text>
-              {Utils.filterValues.difficulty.map((dif, idx) => (
-                <Checkbox
-                  key={idx}
-                  title={dif}
-                  selected={filters.difficulty === dif}
-                  onPress={() =>
-                    setFilters({
-                      ...filters,
-                      difficulty: filters.difficulty === dif ? "" : dif,
-                    })
-                  }
-                />
-              ))}
-            </View>
-            <View style={styles.filterBox}>
-              <Text style={styles.filterTitle}>Tags</Text>
-              {Utils.filterValues.tags.map((tag, idx) => (
-                <Checkbox
-                  key={idx}
-                  title={tag}
-                  selected={filters.tag === tag}
-                  onPress={() =>
-                    setFilters({
-                      ...filters,
-                      tag: filters.tag === tag ? "" : tag,
-                    })
-                  }
-                />
-              ))}
-            </View>
-          </ScrollView>
-
-          <View style={styles.row}>
-            <Pressable style={styles.clearbtn} onPress={clearFilter}>
-              <Text style={styles.clearbtntxt}>Clear All</Text>
-            </Pressable>
-
-            <Pressable style={styles.applybtn} onPress={applyFilter}>
-              <Text style={styles.applybtntxt}>Apply Filter</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+        )}
+      </>
     );
   };
 
@@ -167,8 +175,8 @@ const styles = StyleSheet.create({
   filterContainer: {
     backgroundColor: "#fff",
     height: "99%",
-    paddingTop: 10,
-    borderRadius: 20,
+    paddingTop: 30,
+    paddingBottom: 50,
   },
 
   row: {
