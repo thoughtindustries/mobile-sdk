@@ -14,7 +14,7 @@ import ContentDetails from "./ContentDetails";
 import TopCategories from "./TopCategories";
 import ExploreCourse from "./ExploreCourse";
 
-export default {
+export {
   Onboarding,
   Login,
   Registration,

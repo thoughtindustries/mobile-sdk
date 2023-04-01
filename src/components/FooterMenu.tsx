@@ -1,30 +1,10 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { get } from "lodash";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Screens from "../screens";
+import { Home, ExploreCatalog, MyLearnings, Account } from "../screens";
 
 const FooterMenu = ({ route }: { route: { name: string } }) => {
   const Tab = createBottomTabNavigator();
-
-  const tabs: { title: string; component: string }[] = [
-    {
-      title: "Home",
-      component: "Home",
-    },
-    {
-      title: "Explore",
-      component: "ExploreCatalog",
-    },
-    {
-      title: "My Learning",
-      component: "MyLearnings",
-    },
-    {
-      title: "Account",
-      component: "Account",
-    },
-  ];
 
   return (
     <Tab.Navigator
@@ -45,32 +25,42 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         tabBarActiveBackgroundColor: "#3B1FA3",
       }}
     >
-      {tabs.map((table, index) => (
-        <Tab.Screen
-          key={index}
-          name={table.title}
-          component={get(Screens, table.component, () => (
-            <></>
-          ))}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name={
-                  table.title === "Home"
-                    ? "home"
-                    : table.title === "Explore"
-                    ? "magnify"
-                    : table.title === "My Learning"
-                    ? "school"
-                    : "account"
-                }
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-      ))}
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Explore"
+        component={ExploreCatalog}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="magnify" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="My Learning"
+        component={MyLearnings}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="school" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Account}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" color={color} size={size} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };

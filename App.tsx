@@ -1,7 +1,17 @@
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Screens from "./src/screens";
-import { StyleSheet, View } from "react-native";
+import {
+  Onboarding,
+  SplashScreen,
+  Registration,
+  Login,
+  Offline,
+  CourseDetails,
+  ExploreCourse,
+  ContentDetails,
+  ProfileEdit,
+} from "./src/screens";
+import { StyleSheet, View, LogBox } from "react-native";
 import { FooterMenu } from "./src/components";
 import {
   useFonts,
@@ -12,9 +22,9 @@ import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
 
-const Stack = createNativeStackNavigator();
-
 const App = () => {
+  LogBox.ignoreLogs(["Require cycle:"]);
+
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_700Bold,
@@ -48,36 +58,37 @@ const App = () => {
     cache: new InMemoryCache(),
   });
 
-  const opts = { headerShown: false };
+  const Stack = createNativeStackNavigator();
 
   const RouterContainer = () => (
     <NavigationContainer theme={MyTheme}>
-      <Stack.Navigator initialRouteName="SplashScreen" screenOptions={opts}>
-        <Stack.Screen name="SplashScreen" component={Screens.SplashScreen} />
+      <Stack.Navigator
+        initialRouteName="
+      "
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen
           name="Onboarding"
-          component={Screens.Onboarding}
+          component={Onboarding}
           options={{ gestureEnabled: false }}
         />
-        <Stack.Screen name="Registration" component={Screens.Registration} />
-        <Stack.Screen name="Login" component={Screens.Login} />
+        <Stack.Screen name="Registration" component={Registration} />
+        <Stack.Screen name="Login" component={Login} />
         <Stack.Screen
           name="HomeScreen"
           component={FooterMenu}
           options={{ gestureEnabled: false }}
         />
-        <Stack.Screen name="TopCategories" component={Screens.Offline} />
-        <Stack.Screen name="CourseDetails" component={Screens.CourseDetails} />
-        <Stack.Screen name="ExploreCourse" component={Screens.ExploreCourse} />
-        <Stack.Screen
-          name="ContentDetails"
-          component={Screens.ContentDetails}
-        />
+        <Stack.Screen name="TopCategories" component={Offline} />
+        <Stack.Screen name="CourseDetails" component={CourseDetails} />
+        <Stack.Screen name="ExploreCourse" component={ExploreCourse} />
+        <Stack.Screen name="ContentDetails" component={ContentDetails} />
         <Stack.Screen name="Explore" component={FooterMenu} />
         <Stack.Screen name="My Learning" component={FooterMenu} />
         <Stack.Screen name="Account" component={FooterMenu} />
-        <Stack.Screen name="ProfileEdit" component={Screens.ProfileEdit} />
-        <Stack.Screen name="Offline" component={Screens.Offline} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEdit} />
+        <Stack.Screen name="Offline" component={Offline} />
       </Stack.Navigator>
     </NavigationContainer>
   );
