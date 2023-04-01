@@ -1,34 +1,31 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions, PixelRatio } from "react-native";
 
 export default StyleSheet.create({
   container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    padding: 40,
-    height: "100%",
-    backgroundColor: "#F3F4F6",
+    flex: 1,
+    justifyContent: "space-evenly",
+    padding: (Dimensions.get("window").height / 440) * 16,
+    paddingTop: (Dimensions.get("window").height / 440) * 30,
   },
 
   label: {
     fontFamily: "Poppins_700Bold",
     color: "#000",
-    marginTop: 20,
-    marginBottom: 10,
-    fontSize: 16,
+    marginTop: (Dimensions.get("window").height / 440) * 10,
+    marginBottom: (Dimensions.get("window").height / 440) * 3,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
   },
 
   input: {
     fontFamily: "Poppins_400Regular",
-    padding: 15,
-    paddingLeft: 20,
-    paddingRight: 20,
+    padding: (Dimensions.get("window").height / 440) * 10,
+    paddingLeft: (Dimensions.get("window").height / 440) * 10,
+    paddingRight: (Dimensions.get("window").height / 440) * 10,
     borderColor: "#D1D5DB",
     borderWidth: 1,
     borderRadius: 5,
     backgroundColor: "#FFFFFF",
-    marginBottom: 12,
+    marginBottom: PixelRatio.get() * 4,
   },
 
   inlineError: {

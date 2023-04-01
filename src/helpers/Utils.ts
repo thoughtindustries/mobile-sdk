@@ -25,11 +25,12 @@ const Utils = {
 
   checkLogin: (navigation: any) => {
     Utils.isLoggedIn().then((loggedIn) => {
-      if (loggedIn) {
-        navigation.navigate("HomeScreen");
-      } else {
-        navigation.navigate("Onboarding");
-      }
+      navigation.navigate("HomeScreen");
+      // if (loggedIn) {
+      //   navigation.navigate("HomeScreen");
+      // } else {
+      //   navigation.navigate("Onboarding");
+      // }
     });
   },
 

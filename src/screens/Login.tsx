@@ -7,7 +7,7 @@ import {
   Pressable,
   Linking,
   KeyboardAvoidingView,
-  ScrollView,
+  Dimensions,
 } from "react-native";
 import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
@@ -162,12 +162,12 @@ const Login = () => {
   };
 
   return (
-    <>
+    <View style={AppStyle.container}>
       {loading && (
         <Success title="" message="Trying to login, Please wait.. " />
       )}
       {!loading && (
-        <ScrollView>
+        <View>
           {responseError.title !== "" && (
             <Message
               title={responseError.title}
@@ -175,76 +175,74 @@ const Login = () => {
               onHide={() => setResponseError({ title: "", message: "" })}
             />
           )}
-          <View style={AppStyle.container}>
-            <KeyboardAvoidingView
-              keyboardVerticalOffset={5}
-              behavior={"position"}
-            >
-              <View style={styles.prompt}>
-                <Logo />
-                <Text style={styles.title}>Sign In</Text>
-              </View>
-              <View>
-                <Text style={AppStyle.label}>Email</Text>
+          <KeyboardAvoidingView
+            keyboardVerticalOffset={5}
+            behavior={"position"}
+          >
+            <View style={styles.prompt}>
+              <Logo />
+              <Text style={styles.title}>Sign In</Text>
+            </View>
+            <View>
+              <Text style={AppStyle.label}>Email</Text>
+              <TextInput
+                textContentType="emailAddress"
+                onChangeText={(value) => handleChange("email", value)}
+                placeholder="example@email.com"
+                defaultValue={form.email.value}
+                style={
+                  form.email.error !== ""
+                    ? { ...AppStyle.input, ...AppStyle.errorField }
+                    : AppStyle.input
+                }
+                keyboardType="email-address"
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+              <Text style={AppStyle.inlineError}>{form.email.error}</Text>
+              <Text style={AppStyle.label}>Password</Text>
+              <View
+                style={
+                  form.password.error !== ""
+                    ? {
+                        ...AppStyle.input,
+                        ...AppStyle.errorField,
+                        flexDirection: "row",
+                      }
+                    : { ...AppStyle.input, flexDirection: "row" }
+                }
+              >
                 <TextInput
-                  textContentType="emailAddress"
-                  onChangeText={(value) => handleChange("email", value)}
-                  placeholder="example@email.com"
-                  defaultValue={form.email.value}
-                  style={
-                    form.email.error !== ""
-                      ? { ...AppStyle.input, ...AppStyle.errorField }
-                      : AppStyle.input
-                  }
-                  keyboardType="email-address"
-                  autoCorrect={false}
-                  autoCapitalize="none"
+                  secureTextEntry={!showPassword}
+                  onChangeText={(value) => handleChange("password", value)}
+                  defaultValue={form.password.value}
+                  style={{ margin: 0, padding: 0, width: "93%" }}
+                  placeholder="Enter your password here"
                 />
-                <Text style={AppStyle.inlineError}>{form.email.error}</Text>
-                <Text style={AppStyle.label}>Password</Text>
-                <View
-                  style={
-                    form.password.error !== ""
-                      ? {
-                          ...AppStyle.input,
-                          ...AppStyle.errorField,
-                          flexDirection: "row",
-                        }
-                      : { ...AppStyle.input, flexDirection: "row" }
-                  }
+                <Pressable
+                  onPress={() => setShowpPassword(!showPassword)}
+                  style={{ justifyContent: "center" }}
                 >
-                  <TextInput
-                    secureTextEntry={!showPassword}
-                    onChangeText={(value) => handleChange("password", value)}
-                    defaultValue={form.password.value}
-                    style={{ margin: 0, padding: 0, width: "93%" }}
-                    placeholder="Enter your password here"
+                  <MaterialCommunityIcons
+                    name={!showPassword ? "eye-off" : "eye"}
+                    size={22}
+                    color="#232323"
                   />
-                  <Pressable
-                    onPress={() => setShowpPassword(!showPassword)}
-                    style={{ justifyContent: "center" }}
-                  >
-                    <MaterialCommunityIcons
-                      name={!showPassword ? "eye-off" : "eye"}
-                      size={22}
-                      color="#232323"
-                    />
-                  </Pressable>
-                </View>
-                <Text style={AppStyle.inlineError}>{form.password.error}</Text>
-                <Button title="Sign In" onPress={onSignIn} />
-                <Link
-                  title="Forgot Password?"
-                  onPress={() =>
-                    Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)
-                  }
-                />
+                </Pressable>
               </View>
-            </KeyboardAvoidingView>
-          </View>
-        </ScrollView>
+              <Text style={AppStyle.inlineError}>{form.password.error}</Text>
+              <Button title="Sign In" onPress={onSignIn} />
+              <Link
+                title="Forgot Password?"
+                onPress={() =>
+                  Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)
+                }
+              />
+            </View>
+          </KeyboardAvoidingView>
+        </View>
       )}
-    </>
+    </View>
   );
 };
 
@@ -252,12 +250,10 @@ const styles = StyleSheet.create({
   prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 100,
-    marginBottom: 60,
   },
 
   title: {
-    fontSize: 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",

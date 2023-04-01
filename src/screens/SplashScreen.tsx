@@ -3,6 +3,7 @@ import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
 import dbObj from "../helpers/Db";
 import Utils from "../helpers/Utils";
+import AppStyle from "../../AppStyle";
 
 interface Props {
   navigation: any;
@@ -15,7 +16,7 @@ const SplashScreen = ({ navigation }: Props) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={{ ...AppStyle.container, backgroundColor: "#3B1FA3" }}>
       <ImageBackground
         source={require("../../assets/start-screen.png")}
         resizeMode="cover"
@@ -30,9 +31,6 @@ const SplashScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   image: {
     flex: 1,
     justifyContent: "center",

@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, PixelRatio, Dimensions } from "react-native";
 import { Logo, Button, Link } from "../components";
-import AppStyle from "../../AppStyle";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
+import AppStyle from "../../AppStyle";
 
 type OnboardingScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -38,16 +38,12 @@ const styles = StyleSheet.create({
   prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 100,
-    marginBottom: 60,
   },
-
   form: {
     width: "100%",
   },
-
   title: {
-    fontSize: 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
@@ -56,7 +52,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: 16,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
     textAlign: "center",
     color: "#6B7280",

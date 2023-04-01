@@ -1,4 +1,5 @@
 import React from "react";
+import { Dimensions, PixelRatio } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Home, ExploreCatalog, MyLearnings, Account } from "../screens";
@@ -11,15 +12,22 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
       initialRouteName={route.name}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { height: 100 },
-        tabBarItemStyle: {
-          margin: 10,
-          padding: 3,
-          borderRadius: 6,
-          marginLeft: 10,
-          marginRight: 10,
+        tabBarStyle: {
+          height:
+            Dimensions.get("window").height < 700
+              ? (Dimensions.get("window").height / 440) * 55
+              : (Dimensions.get("window").height / 440) * 45,
+          justifyContent: "center",
+          alignItems: "center",
         },
-        tabBarLabelStyle: { marginTop: 3 },
+        tabBarItemStyle: {
+          borderRadius: 6,
+          margin: (Dimensions.get("window").width / 414) * 10,
+        },
+        tabBarLabelStyle: {
+          marginBottom: (Dimensions.get("window").width / 414) * 10,
+          marginTop: (Dimensions.get("window").width / 414) * -8,
+        },
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: "#6B7280",
         tabBarActiveBackgroundColor: "#3B1FA3",
@@ -30,7 +38,11 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={Home}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="home"
+              color={color}
+              size={(Dimensions.get("window").width / 414) * size}
+            />
           ),
         }}
       />
@@ -39,7 +51,11 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={ExploreCatalog}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="magnify" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="magnify"
+              color={color}
+              size={(Dimensions.get("window").width / 414) * size}
+            />
           ),
         }}
       />
@@ -48,7 +64,11 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={MyLearnings}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="school" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="school"
+              color={color}
+              size={(Dimensions.get("window").width / 414) * size}
+            />
           ),
         }}
       />
@@ -57,7 +77,11 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={Account}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="account"
+              color={color}
+              size={(Dimensions.get("window").width / 414) * size}
+            />
           ),
         }}
       />

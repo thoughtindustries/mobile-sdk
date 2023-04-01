@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
 
 interface ButtonProps {
   title: string;
@@ -22,11 +22,11 @@ const Button = ({ title, onPress, mode }: ButtonProps) => {
 
 const styles = StyleSheet.create({
   button: {
-    marginTop: 40,
-    marginBottom: 20,
+    marginTop: (Dimensions.get("window").height / 440) * 30,
+    marginBottom: (Dimensions.get("window").height / 440) * 16,
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: (Dimensions.get("window").height / 440) * 10,
     backgroundColor: "#3B1FA3",
     borderRadius: 4,
   },
@@ -34,14 +34,15 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "Inter_700Bold",
     color: "#ffffff",
+    fontSize: (Dimensions.get("window").width / 440) * 20,
   },
 
   button2: {
-    marginTop: 40,
-    marginBottom: 20,
+    marginTop: (Dimensions.get("window").height / 440) * 30,
+    marginBottom: (Dimensions.get("window").height / 440) * 16,
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: (Dimensions.get("window").height / 440) * 10,
     backgroundColor: "#FAFAFA",
     borderColor: "#D1D5DB",
     borderWidth: 1,

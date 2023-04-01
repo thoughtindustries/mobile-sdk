@@ -5,6 +5,7 @@ import {
   TextInput,
   StyleSheet,
   KeyboardAvoidingView,
+  Dimensions,
 } from "react-native";
 import { Logo, Button, Message } from "../components";
 import Success from "./Success";
@@ -144,7 +145,7 @@ const Registration = () => {
   };
 
   return (
-    <>
+    <View style={AppStyle.container}>
       {processing && (
         <Success title="" message="Registration going on, Please wait.. " />
       )}
@@ -157,7 +158,7 @@ const Registration = () => {
       )}
 
       {!processing && message === "" && (
-        <View style={AppStyle.container}>
+        <View>
           {responseError.title !== "" && (
             <Message
               title={responseError.title}
@@ -223,7 +224,7 @@ const Registration = () => {
           </KeyboardAvoidingView>
         </View>
       )}
-    </>
+    </View>
   );
 };
 
@@ -231,7 +232,6 @@ const styles = StyleSheet.create({
   prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 100,
   },
 
   keyboardOffset: {
@@ -239,12 +239,12 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
+    fontFamily: "Poppins_700Bold",
   },
 });
 

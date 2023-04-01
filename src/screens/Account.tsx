@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Linking, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Linking,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TI_API_INSTANCE } from "@env";
@@ -36,13 +44,23 @@ const Account = () => {
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
-          {_.isEmpty(profilePic) && <Image source={require("../../assets/profile.png")} />}
-          {!_.isEmpty(profilePic) && <Image source={{ uri: profilePic }} style={styles.profileImage} />}
+          {_.isEmpty(profilePic) && Dimensions.get("window").height > 600 && (
+            <Image
+              source={require("../../assets/profile.png")}
+              style={styles.profileImage}
+            />
+          )}
+          {!_.isEmpty(profilePic) && Dimensions.get("window").height > 600 && (
+            <Image source={{ uri: profilePic }} style={styles.profileImage} />
+          )}
 
           <Text style={styles.subtitle}>
-            {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
+            {_.get(udata, "firstName", "Blake")}{" "}
+            {_.get(udata, "lastName", "Reimer")}
           </Text>
-          <Text style={styles.userEmail}>{_.get(udata, "email", "")}</Text>
+          <Text style={styles.userEmail}>
+            {_.get(udata, "email", "sobeksea@gmail")}
+          </Text>
 
           <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
             <Text style={styles.profileEdit}>Edit</Text>
@@ -52,11 +70,24 @@ const Account = () => {
       <View style={styles.settingInfo}>
         <Text style={styles.settingTitle}>Settings</Text>
 
-        <TouchableOpacity onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}>
+        <TouchableOpacity
+          onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}
+          style={styles.resetButton}
+        >
           <View style={styles.resetBtn}>
-            <MaterialCommunityIcons name={"eye-off-outline"} size={22} color="#3B1FA3" style={styles.eyeIcon} />
+            <MaterialCommunityIcons
+              name={"eye-off-outline"}
+              size={22}
+              color="#3B1FA3"
+              style={styles.eyeIcon}
+            />
             <Text style={styles.resetField}>Reset Password</Text>
-            <MaterialCommunityIcons style={styles.settingIcon} name={"chevron-right"} size={25} color="#232323" />
+            <MaterialCommunityIcons
+              style={styles.settingIcon}
+              name={"chevron-right"}
+              size={25}
+              color="#232323"
+            />
           </View>
         </TouchableOpacity>
 
@@ -71,13 +102,8 @@ const Account = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 16,
   },
   accountInfo: {
-    marginTop: 10,
-    marginBottom: 90,
-    padding: 32,
-    flex: 1,
     width: "100%",
   },
   profileInfo: {
@@ -85,11 +111,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   settingInfo: {
-    flex: 1,
     backgroundColor: "#FFFFFF",
     width: "100%",
     padding: 24,
     alignItems: "flex-start",
+    flex: 1,
   },
   resetBtn: {
     borderRadius: 8,
@@ -116,31 +142,33 @@ const styles = StyleSheet.create({
     marginTop: -3,
   },
   title: {
-    fontSize: 24,
+    marginTop: 60,
+    marginBottom: 20,
+    marginLeft: 30,
+    fontSize: 20,
     lineHeight: 36,
     textAlign: "left",
     color: "#1F2937",
-    marginBottom: 10,
     fontFamily: "Poppins_700Bold",
   },
   profileImage: {
-    marginTop: 10,
+    marginTop: Dimensions.get("window").height < 700 ? 0 : 10,
     marginBottom: 20,
-    width: 132,
-    height: 132,
+    height: Dimensions.get("window").height < 700 ? 100 : 132,
+    width: Dimensions.get("window").height < 700 ? 100 : 132,
     borderRadius: 132,
   },
   subtitle: {
-    fontSize: 24,
+    fontSize: Dimensions.get("window").height < 700 ? 16 : 24,
     lineHeight: 36,
+    marginBottom: Dimensions.get("window").height < 700 ? 0 : 12,
     textAlign: "center",
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
   userEmail: {
-    fontSize: 16,
+    fontSize: Dimensions.get("window").height < 700 ? 12 : 16,
     lineHeight: 24,
-    paddingTop: 16,
     color: "#6B7280",
     fontFamily: "Poppins_400Regular",
   },
@@ -163,7 +191,10 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     fontSize: 16,
     lineHeight: 24,
-    marginBottom: 32,
+    marginBottom: Dimensions.get("window").height < 700 ? 10 : 24,
+  },
+  resetButton: {
+    marginBottom: Dimensions.get("window").height < 700 ? 0 : 24,
   },
 });
 

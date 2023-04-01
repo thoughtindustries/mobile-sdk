@@ -208,12 +208,6 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
             </View>
           )}
 
-          {/*question.type === "fileSubmission" && (
-            <View style={{ marginTop: 16 }}>
-              <Button title="Upload File" mode={2} onPress={() => setQIndex(qIndex + 1)} />
-            </View>
-          )*/}
-
           {qIndex < quiz.questions.length && (
             <View
               style={
