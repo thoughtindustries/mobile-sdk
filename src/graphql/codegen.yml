@@ -30,7 +30,3 @@ generates:
     plugins:
       - "typescript-operations"
       - "typescript-react-apollo"
-  # # use this to re-generate schema from remote schema
-  # ./graphql.schema.json:
-  #   plugins:
-  #     - "introspection"

@@ -44,23 +44,20 @@ const Account = () => {
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
-          {_.isEmpty(profilePic) && Dimensions.get("window").height > 600 && (
+          {_.isEmpty(profilePic) && Dimensions.get("window").height > 667 && (
             <Image
               source={require("../../assets/profile.png")}
               style={styles.profileImage}
             />
           )}
-          {!_.isEmpty(profilePic) && Dimensions.get("window").height > 600 && (
+          {!_.isEmpty(profilePic) && Dimensions.get("window").height > 667 && (
             <Image source={{ uri: profilePic }} style={styles.profileImage} />
           )}
 
           <Text style={styles.subtitle}>
-            {_.get(udata, "firstName", "Blake")}{" "}
-            {_.get(udata, "lastName", "Reimer")}
+            {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
           </Text>
-          <Text style={styles.userEmail}>
-            {_.get(udata, "email", "sobeksea@gmail")}
-          </Text>
+          <Text style={styles.userEmail}>{_.get(udata, "email", "")}</Text>
 
           <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
             <Text style={styles.profileEdit}>Edit</Text>
@@ -142,8 +139,8 @@ const styles = StyleSheet.create({
     marginTop: -3,
   },
   title: {
+    marginBottom: Dimensions.get("window").height < 667 ? 20 : 0,
     marginTop: 60,
-    marginBottom: 20,
     marginLeft: 30,
     fontSize: 20,
     lineHeight: 36,
@@ -152,22 +149,21 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
   },
   profileImage: {
-    marginTop: Dimensions.get("window").height < 700 ? 0 : 10,
-    marginBottom: 20,
-    height: Dimensions.get("window").height < 700 ? 100 : 132,
-    width: Dimensions.get("window").height < 700 ? 100 : 132,
+    marginBottom: (Dimensions.get("window").height / 440) * 16,
+    height: (Dimensions.get("window").height / 440) * 80,
+    width: (Dimensions.get("window").height / 440) * 80,
     borderRadius: 132,
   },
   subtitle: {
-    fontSize: Dimensions.get("window").height < 700 ? 16 : 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
-    marginBottom: Dimensions.get("window").height < 700 ? 0 : 12,
+    marginBottom: (Dimensions.get("window").height / 440) * 6,
     textAlign: "center",
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
   userEmail: {
-    fontSize: Dimensions.get("window").height < 700 ? 12 : 16,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
     color: "#6B7280",
     fontFamily: "Poppins_400Regular",
@@ -175,26 +171,26 @@ const styles = StyleSheet.create({
   profileEdit: {
     color: "#3B1FA3",
     fontFamily: "Inter_700Bold",
-    fontSize: 14,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 17,
     backgroundColor: "#F9FAFB",
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#D1D5DB",
     borderRadius: 4,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    marginTop: 16,
-    marginBottom: 32,
+    paddingVertical: (Dimensions.get("window").height / 440) * 10,
+    paddingHorizontal: (Dimensions.get("window").height / 440) * 24,
+    marginTop: (Dimensions.get("window").height / 440) * 12,
+    marginBottom: (Dimensions.get("window").height / 440) * 20,
   },
   settingTitle: {
     fontFamily: "Poppins_700Bold",
     fontSize: 16,
     lineHeight: 24,
-    marginBottom: Dimensions.get("window").height < 700 ? 10 : 24,
+    marginBottom: (Dimensions.get("window").height / 440) * 14,
   },
   resetButton: {
-    marginBottom: Dimensions.get("window").height < 700 ? 0 : 24,
+    marginBottom: (Dimensions.get("window").height / 440) * 6,
   },
 });
 

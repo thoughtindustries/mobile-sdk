@@ -19,7 +19,14 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import {
+  ApolloProvider,
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import * as SecureStore from "expo-secure-store";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
 
 const App = () => {
@@ -53,8 +60,23 @@ const App = () => {
     },
   });
 
-  const client = new ApolloClient({
+  const httpLink = createHttpLink({
     uri: `${TI_API_INSTANCE}/helium?apiKey=${TI_API_KEY}`,
+  });
+
+  const authLink = setContext(async (_, { headers }) => {
+    const token = await SecureStore.getItemAsync("token");
+    console.log("AUTH: ", token);
+    return {
+      headers: {
+        ...headers,
+        authToken: token,
+      },
+    };
+  });
+
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
   });
 

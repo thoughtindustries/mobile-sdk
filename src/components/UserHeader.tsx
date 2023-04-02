@@ -1,27 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { Image, View, Text, StyleSheet } from "react-native";
-import Utils from "../helpers/Utils";
-import _ from "lodash";
-import { UserDetailType } from "../../types";
+import * as SecureStore from "expo-secure-store";
+
+interface UserDetailProps {
+  firstName: string;
+  lastName: string;
+  asset: string;
+}
 
 const UserHeader = () => {
-  const [udata, setUdata] = useState<UserDetailType | boolean>(false);
+  const [userInfo, setUserInfo] = useState<UserDetailProps>({
+    firstName: "",
+    lastName: "",
+    asset: "",
+  });
 
   useEffect(() => {
-    Utils.fetch("udata").then(setUdata);
+    const fetchUserInfo = async () => {
+      try {
+        const info = await SecureStore.getItemAsync("userInfo");
+        if (info) {
+          setUserInfo(JSON.parse(info));
+        }
+      } catch (error) {
+        console.log("Fetch user info error: ", error);
+      }
+    };
+
+    fetchUserInfo();
   }, []);
 
-  const profilePic = _.get(udata, "asset", "");
   return (
     <View style={styles.container}>
-      {_.isEmpty(profilePic) && (
+      {userInfo.asset === null || userInfo.asset === "" ? (
         <Image source={require("../../assets/user.png")} />
-      )}
-      {!_.isEmpty(profilePic) && (
-        <Image source={{ uri: profilePic }} style={styles.profilePic} />
+      ) : (
+        <Image source={{ uri: userInfo.asset }} style={styles.profilePic} />
       )}
       <Text style={styles.name}>
-        Hi, {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
+        {`Hi, ${userInfo.firstName} ${userInfo.lastName}`}
       </Text>
     </View>
   );

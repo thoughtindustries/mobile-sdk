@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import _ from "lodash";
 
 const Utils = {
@@ -17,6 +18,11 @@ const Utils = {
     });
   },
 
+  fetchToken: async () => {
+    const token = await SecureStore.getItemAsync("token");
+    return token;
+  },
+
   isLoggedIn: () => {
     return Utils.fetch("udata")
       .then((val) => !_.isEmpty(_.get(val, "email", "")))
@@ -25,12 +31,11 @@ const Utils = {
 
   checkLogin: (navigation: any) => {
     Utils.isLoggedIn().then((loggedIn) => {
-      navigation.navigate("HomeScreen");
-      // if (loggedIn) {
-      //   navigation.navigate("HomeScreen");
-      // } else {
-      //   navigation.navigate("Onboarding");
-      // }
+      if (loggedIn) {
+        navigation.navigate("HomeScreen");
+      } else {
+        navigation.navigate("Onboarding");
+      }
     });
   },
 

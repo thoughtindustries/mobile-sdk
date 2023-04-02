@@ -8,6 +8,7 @@ import {
   Linking,
   KeyboardAvoidingView,
   Dimensions,
+  Platform,
 } from "react-native";
 import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
@@ -176,8 +177,7 @@ const Login = () => {
             />
           )}
           <KeyboardAvoidingView
-            keyboardVerticalOffset={5}
-            behavior={"position"}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
             <View style={styles.prompt}>
               <Logo />

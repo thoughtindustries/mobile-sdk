@@ -16,17 +16,17 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
           height:
             Dimensions.get("window").height < 700
               ? (Dimensions.get("window").height / 440) * 55
-              : (Dimensions.get("window").height / 440) * 45,
+              : (Dimensions.get("window").height / 440) * 50,
           justifyContent: "center",
           alignItems: "center",
         },
         tabBarItemStyle: {
           borderRadius: 6,
-          margin: (Dimensions.get("window").width / 414) * 10,
+          margin: (Dimensions.get("window").width / 440) * 10,
         },
         tabBarLabelStyle: {
-          marginBottom: (Dimensions.get("window").width / 414) * 10,
-          marginTop: (Dimensions.get("window").width / 414) * -8,
+          marginBottom: (Dimensions.get("window").width / 440) * 10,
+          marginTop: (Dimensions.get("window").width / 440) * -8,
         },
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: "#6B7280",
@@ -41,7 +41,7 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
             <MaterialCommunityIcons
               name="home"
               color={color}
-              size={(Dimensions.get("window").width / 414) * size}
+              size={(Dimensions.get("window").width / 440) * size}
             />
           ),
         }}
@@ -54,7 +54,7 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
             <MaterialCommunityIcons
               name="magnify"
               color={color}
-              size={(Dimensions.get("window").width / 414) * size}
+              size={(Dimensions.get("window").width / 440) * size}
             />
           ),
         }}
@@ -67,20 +67,20 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
             <MaterialCommunityIcons
               name="school"
               color={color}
-              size={(Dimensions.get("window").width / 414) * size}
+              size={(Dimensions.get("window").width / 440) * size}
             />
           ),
         }}
       />
       <Tab.Screen
-        name="Settings"
+        name="Account"
         component={Account}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="account"
               color={color}
-              size={(Dimensions.get("window").width / 414) * size}
+              size={(Dimensions.get("window").width / 440) * size}
             />
           ),
         }}

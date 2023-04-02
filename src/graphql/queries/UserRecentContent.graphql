@@ -1,0 +1,7 @@
+query UserRecentContent($limit: Int) {
+  UserRecentContent(limit: $limit) {
+    title
+    description
+    asset
+  }
+}
