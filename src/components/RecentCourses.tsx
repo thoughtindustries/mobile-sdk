@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,34 +9,45 @@ import {
 } from "react-native";
 import _ from "lodash";
 import striptags from "striptags";
-import tiGql from "../helpers/TIGraphQL";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, userRecentContentType } from "../../types";
+import { useUserRecentContentQuery } from "../graphql";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const [courses, setCourses] = useState<userRecentContentType[]>([]);
+  const { data, loading, error } = useUserRecentContentQuery({
+    variables: { limit: 5 },
+  });
 
-  const fetchRecentCourses = () => {
-    tiGql.fetchRecentCourses(5).then(setCourses);
-  };
+  if (loading)
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
 
-  useEffect(fetchRecentCourses, []);
+  if (error)
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>{error?.message}</Text>
+      </View>
+    );
 
   return (
     <View>
-      {courses.length > 0 && (
+      {data?.UserRecentContent && (
         <View style={styles.courseBox}>
           <Text style={styles.heading}>Recently Launched Courses</Text>
         </View>
       )}
-      {courses.length > 0 && (
+      {data?.UserRecentContent && (
         <ScrollView horizontal={true} style={styles.courseContainer}>
-          {courses.map((course, idx) => (
+          {data.UserRecentContent.map((course, idx) => (
             <Pressable
+              key={idx}
               onPress={() =>
                 navigation.navigate("ContentDetails", {
                   cid: course.id,
@@ -49,13 +60,13 @@ const RecentCourses = () => {
                   <Image
                     key={idx}
                     source={{ uri: course.asset }}
-                    style={{ width: "100%", height: "100%" }}
+                    style={{ width: "100%", height: "100%", borderRadius: 5 }}
                   />
                 </View>
                 <View style={styles.contentArea}>
                   <Text style={styles.recCourseTitle}>{course.title}</Text>
                   <Text style={styles.courseDes}>
-                    {_.truncate(striptags(course.description), {
+                    {_.truncate(striptags(course.description || ""), {
                       length: 100,
                     })}
                   </Text>

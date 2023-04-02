@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 
   linkText: {
     fontFamily: "Poppins_700Bold",
-    fontSize: (Dimensions.get("window").width / 440) * 20,
+    fontSize: (Dimensions.get("window").width / 440) * 18,
     color: "#3B1FA3",
   },
 });

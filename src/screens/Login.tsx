@@ -163,7 +163,7 @@ const Login = () => {
   };
 
   return (
-    <View style={AppStyle.container}>
+    <View style={styles(loading).container}>
       {loading && (
         <Success title="" message="Trying to login, Please wait.. " />
       )}
@@ -179,9 +179,9 @@ const Login = () => {
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <View style={styles.prompt}>
+            <View style={styles(loading).prompt}>
               <Logo />
-              <Text style={styles.title}>Sign In</Text>
+              <Text style={styles(loading).title}>Sign In</Text>
             </View>
             <View>
               <Text style={AppStyle.label}>Email</Text>
@@ -246,20 +246,24 @@ const Login = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  prompt: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  title: {
-    fontSize: (Dimensions.get("window").width / 440) * 24,
-    lineHeight: 36,
-    textAlign: "center",
-    color: "#1F2937",
-    marginBottom: 10,
-    fontFamily: "Poppins_700Bold",
-  },
-});
+const styles = (loading: boolean) =>
+  StyleSheet.create({
+    container: {
+      ...AppStyle.container,
+      backgroundColor: loading ? "#3B1FA3" : "#FFFFFF",
+    },
+    prompt: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    title: {
+      fontSize: (Dimensions.get("window").width / 440) * 24,
+      lineHeight: 36,
+      textAlign: "center",
+      color: "#1F2937",
+      marginBottom: 10,
+      fontFamily: "Poppins_700Bold",
+    },
+  });
 
 export default Login;

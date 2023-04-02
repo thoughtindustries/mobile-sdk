@@ -36,9 +36,9 @@ const Home = () => {
       >
         <UserHeader />
         <Banner />
-        {/* <TopCategories />
+        <TopCategories />
         <Recommendation />
-        <RecentCourses /> */}
+        <RecentCourses />
       </ScrollView>
     </GestureRecognizer>
   );

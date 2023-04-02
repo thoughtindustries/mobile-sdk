@@ -66,7 +66,6 @@ const App = () => {
 
   const authLink = setContext(async (_, { headers }) => {
     const token = await SecureStore.getItemAsync("token");
-    console.log("AUTH: ", token);
     return {
       headers: {
         ...headers,

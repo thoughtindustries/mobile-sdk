@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import _ from "lodash";
 
 interface MessageProps {
   title?: string;
@@ -13,17 +12,16 @@ const Message = ({
   title = "",
   message = "",
   extraJSX = <></>,
+  onHide,
 }: MessageProps) => {
-  const [showModal, setShowModal] = useState<boolean>(title !== "");
-
   return (
-    <Modal animationType="fade" transparent={true} visible={showModal}>
+    <Modal animationType="fade" transparent={true} visible={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalDialog}>
           <Text style={styles.modalTitle}>{title}</Text>
           <Text style={styles.modalMessage}>{message}</Text>
           {extraJSX}
-          <TouchableOpacity onPress={() => setShowModal(false)}>
+          <TouchableOpacity onPress={onHide}>
             <Text style={styles.closeBtn}>Close</Text>
           </TouchableOpacity>
         </View>

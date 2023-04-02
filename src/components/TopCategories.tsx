@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Link } from "../components";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -39,14 +39,14 @@ const TopCategories = () => {
 
 const styles = StyleSheet.create({
   topCatBox: {
-    marginTop: 10,
+    marginTop: (Dimensions.get("window").height / 440) * 8,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   heading: {
     marginTop: 15,
-    fontSize: 16,
+    fontSize: (Dimensions.get("window").width / 400) * 16,
     lineHeight: 24,
     fontFamily: "Poppins_700Bold",
     color: "#000",
@@ -59,12 +59,10 @@ const styles = StyleSheet.create({
   catTitle: {
     color: "#1f2937",
     fontWeight: "400",
-    fontSize: 14,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
-    paddingTop: 13,
-    paddingBottom: 13,
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingVertical: (Dimensions.get("window").width / 440) * 14,
+    paddingHorizontal: (Dimensions.get("window").width / 440) * 14,
   },
   catBox: {
     backgroundColor: "#f9fafv",

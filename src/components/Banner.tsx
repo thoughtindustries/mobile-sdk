@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ImageBackground,
   Pressable,
+  Dimensions,
 } from "react-native";
 import _ from "lodash";
 import striptags from "striptags";
@@ -12,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { useUserRecentContentQuery } from "../graphql";
+import Loader from "./Loader";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -23,15 +25,15 @@ const Banner = () => {
 
   if (loading)
     return (
-      <View>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text>Loading...</Text>
       </View>
     );
 
   if (error)
     return (
-      <View>
-        <Text>{error.message}</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>{error?.message}</Text>
       </View>
     );
 
@@ -76,19 +78,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   bannerArea: {
-    height: 282,
+    paddingTop:
+      Dimensions.get("window").height < 667
+        ? (Dimensions.get("window").height / 440) * 50
+        : (Dimensions.get("window").height / 440) * 100,
     padding: 32,
     justifyContent: "flex-end",
     fontFamily: "Poppins_400Regular",
   },
   bannerTitle: {
-    fontSize: 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
     fontFamily: "Poppins_700Bold",
     color: "#fff",
   },
   bannerText: {
-    fontSize: 16,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
     fontFamily: "Poppins_400Regular",
     color: "#ccc",

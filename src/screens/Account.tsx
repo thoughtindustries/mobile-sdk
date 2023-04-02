@@ -14,11 +14,18 @@ import { TI_API_INSTANCE } from "@env";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../../types";
 import Utils from "../helpers/Utils";
-import _ from "lodash";
+import * as SecureStore from "expo-secure-store";
 
 import GestureRecognizer from "react-native-swipe-gestures";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
+
+interface UserDetailProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  asset: string;
+}
 
 const Account = () => {
   const navigation = useNavigation<AccountScreenProps>();
@@ -26,38 +33,55 @@ const Account = () => {
   const onSwipe = (gestureName: string) => {
     switch (gestureName) {
       case "SWIPE_RIGHT":
-        navigation.navigate("My Learning");
+        navigation.navigate("MyLearning");
         break;
     }
   };
 
-  const [udata, setUdata] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<UserDetailProps>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    asset: "",
+  });
 
   useEffect(() => {
-    Utils.fetch("udata").then(setUdata);
-  }, []);
+    const fetchUserInfo = async () => {
+      try {
+        const info = await SecureStore.getItemAsync("userInfo");
+        if (info) {
+          setUserInfo(JSON.parse(info));
+        }
+      } catch (error) {
+        console.log("Fetch account info error: ", error);
+      }
+    };
 
-  const profilePic = _.get(udata, "asset", "");
+    fetchUserInfo();
+  }, []);
 
   return (
     <GestureRecognizer onSwipe={onSwipe} style={styles.container}>
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
-          {_.isEmpty(profilePic) && Dimensions.get("window").height > 667 && (
+          {!userInfo.asset && Dimensions.get("window").height > 667 && (
             <Image
               source={require("../../assets/profile.png")}
               style={styles.profileImage}
             />
           )}
-          {!_.isEmpty(profilePic) && Dimensions.get("window").height > 667 && (
-            <Image source={{ uri: profilePic }} style={styles.profileImage} />
+          {userInfo.asset && Dimensions.get("window").height > 667 && (
+            <Image
+              source={{ uri: userInfo.asset }}
+              style={styles.profileImage}
+            />
           )}
 
           <Text style={styles.subtitle}>
-            {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
+            {userInfo.firstName} {userInfo.lastName}
           </Text>
-          <Text style={styles.userEmail}>{_.get(udata, "email", "")}</Text>
+          <Text style={styles.userEmail}>{userInfo.email}</Text>
 
           <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
             <Text style={styles.profileEdit}>Edit</Text>

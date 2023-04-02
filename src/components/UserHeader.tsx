@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, View, Text, StyleSheet } from "react-native";
+import { Image, View, Text, StyleSheet, Dimensions } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
 interface UserDetailProps {
@@ -56,13 +56,14 @@ const styles = StyleSheet.create({
   name: {
     margin: 5,
     fontFamily: "Poppins_700Bold",
-    fontSize: 20,
+    fontSize: (Dimensions.get("window").width / 440) * 20,
     lineHeight: 30,
   },
   profilePic: {
-    width: 40,
-    height: 40,
-    borderRadius: 40,
+    width: (Dimensions.get("window").width / 440) * 40,
+    height: (Dimensions.get("window").width / 440) * 40,
+    marginRight: (Dimensions.get("window").width / 440) * 10,
+    borderRadius: 9999,
   },
 });
 
