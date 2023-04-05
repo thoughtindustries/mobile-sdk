@@ -28,19 +28,17 @@ const Home = () => {
   };
 
   return (
-    <GestureRecognizer onSwipe={onSwipe}>
-      <ScrollView
-        style={styles.page}
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
-      >
-        <UserHeader />
-        <Banner />
-        <TopCategories />
-        <Recommendation />
-        <RecentCourses />
-      </ScrollView>
-    </GestureRecognizer>
+    <ScrollView
+      style={styles.page}
+      showsVerticalScrollIndicator={false}
+      stickyHeaderIndices={[0]}
+    >
+      <UserHeader />
+      <Banner />
+      <TopCategories />
+      <Recommendation />
+      <RecentCourses />
+    </ScrollView>
   );
 };
 

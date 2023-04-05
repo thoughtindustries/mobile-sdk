@@ -23,20 +23,6 @@ const Banner = () => {
     variables: { limit: 1 },
   });
 
-  if (loading)
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
-      </View>
-    );
-
-  if (error)
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>{error?.message}</Text>
-      </View>
-    );
-
   return (
     <View>
       <Pressable

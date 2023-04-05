@@ -22,27 +22,11 @@ const RecentCourses = () => {
     variables: { limit: 5 },
   });
 
-  if (loading)
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
-      </View>
-    );
-
-  if (error)
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>{error?.message}</Text>
-      </View>
-    );
-
   return (
     <View>
-      {data?.UserRecentContent && (
-        <View style={styles.courseBox}>
-          <Text style={styles.heading}>Recently Launched Courses</Text>
-        </View>
-      )}
+      <View style={styles.courseBox}>
+        <Text style={styles.heading}>Recently Launched Courses</Text>
+      </View>
       {data?.UserRecentContent && (
         <ScrollView horizontal={true} style={styles.courseContainer}>
           {data.UserRecentContent.map((course, idx) => (

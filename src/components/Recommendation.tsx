@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { courseListType, RootStackParamList } from "../../types";
@@ -10,43 +10,33 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import tiGql from "../helpers/TIGraphQL";
-
 import _ from "lodash";
+import { useUserContentItemsQuery, useCatalogContentQuery } from "../graphql";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
+  const { data: contentData } = useUserContentItemsQuery();
+
   const [courses, setCourses] = useState<courseListType[]>([]);
   const navigation = useNavigation<HomeScreenProps>();
 
-  const fetchRecommendedCourses = () => {
-    let mycourses: String[] = [];
-    tiGql
-      .myLearnings({})
-      .then((res) => {
-        mycourses = res.items
-          .filter((c) => c.contentTypeLabel === "Course")
-          .map((c) => c.id);
-      })
-      .then(() => tiGql.fetchCourses({}))
-      .then((res) => {
-        setCourses(res.filter((c) => !mycourses.includes(c.displayCourse)));
-      });
-  };
+  useEffect(() => {
+    if (contentData?.UserContentItems) {
+      const courses = contentData?.UserContentItems.filter(
+        (item) => item.contentTypeLabel === "Course"
+      ).map((item) => item);
 
-  useEffect(fetchRecommendedCourses, []);
-
-  useEffect(() => console.log(courses), [courses]);
+      setCourses(courses);
+    }
+  }, []);
 
   return (
     <View>
-      {courses.length > 0 && (
-        <View style={styles.courseBox}>
-          <Text style={styles.heading}>Recommendations</Text>
-        </View>
-      )}
-      {courses.length > 0 && (
+      <View style={styles.courseBox}>
+        <Text style={styles.heading}>Recommendations</Text>
+      </View>
+      {courses && courses.length > 0 && (
         <ScrollView horizontal={true} style={styles.courseContainer}>
           {courses.map((course, idx) => (
             <TouchableOpacity
