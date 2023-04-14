@@ -28,7 +28,7 @@ const Banner = () => {
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: data?.UserRecentContent[0].id,
+            cid: data?.UserRecentContent[0].id || "",
             from: "Home",
           })
         }

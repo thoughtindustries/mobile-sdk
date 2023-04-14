@@ -24,6 +24,13 @@ export type CatalogContentQueryVariables = Exact<{
 
 export type CatalogContentQuery = { __typename?: 'Query', CatalogContent: { __typename?: 'CatalogContent', contentItems?: Array<{ __typename?: 'Content', id: string, asset?: string, authors?: Array<string>, title?: string, displayCourse?: string, contentTypeLabel?: string }> } };
 
+export type CourseByIdQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type CourseByIdQuery = { __typename?: 'Query', CourseById: { __typename?: 'Course', id: string, title?: string, courseGroup?: { __typename?: 'CourseGroup', description?: string, authors?: Array<string>, asset?: string }, sections?: Array<{ __typename?: 'Section', id: string, title?: string, lessons?: Array<{ __typename?: 'Lesson', id: string, title?: string, topics: Array<{ __typename?: 'ArticlePage', id: string, type: TopicType } | { __typename?: 'AssignmentPage' } | { __typename?: 'AudioPage' } | { __typename?: 'FlipCardPage' } | { __typename?: 'HighlightZonePage' } | { __typename?: 'ListRollPage' } | { __typename?: 'MatchPairPage' } | { __typename?: 'MeetingPage' } | { __typename?: 'NotebookPage' } | { __typename?: 'PDFViewerPage' } | { __typename?: 'PresentationPage' } | { __typename?: 'QuizPage', id: string, type: TopicType } | { __typename?: 'RecipePage' } | { __typename?: 'ScormPage' } | { __typename?: 'SlideshowPage' } | { __typename?: 'SurveyPage' } | { __typename?: 'TallyPage' } | { __typename?: 'TestPage' } | { __typename?: 'TextPage', id: string, type: TopicType } | { __typename?: 'VideoPage', id: string, type: TopicType } | { __typename?: 'WorkbookPage' }> }> }> } };
+
 export type LoadAssessmentAttemptWithQuestionsQueryVariables = Exact<{
   assessmentAttemptId?: InputMaybe<Scalars['ID']>;
   courseId?: InputMaybe<Scalars['ID']>;
@@ -45,7 +52,7 @@ export type UserContentItemsQueryVariables = Exact<{
 }>;
 
 
-export type UserContentItemsQuery = { __typename?: 'Query', UserContentItems?: Array<{ __typename?: 'Content', asset?: string, contentTypeLabel?: string, displayCourse?: string, id: string, title?: string }> };
+export type UserContentItemsQuery = { __typename?: 'Query', UserContentItems?: Array<{ __typename?: 'Content', id: string, asset?: string, contentTypeLabel?: string, displayCourse?: string, title?: string }> };
 
 export type UserRecentContentQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']>;
@@ -147,6 +154,73 @@ export function useCatalogContentLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type CatalogContentQueryHookResult = ReturnType<typeof useCatalogContentQuery>;
 export type CatalogContentLazyQueryHookResult = ReturnType<typeof useCatalogContentLazyQuery>;
 export type CatalogContentQueryResult = Apollo.QueryResult<CatalogContentQuery, CatalogContentQueryVariables>;
+export const CourseByIdDocument = gql`
+    query CourseById($id: ID!) {
+  CourseById(id: $id) {
+    id
+    title
+    courseGroup {
+      description
+      authors
+      asset
+    }
+    sections {
+      id
+      title
+      lessons {
+        id
+        title
+        topics {
+          ... on TextPage {
+            id
+            type
+          }
+          ... on ArticlePage {
+            id
+            type
+          }
+          ... on QuizPage {
+            id
+            type
+          }
+          ... on VideoPage {
+            id
+            type
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCourseByIdQuery__
+ *
+ * To run a query within a React component, call `useCourseByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCourseByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCourseByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useCourseByIdQuery(baseOptions: Apollo.QueryHookOptions<CourseByIdQuery, CourseByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CourseByIdQuery, CourseByIdQueryVariables>(CourseByIdDocument, options);
+      }
+export function useCourseByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CourseByIdQuery, CourseByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CourseByIdQuery, CourseByIdQueryVariables>(CourseByIdDocument, options);
+        }
+export type CourseByIdQueryHookResult = ReturnType<typeof useCourseByIdQuery>;
+export type CourseByIdLazyQueryHookResult = ReturnType<typeof useCourseByIdLazyQuery>;
+export type CourseByIdQueryResult = Apollo.QueryResult<CourseByIdQuery, CourseByIdQueryVariables>;
 export const LoadAssessmentAttemptWithQuestionsDocument = gql`
     query LoadAssessmentAttemptWithQuestions($assessmentAttemptId: ID, $courseId: ID, $id: ID!, $instructorAssessmentUserId: ID, $linkedWorkbookId: ID, $shouldShuffleAndSubset: Boolean, $topicType: AssessmentTopicType!) {
   LoadAssessmentAttemptWithQuestions(
@@ -206,10 +280,10 @@ export const UserContentItemsDocument = gql`
     sortColumn: $sortColumn
     sortDirection: $sortDirection
   ) {
+    id
     asset
     contentTypeLabel
     displayCourse
-    id
     title
   }
 }

@@ -11,7 +11,7 @@ export type UserContentItemsQueryVariables = Types.Exact<{
 }>;
 
 
-export type UserContentItemsQuery = { __typename?: 'Query', UserContentItems?: Array<{ __typename?: 'Content', asset?: string, contentTypeLabel?: string, displayCourse?: string, id: string, title?: string }> };
+export type UserContentItemsQuery = { __typename?: 'Query', UserContentItems?: Array<{ __typename?: 'Content', id: string, asset?: string, contentTypeLabel?: string, displayCourse?: string, title?: string }> };
 
 
 export const UserContentItemsDocument = gql`
@@ -22,10 +22,10 @@ export const UserContentItemsDocument = gql`
     sortColumn: $sortColumn
     sortDirection: $sortDirection
   ) {
+    id
     asset
     contentTypeLabel
     displayCourse
-    id
     title
   }
 }

@@ -10,10 +10,10 @@ query UserContentItems(
     sortColumn: $sortColumn
     sortDirection: $sortDirection
   ) {
+    id
     asset
     contentTypeLabel
     displayCourse
-    id
     title
   }
 }

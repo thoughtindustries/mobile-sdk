@@ -22,8 +22,8 @@ import {
   CollapseBody,
 } from "accordion-collapse-react-native";
 
-import tiGql from "../helpers/TIGraphQL";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useCourseByIdQuery } from "../graphql";
 
 type ContentDetailsScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -32,26 +32,20 @@ type ContentDetailsScreenProps = StackNavigationProp<
 
 const ContentDetails = () => {
   const route = useRoute();
-  const cid = get(route, "params.cid", "");
+  const { cid } = route.params;
+  const { data, loading } = useCourseByIdQuery({
+    variables: {
+      id: cid || "",
+    },
+  });
+
   let backToRoute = get(route, "params.from", "Home");
   const navigation = useNavigation<ContentDetailsScreenProps>();
   const [content, setContent] = useState<contentListType>({
     course: [],
     progress: [],
   });
-  const [loading, setloading] = useState<boolean>(true);
   const [activeSection, setActiveSection] = useState<string>("");
-  const initialLayout = { width: Dimensions.get("window").width };
-
-  const fetchContentDetails = () => {
-    tiGql
-      .fetchContentDetails(cid)
-      .then(setContent)
-      .catch(console.log)
-      .finally(() => setloading(false));
-  };
-
-  useEffect(fetchContentDetails, [cid]);
 
   const getLastViewedSection = () => {
     let secreads = get(content, "course.sections", []).filter(isSectionRead);
@@ -60,26 +54,22 @@ const ContentDetails = () => {
 
   useEffect(() => {
     const lastId = getLastViewedSection();
-    if (lastId != "") {
-      setActiveSection(lastId);
-    } else {
-      setActiveSection(get(content, "course.sections[0].id", ""));
-    }
+    setActiveSection(
+      lastId !== "" ? lastId : data?.CourseById?.sections[0].id || ""
+    );
   }, [content]);
 
   const CustomReport = () => (
     <View style={styles.reportRow}>
       <View style={styles.reportRightBox}>
-        <Text style={styles.courseTitle}>
-          {get(content, "course.title", "Course")}
-        </Text>
+        <Text style={styles.courseTitle}>{data?.CourseById.title}</Text>
         <Text style={styles.courseAuthor}>
-          By {get(content, "course.courseGroup.authors", []).join(",")}
+          By {(data?.CourseById.courseGroup.authors).join(",") || "Anonymous"}
         </Text>
       </View>
-      {get(content, "course.courseGroup.asset", "") !== "" && (
+      {data?.CourseById.courseGroup?.asset !== "" && (
         <Image
-          source={{ uri: get(content, "course.courseGroup.asset", "") }}
+          source={{ uri: data?.CourseById.courseGroup?.asset }}
           style={styles.recentImage}
         />
       )}
@@ -91,7 +81,7 @@ const ContentDetails = () => {
       <View style={styles.aboutSection}>
         <Text style={styles.courseSubTitle}>About this Course</Text>
         <Text style={styles.courseDesc}>
-          {get(content, "course.courseGroup.description", "")}
+          {data?.CourseById.courseGroup?.description}
         </Text>
       </View>
     </>
@@ -135,7 +125,7 @@ const ContentDetails = () => {
         onPress={() =>
           navigation.navigate("ExploreCourse", {
             cid: cid,
-            course: get(content, "course.title", ""),
+            course: data?.CourseById.title || "",
             section: section,
             lesson: lesson.title,
             progress: secProgress,
@@ -224,33 +214,36 @@ const ContentDetails = () => {
   const SectionList = () => {
     return (
       <View style={styles.sectionList}>
-        {get(content, "course.sections", []).map(SectionView)}
+        {data?.CourseById.sections?.map((section, idx) => (
+          <SectionView
+            key={idx}
+            id={section.id}
+            title={section.title || ""}
+            lessons={section.lessons}
+          />
+        ))}
       </View>
     );
   };
 
-  const clickHandler = () => {
-    alert("This will go to section");
-  };
-
   const FloatingContainer = () => {
-    const secId = getLastViewedSection();
-    let sec: any = get(content, "course.sections[0]", {});
-    if (secId != "") {
-      sec = get(content, "course.sections", []).find(
-        (s: { id: string }) => s.id === secId
+    const sectionId = getLastViewedSection();
+    let section: any = data?.CourseById.sections[0];
+    if (sectionId != "") {
+      section = data?.CourseById.sections.find(
+        (s: { id: string }) => s.id === sectionId
       );
     }
     return (
       <View style={styles.floatingFooter}>
         <View style={styles.FlotingText}>
           <Text style={styles.ftextItem}>UP NEXT</Text>
-          <Text style={styles.fsection}>{get(sec, "title", "")}</Text>
-          <Text style={styles.ftopic}>{get(sec, "lessons[0].title", "")}</Text>
+          <Text style={styles.fsection}>{section.title}</Text>
+          <Text style={styles.ftopic}>{section.lessons[0].title}</Text>
         </View>
         <TouchableOpacity
           style={styles.button}
-          onPress={clickHandler}
+          onPress={() => alert("This will go to section")}
           activeOpacity={0.7}
         >
           <Text style={styles.buttonText}>GO</Text>

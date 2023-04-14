@@ -1,25 +1,33 @@
-import * as Types from '../global-types';
+import * as Types from "../global-types";
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 const defaultOptions = {} as const;
 export type UserRecentContentQueryVariables = Types.Exact<{
-  limit?: Types.InputMaybe<Types.Scalars['Int']>;
+  limit?: Types.InputMaybe<Types.Scalars["Int"]>;
 }>;
 
-
-export type UserRecentContentQuery = { __typename?: 'Query', UserRecentContent: Array<{ __typename?: 'Content', title?: string, description?: string, asset?: string }> };
-
+export type UserRecentContentQuery = {
+  __typename?: "Query";
+  UserRecentContent: Array<{
+    __typename?: "Content";
+    id: string;
+    title?: string;
+    description?: string;
+    asset?: string;
+  }>;
+};
 
 export const UserRecentContentDocument = gql`
-    query UserRecentContent($limit: Int) {
-  UserRecentContent(limit: $limit) {
-    title
-    description
-    asset
+  query UserRecentContent($limit: Int) {
+    UserRecentContent(limit: $limit) {
+      id
+      title
+      description
+      asset
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useUserRecentContentQuery__
@@ -37,14 +45,37 @@ export const UserRecentContentDocument = gql`
  *   },
  * });
  */
-export function useUserRecentContentQuery(baseOptions?: Apollo.QueryHookOptions<UserRecentContentQuery, UserRecentContentQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UserRecentContentQuery, UserRecentContentQueryVariables>(UserRecentContentDocument, options);
-      }
-export function useUserRecentContentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserRecentContentQuery, UserRecentContentQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UserRecentContentQuery, UserRecentContentQueryVariables>(UserRecentContentDocument, options);
-        }
-export type UserRecentContentQueryHookResult = ReturnType<typeof useUserRecentContentQuery>;
-export type UserRecentContentLazyQueryHookResult = ReturnType<typeof useUserRecentContentLazyQuery>;
-export type UserRecentContentQueryResult = Apollo.QueryResult<UserRecentContentQuery, UserRecentContentQueryVariables>;
+export function useUserRecentContentQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserRecentContentQuery,
+    UserRecentContentQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UserRecentContentQuery,
+    UserRecentContentQueryVariables
+  >(UserRecentContentDocument, options);
+}
+export function useUserRecentContentLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserRecentContentQuery,
+    UserRecentContentQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserRecentContentQuery,
+    UserRecentContentQueryVariables
+  >(UserRecentContentDocument, options);
+}
+export type UserRecentContentQueryHookResult = ReturnType<
+  typeof useUserRecentContentQuery
+>;
+export type UserRecentContentLazyQueryHookResult = ReturnType<
+  typeof useUserRecentContentLazyQuery
+>;
+export type UserRecentContentQueryResult = Apollo.QueryResult<
+  UserRecentContentQuery,
+  UserRecentContentQueryVariables
+>;
