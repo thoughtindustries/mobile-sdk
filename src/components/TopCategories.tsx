@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Link } from "../components";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import tiGql from "../helpers/TIGraphQL";
 
 type TopCategoriesProps = StackNavigationProp<RootStackParamList, "HomeScreen">;
 
 const TopCategories = () => {
   const navigation = useNavigation<TopCategoriesProps>();
-  const [categories, setCategories] = useState<string[]>([]);
-  const fetchTopCategories = () => {
-    tiGql.getTopCategories().then(setCategories).catch(console.log);
-  };
-
-  useEffect(fetchTopCategories, []);
+  const categories: string[] = [
+    "Partner",
+    "Enablement",
+    "News",
+    "Release",
+    "Sales Enablement",
+  ];
 
   return (
     <View>

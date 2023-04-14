@@ -50,12 +50,6 @@ class TIGraphQL {
     });
   }
 
-  getTopCategories(): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      resolve(Utils.topCategoriesArray);
-    });
-  }
-
   fetchCourses(params: {
     sortBy?: string;
     sortDir?: string;
