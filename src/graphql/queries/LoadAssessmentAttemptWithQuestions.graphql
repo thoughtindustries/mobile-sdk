@@ -1,0 +1,23 @@
+query LoadAssessmentAttemptWithQuestions(
+  $assessmentAttemptId: ID
+  $courseId: ID
+  $id: ID!
+  $instructorAssessmentUserId: ID
+  $linkedWorkbookId: ID
+  $shouldShuffleAndSubset: Boolean
+  $topicType: AssessmentTopicType!
+) {
+  LoadAssessmentAttemptWithQuestions(
+    assessmentAttemptId: $assessmentAttemptId
+    courseId: $courseId
+    id: $id
+    instructorAssessmentUserId: $instructorAssessmentUserId
+    linkedWorkbookId: $linkedWorkbookId
+    shouldShuffleAndSubset: $shouldShuffleAndSubset
+    topicType: $topicType
+  ) {
+    id
+    status
+    grade
+  }
+}

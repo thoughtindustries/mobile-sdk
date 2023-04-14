@@ -24,6 +24,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { questionChoice } from "../../types";
 import tiGql from "../helpers/TIGraphQL";
 import { VictoryPie } from "victory-native";
+import { useLoadAssessmentAttemptWithQuestionsQuery } from "../graphql";
 
 interface CourseQuizProps {
   courseid: string;
@@ -31,6 +32,14 @@ interface CourseQuizProps {
 }
 
 const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
+  const { data } = useLoadAssessmentAttemptWithQuestionsQuery({
+    variables: {
+      courseId: courseid,
+      id: quiz.id,
+      topicType: "quiz",
+    },
+  });
+
   const [loading, setLoading] = useState<boolean>(false);
   const [qIndex, setQIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);

@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
     width: 260,
     margin: 12,
+    height: 300,
   },
   courseTitle: {
     color: "#D4D4D8",

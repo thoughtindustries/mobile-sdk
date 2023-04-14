@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { courseListType, RootStackParamList } from "../../types";
+import { RootStackParamList } from "../../types";
 import {
   View,
   Text,
@@ -16,34 +16,24 @@ import { useUserContentItemsQuery, useCatalogContentQuery } from "../graphql";
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
-  const { data: contentData } = useUserContentItemsQuery();
-
-  const [courses, setCourses] = useState<courseListType[]>([]);
+  const { data } = useUserContentItemsQuery();
   const navigation = useNavigation<HomeScreenProps>();
-
-  useEffect(() => {
-    if (contentData?.UserContentItems) {
-      const courses = contentData?.UserContentItems.filter(
-        (item) => item.contentTypeLabel === "Course"
-      ).map((item) => item);
-
-      setCourses(courses);
-    }
-  }, []);
 
   return (
     <View>
       <View style={styles.courseBox}>
         <Text style={styles.heading}>Recommendations</Text>
       </View>
-      {courses && courses.length > 0 && (
+      {data && data.UserContentItems && (
         <ScrollView horizontal={true} style={styles.courseContainer}>
-          {courses.map((course, idx) => (
+          {data.UserContentItems.filter(
+            (item) => item.contentTypeLabel === "Course"
+          ).map((course, idx) => (
             <TouchableOpacity
               key={idx}
               onPress={() =>
                 navigation.navigate("ContentDetails", {
-                  cid: course.displayCourse,
+                  cid: course.displayCourse ? course.displayCourse : "",
                   from: "Home",
                 })
               }

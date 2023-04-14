@@ -122,6 +122,13 @@ const Login = () => {
 
         // Navigate to home screen
         navigation.navigate("HomeScreen");
+
+        // Clear input fields
+        setForm({
+          ...form,
+          email: { ...form.email, value: "", error: "" },
+          password: { ...form.password, value: "", error: "" },
+        });
       }
     } catch ({ message }) {
       if (message === "401 Unauthorized") {

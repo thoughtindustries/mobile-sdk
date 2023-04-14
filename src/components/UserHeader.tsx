@@ -16,7 +16,7 @@ const UserHeader = () => {
   });
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    (async () => {
       try {
         const info = await SecureStore.getItemAsync("userInfo");
         if (info) {
@@ -25,9 +25,7 @@ const UserHeader = () => {
       } catch (error) {
         console.log("Fetch user info error: ", error);
       }
-    };
-
-    fetchUserInfo();
+    })();
   }, []);
 
   return (
