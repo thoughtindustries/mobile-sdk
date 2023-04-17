@@ -500,7 +500,7 @@ const MyLearnings = () => {
                 }
               />
             </View>
-            <FilterControl onFilter={onFilter} />
+            <FilterControl onFilter={onFilter} navigation={navigation} />
           </View>
 
           {pageVars.searching && (

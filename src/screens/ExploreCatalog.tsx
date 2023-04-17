@@ -131,6 +131,7 @@ const ExploreCatalog = () => {
             }
           />
         </View>
+
         <FilterControl onFilter={onFilter} currFilters={filters} />
       </View>
 
