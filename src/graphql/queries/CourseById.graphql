@@ -1,0 +1,37 @@
+query CourseById($id: ID!) {
+  CourseById(id: $id) {
+    id
+    title
+    courseGroup {
+      description
+      authors
+      asset
+    }
+    sections {
+      id
+      title
+      lessons {
+        id
+        title
+        topics {
+          ... on TextPage {
+            id
+            type
+          }
+          ... on ArticlePage {
+            id
+            type
+          }
+          ... on QuizPage {
+            id
+            type
+          }
+          ... on VideoPage {
+            id
+            type
+          }
+        }
+      }
+    }
+  }
+}

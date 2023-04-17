@@ -1,9 +1,7 @@
 import React from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import _ from "lodash";
 
 interface MessageProps {
-  type?: string;
   title?: string;
   message?: string;
   extraJSX?: JSX.Element;
@@ -11,19 +9,13 @@ interface MessageProps {
 }
 
 const Message = ({
-  type = "info",
   title = "",
   message = "",
   extraJSX = <></>,
   onHide,
 }: MessageProps) => {
-  const icon: { success: NodeRequire; error: NodeRequire } = {
-    success: require("../../assets/success.png"),
-    error: require("../../assets/error.png"),
-  };
-
   return (
-    <Modal animationType="slide" transparent={true} visible={true}>
+    <Modal animationType="fade" transparent={true} visible={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalDialog}>
           <Text style={styles.modalTitle}>{title}</Text>

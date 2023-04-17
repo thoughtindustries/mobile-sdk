@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { courseListType, RootStackParamList } from "../../types";
+import { RootStackParamList } from "../../types";
 import {
   View,
   Text,
@@ -10,50 +10,30 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import tiGql from "../helpers/TIGraphQL";
-
 import _ from "lodash";
+import { useUserContentItemsQuery, useCatalogContentQuery } from "../graphql";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
-  const [courses, setCourses] = useState<courseListType[]>([]);
+  const { data } = useUserContentItemsQuery();
   const navigation = useNavigation<HomeScreenProps>();
-
-  const fetchRecommendedCourses = () => {
-    let mycourses: String[] = [];
-    tiGql
-      .myLearnings({})
-      .then((res) => {
-        mycourses = res.items
-          .filter((c) => c.contentTypeLabel === "Course")
-          .map((c) => c.id);
-      })
-      .then(() => tiGql.fetchCourses({}))
-      .then((res) => {
-        setCourses(res.filter((c) => !mycourses.includes(c.displayCourse)));
-      });
-  };
-
-  useEffect(fetchRecommendedCourses, []);
-
-  useEffect(() => console.log(courses), [courses]);
 
   return (
     <View>
-      {courses.length > 0 && (
-        <View style={styles.courseBox}>
-          <Text style={styles.heading}>Recommendations</Text>
-        </View>
-      )}
-      {courses.length > 0 && (
+      <View style={styles.courseBox}>
+        <Text style={styles.heading}>Recommendations</Text>
+      </View>
+      {data && data.UserContentItems && (
         <ScrollView horizontal={true} style={styles.courseContainer}>
-          {courses.map((course, idx) => (
+          {data.UserContentItems.filter(
+            (item) => item.contentTypeLabel === "Course"
+          ).map((course, idx) => (
             <TouchableOpacity
               key={idx}
               onPress={() =>
                 navigation.navigate("ContentDetails", {
-                  cid: course.displayCourse,
+                  cid: course.displayCourse ? course.displayCourse : "",
                   from: "Home",
                 })
               }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,61 +9,58 @@ import {
 } from "react-native";
 import _ from "lodash";
 import striptags from "striptags";
-import tiGql from "../helpers/TIGraphQL";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, userRecentContentType } from "../../types";
+import { useUserRecentContentQuery } from "../graphql";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const [courses, setCourses] = useState<userRecentContentType[]>([]);
-
-  const fetchRecentCourses = () => {
-    tiGql.fetchRecentCourses(5).then(setCourses);
-  };
-
-  useEffect(fetchRecentCourses, []);
+  const { data, loading, error } = useUserRecentContentQuery({
+    variables: { limit: 5 },
+  });
 
   return (
     <View>
-      {courses.length > 0 && (
-        <View style={styles.courseBox}>
-          <Text style={styles.heading}>Recently Launched Courses</Text>
-        </View>
-      )}
-      {courses.length > 0 && (
-        <ScrollView horizontal={true} style={styles.courseContainer}>
-          {courses.map((course, idx) => (
-            <Pressable
-              onPress={() =>
-                navigation.navigate("ContentDetails", {
-                  cid: course.id,
-                  from: "Home",
-                })
-              }
-            >
-              <View key={idx} style={styles.recContentBox}>
-                <View style={styles.courseThumbnail}>
-                  <Image
-                    key={idx}
-                    source={{ uri: course.asset }}
-                    style={{ width: "100%", height: "100%" }}
-                  />
+      {data?.UserRecentContent && (
+        <>
+          <View style={styles.courseBox}>
+            <Text style={styles.heading}>Recently Launched Courses</Text>
+          </View>
+          <ScrollView horizontal={true} style={styles.courseContainer}>
+            {data.UserRecentContent.map((course, idx) => (
+              <Pressable
+                key={idx}
+                onPress={() =>
+                  navigation.navigate("ContentDetails", {
+                    cid: course.id,
+                    from: "Home",
+                  })
+                }
+              >
+                <View key={idx} style={styles.recContentBox}>
+                  <View style={styles.courseThumbnail}>
+                    <Image
+                      key={idx}
+                      source={{ uri: course.asset }}
+                      style={{ width: "100%", height: "100%", borderRadius: 5 }}
+                    />
+                  </View>
+                  <View style={styles.contentArea}>
+                    <Text style={styles.recCourseTitle}>{course.title}</Text>
+                    <Text style={styles.courseDes}>
+                      {_.truncate(striptags(course.description || ""), {
+                        length: 100,
+                      })}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.contentArea}>
-                  <Text style={styles.recCourseTitle}>{course.title}</Text>
-                  <Text style={styles.courseDes}>
-                    {_.truncate(striptags(course.description), {
-                      length: 100,
-                    })}
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
-          ))}
-        </ScrollView>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
       )}
     </View>
   );
@@ -94,6 +91,7 @@ const styles = StyleSheet.create({
     borderColor: "#E5E7EB",
     width: 260,
     margin: 12,
+    height: 300,
   },
   courseTitle: {
     color: "#D4D4D8",

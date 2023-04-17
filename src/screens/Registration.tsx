@@ -1,112 +1,171 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   KeyboardAvoidingView,
+  Dimensions,
 } from "react-native";
 import { Logo, Button, Message } from "../components";
 import Success from "./Success";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
-import { get } from "lodash";
-import validator from "validator";
 import { TI_INSTANCE_NAME } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 
+type RegistrationScreenProps = StackNavigationProp<
+  RootStackParamList,
+  "Registration"
+>;
+
+interface FormProps {
+  email: {
+    value: string;
+    error?: string;
+  };
+  firstName: {
+    value: string;
+    error?: string;
+  };
+  lastName: {
+    value: string;
+    error?: string;
+  };
+}
+
 const Registration = () => {
-  const [email, setEmail] = useState<string>("");
-  const [fname, setFName] = useState<string>("");
-  const [lname, setLName] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
-  const [message, setMessage] = useState<any>({ error: "", info: "" });
-  const [inlineMsg, setInlineMsg] = useState<any>({ field: "", message: "" });
-
-  useEffect(() => {
-    if (inlineMsg.field === "email") {
-      setInlineMsg({ field: "", message: "" });
-    }
-  }, [email]);
-
-  type RegistrationScreenProps = StackNavigationProp<
-    RootStackParamList,
-    "Registration"
-  >;
-
+  const [responseError, setResponseError] = useState<{
+    title: string;
+    message: string;
+  }>({ title: "", message: "" });
+  const [message, setMessage] = useState<any>("");
   const navigation = useNavigation<RegistrationScreenProps>();
+  const [form, setForm] = useState<FormProps>({
+    email: { value: "", error: "" },
+    firstName: { value: "", error: "" },
+    lastName: { value: "", error: "" },
+  });
 
-  const goRegistration = () => {
-    const udata: { firstName: string; lastName: string; email: string } = {
-      firstName: fname,
-      lastName: lname,
-      email: email,
-    };
-
-    if (!validator.isEmail(udata.email)) {
-      setInlineMsg({
-        field: "email",
-        message: `Please enter a valid email (example@gmail.com)`,
+  const handleChange = (field: string, value: string) => {
+    if (field === "email") {
+      setForm({ ...form, email: { ...form.email, value: value, error: "" } });
+    } else if (field === "firstName") {
+      setForm({
+        ...form,
+        firstName: { ...form.firstName, value: value, error: "" },
       });
-      return false;
+    } else {
+      setForm({
+        ...form,
+        lastName: { ...form.lastName, value: value, error: "" },
+      });
     }
-
-    setProcessing(true);
-
-    tiApiObj
-      .createUser(udata)
-      .then(() => {
-        setProcessing(false);
-        setMessage({
-          error: "",
-          info: `Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`,
-        });
-        window.setTimeout(() => {
-          setMessage({ info: "", error: "" });
-          navigation.navigate("Login");
-        }, 3000);
-      })
-      .catch((err) => {
-        setProcessing(false);
-        setMessage({ info: "", error: get(err, "message", err) });
-      });
   };
 
-  const ShowError = (): JSX.Element => {
-    let modalTitle = "Email in use";
-    let modalMessage =
-      "Sorry, that email address is already in use. Please try another one or log in if you already have an account.";
-    return (
-      <Message
-        type="error"
-        title={modalTitle}
-        message={modalMessage}
-        extraJSX={
-          <Button
-            title="Log into existing account"
-            onPress={() => navigation.navigate("Login")}
-          />
+  const formValidated = () => {
+    const emailRegex =
+      /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+
+    let updateForm = form;
+
+    if (form.email.value === "" || !emailRegex.test(form.email.value)) {
+      updateForm = {
+        ...updateForm,
+        email: {
+          ...updateForm.email,
+          error: "Please enter a valid email (example@gmail.com).",
+        },
+      };
+    }
+
+    if (form.firstName.value === "") {
+      updateForm = {
+        ...updateForm,
+        firstName: {
+          ...updateForm.firstName,
+          error: "Please enter your first name.",
+        },
+      };
+    }
+
+    if (form.lastName.value === "") {
+      updateForm = {
+        ...updateForm,
+        lastName: {
+          ...updateForm.lastName,
+          error: "Please enter your last name.",
+        },
+      };
+    }
+
+    setForm(updateForm);
+
+    return updateForm.email.error === "" &&
+      updateForm.firstName.error === "" &&
+      updateForm.lastName.error === ""
+      ? true
+      : false;
+  };
+
+  const Register = async () => {
+    if (formValidated()) {
+      try {
+        setProcessing(true);
+
+        await tiApiObj.createUser({
+          email: form.email.value,
+          firstName: form.firstName.value,
+          lastName: form.lastName.value,
+        });
+
+        setMessage(
+          `Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`
+        );
+        setProcessing(false);
+
+        navigation.navigate("Login");
+      } catch (error) {
+        setProcessing(false);
+        if (
+          error ===
+          "A user already exists with the external customer ID provided."
+        ) {
+          setResponseError({
+            title: "Email In Use",
+            message:
+              "Sorry, that email address is already in use. Please try another one or log in if you already have an account.",
+          });
         }
-        onHide={() => setMessage({ info: "", error: "" })}
-      />
-    );
+      }
+    }
   };
 
   return (
-    <>
+    <View style={AppStyle.container}>
       {processing && (
         <Success title="" message="Registration going on, Please wait.. " />
       )}
 
-      {!processing && message.info !== "" && (
-        <Success title="Success" message={message.info} />
+      {!processing && message !== "" && (
+        <Success
+          title="Success!"
+          message={`Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`}
+        />
       )}
 
-      {!processing && message.info === "" && (
-        <View style={AppStyle.container}>
-          {message.error !== "" && <ShowError />}
+      {!processing && message === "" && (
+        <View>
+          {responseError.title !== "" && (
+            <Message
+              title={responseError.title}
+              message={responseError.message}
+              onHide={() => setResponseError({ title: "", message: "" })}
+            />
+          )}
 
           <KeyboardAvoidingView
             style={styles.keyboardOffset}
@@ -123,39 +182,49 @@ const Registration = () => {
                 textContentType="emailAddress"
                 placeholder="example@email.com"
                 keyboardType="email-address"
-                onChangeText={setEmail}
-                defaultValue={email}
+                onChangeText={(value) => handleChange("email", value)}
+                defaultValue={form.email.value}
                 style={
-                  inlineMsg.field === "email"
+                  form.email.error !== ""
                     ? { ...AppStyle.input, ...AppStyle.errorField }
                     : AppStyle.input
                 }
                 autoCorrect={false}
                 autoCapitalize="none"
               />
-              <Text style={AppStyle.inlineError}>{inlineMsg.message}</Text>
+              <Text style={AppStyle.inlineError}>{form.email.error}</Text>
               <Text style={AppStyle.label}>First Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="First Name"
-                onChangeText={setFName}
-                defaultValue={fname}
-                style={AppStyle.input}
+                onChangeText={(value) => handleChange("firstName", value)}
+                defaultValue={form.firstName.value}
+                style={
+                  form.firstName.error !== ""
+                    ? { ...AppStyle.input, ...AppStyle.errorField }
+                    : AppStyle.input
+                }
               />
+              <Text style={AppStyle.inlineError}>{form.firstName.error}</Text>
               <Text style={AppStyle.label}>Last Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="Last Name"
-                onChangeText={setLName}
-                defaultValue={lname}
-                style={AppStyle.input}
+                onChangeText={(value) => handleChange("lastName", value)}
+                defaultValue={form.lastName.value}
+                style={
+                  form.lastName.error !== ""
+                    ? { ...AppStyle.input, ...AppStyle.errorField }
+                    : AppStyle.input
+                }
               />
-              <Button title="Sign up" onPress={goRegistration} />
+              <Text style={AppStyle.inlineError}>{form.lastName.error}</Text>
+              <Button title="Sign up" onPress={Register} />
             </View>
           </KeyboardAvoidingView>
         </View>
       )}
-    </>
+    </View>
   );
 };
 
@@ -163,7 +232,6 @@ const styles = StyleSheet.create({
   prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 100,
   },
 
   keyboardOffset: {
@@ -171,12 +239,12 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
+    fontFamily: "Poppins_700Bold",
   },
 });
 

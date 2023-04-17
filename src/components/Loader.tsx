@@ -8,17 +8,17 @@ interface LoaderProps {
 const Loader = ({ size }: LoaderProps) => {
   const [init] = useState(new Animated.Value(0));
 
-  const startAnimation = () => {
-    Animated.loop(
-      Animated.timing(init, {
-        toValue: size,
-        duration: size * 10,
-        useNativeDriver: false,
-      })
-    ).start();
-  };
-
-  useEffect(startAnimation, []);
+  useEffect(() => {
+    (() => {
+      Animated.loop(
+        Animated.timing(init, {
+          toValue: size,
+          duration: size * 10,
+          useNativeDriver: false,
+        })
+      ).start();
+    })();
+  }, []);
 
   const style = StyleSheet.create({
     container: {

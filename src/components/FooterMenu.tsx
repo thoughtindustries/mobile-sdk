@@ -1,76 +1,90 @@
 import React from "react";
+import { Dimensions, PixelRatio } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { get } from "lodash";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Screens from "../screens";
+import { Home, ExploreCatalog, MyLearnings, Account } from "../screens";
 
 const FooterMenu = ({ route }: { route: { name: string } }) => {
   const Tab = createBottomTabNavigator();
-
-  const tabs: { title: string; component: string }[] = [
-    {
-      title: "Home",
-      component: "Home",
-    },
-    {
-      title: "Explore",
-      component: "ExploreCatalog",
-    },
-    {
-      title: "My Learning",
-      component: "MyLearnings",
-    },
-    {
-      title: "Account",
-      component: "Account",
-    },
-  ];
 
   return (
     <Tab.Navigator
       initialRouteName={route.name}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { height: 100 },
-        tabBarItemStyle: {
-          margin: 10,
-          padding: 3,
-          borderRadius: 6,
-          marginLeft: 10,
-          marginRight: 10,
+        tabBarStyle: {
+          height:
+            Dimensions.get("window").height < 700
+              ? (Dimensions.get("window").height / 440) * 55
+              : (Dimensions.get("window").height / 440) * 50,
+          justifyContent: "center",
+          alignItems: "center",
         },
-        tabBarLabelStyle: { marginTop: 3 },
+        tabBarItemStyle: {
+          borderRadius: 6,
+          margin: (Dimensions.get("window").width / 440) * 10,
+        },
+        tabBarLabelStyle: {
+          marginBottom: (Dimensions.get("window").width / 440) * 10,
+          marginTop: (Dimensions.get("window").width / 440) * -8,
+        },
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: "#6B7280",
         tabBarActiveBackgroundColor: "#3B1FA3",
       }}
     >
-      {tabs.map((table, index) => (
-        <Tab.Screen
-          key={index}
-          name={table.title}
-          component={get(Screens, table.component, () => (
-            <></>
-          ))}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name={
-                  table.title === "Home"
-                    ? "home"
-                    : table.title === "Explore"
-                    ? "magnify"
-                    : table.title === "My Learning"
-                    ? "school"
-                    : "account"
-                }
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-      ))}
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="home"
+              color={color}
+              size={(Dimensions.get("window").width / 440) * size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Explore"
+        component={ExploreCatalog}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="magnify"
+              color={color}
+              size={(Dimensions.get("window").width / 440) * size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="My Learning"
+        component={MyLearnings}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="school"
+              color={color}
+              size={(Dimensions.get("window").width / 440) * size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Account"
+        component={Account}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account"
+              color={color}
+              size={(Dimensions.get("window").width / 440) * size}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };

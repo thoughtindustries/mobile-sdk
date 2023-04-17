@@ -1,0 +1,32 @@
+query CatalogContent(
+  $contentTypes: [String!]
+  $labels: [String!]
+  $page: Int!
+  $query: String
+  $resultsDisplayType: ContentItemDisplayType
+  $sortColumn: SortColumn
+  $sortDirection: SortDirection
+  $token: String
+  $values: [String!]
+) {
+  CatalogContent(
+    contentTypes: $contentTypes
+    labels: $labels
+    page: $page
+    query: $query
+    resultsDisplayType: $resultsDisplayType
+    sortColumn: $sortColumn
+    sortDirection: $sortDirection
+    token: $token
+    values: $values
+  ) {
+    contentItems {
+      id
+      asset
+      authors
+      title
+      displayCourse
+      contentTypeLabel
+    }
+  }
+}

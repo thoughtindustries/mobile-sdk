@@ -1,48 +1,79 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Linking, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Linking,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TI_API_INSTANCE } from "@env";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../../types";
-import Utils from "../helpers/Utils";
-import _ from "lodash";
-
-import GestureRecognizer from "react-native-swipe-gestures";
+import * as SecureStore from "expo-secure-store";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
+
+interface UserDetailProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  asset: string;
+}
 
 const Account = () => {
   const navigation = useNavigation<AccountScreenProps>();
 
-  const onSwipe = (gestureName: string) => {
-    switch (gestureName) {
-      case "SWIPE_RIGHT":
-        navigation.navigate("My Learning");
-        break;
-    }
-  };
-
-  const [udata, setUdata] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<UserDetailProps>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    asset: "",
+  });
 
   useEffect(() => {
-    Utils.fetch("udata").then(setUdata);
+    (async () => {
+      try {
+        const info = await SecureStore.getItemAsync("userInfo");
+        if (info) {
+          setUserInfo(JSON.parse(info));
+        }
+      } catch (error) {
+        console.log("Fetch account info error: ", error);
+      }
+    })();
   }, []);
 
-  const profilePic = _.get(udata, "asset", "");
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("userInfo");
+    navigation.navigate("Login");
+  };
 
   return (
-    <GestureRecognizer onSwipe={onSwipe} style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
-          {_.isEmpty(profilePic) && <Image source={require("../../assets/profile.png")} />}
-          {!_.isEmpty(profilePic) && <Image source={{ uri: profilePic }} style={styles.profileImage} />}
+          {!userInfo.asset && Dimensions.get("window").height > 667 && (
+            <Image
+              source={require("../../assets/profile.png")}
+              style={styles.profileImage}
+            />
+          )}
+          {userInfo.asset && Dimensions.get("window").height > 667 && (
+            <Image
+              source={{ uri: userInfo.asset }}
+              style={styles.profileImage}
+            />
+          )}
 
           <Text style={styles.subtitle}>
-            {_.get(udata, "firstName", "")} {_.get(udata, "lastName", "")}
+            {userInfo.firstName} {userInfo.lastName}
           </Text>
-          <Text style={styles.userEmail}>{_.get(udata, "email", "")}</Text>
+          <Text style={styles.userEmail}>{userInfo.email}</Text>
 
           <TouchableOpacity onPress={() => navigation.navigate("ProfileEdit")}>
             <Text style={styles.profileEdit}>Edit</Text>
@@ -52,32 +83,40 @@ const Account = () => {
       <View style={styles.settingInfo}>
         <Text style={styles.settingTitle}>Settings</Text>
 
-        <TouchableOpacity onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}>
+        <TouchableOpacity
+          onPress={() => Linking.openURL(`${TI_API_INSTANCE}/learn/forgot`)}
+          style={styles.resetButton}
+        >
           <View style={styles.resetBtn}>
-            <MaterialCommunityIcons name={"eye-off-outline"} size={22} color="#3B1FA3" style={styles.eyeIcon} />
+            <MaterialCommunityIcons
+              name={"eye-off-outline"}
+              size={22}
+              color="#3B1FA3"
+              style={styles.eyeIcon}
+            />
             <Text style={styles.resetField}>Reset Password</Text>
-            <MaterialCommunityIcons style={styles.settingIcon} name={"chevron-right"} size={25} color="#232323" />
+            <MaterialCommunityIcons
+              style={styles.settingIcon}
+              name={"chevron-right"}
+              size={25}
+              color="#232323"
+            />
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => Utils.logMeOut(navigation)}>
+        <TouchableOpacity onPress={() => handleLogout()}>
           <Text style={styles.profileEdit}>Log out</Text>
         </TouchableOpacity>
       </View>
-    </GestureRecognizer>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 16,
   },
   accountInfo: {
-    marginTop: 10,
-    marginBottom: 90,
-    padding: 32,
-    flex: 1,
     width: "100%",
   },
   profileInfo: {
@@ -85,11 +124,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   settingInfo: {
-    flex: 1,
     backgroundColor: "#FFFFFF",
     width: "100%",
     padding: 24,
     alignItems: "flex-start",
+    flex: 1,
   },
   resetBtn: {
     borderRadius: 8,
@@ -116,54 +155,58 @@ const styles = StyleSheet.create({
     marginTop: -3,
   },
   title: {
-    fontSize: 24,
+    marginBottom: Dimensions.get("window").height < 667 ? 20 : 0,
+    marginTop: 60,
+    marginLeft: 30,
+    fontSize: 20,
     lineHeight: 36,
     textAlign: "left",
     color: "#1F2937",
-    marginBottom: 10,
     fontFamily: "Poppins_700Bold",
   },
   profileImage: {
-    marginTop: 10,
-    marginBottom: 20,
-    width: 132,
-    height: 132,
+    marginBottom: (Dimensions.get("window").height / 440) * 16,
+    height: (Dimensions.get("window").height / 440) * 80,
+    width: (Dimensions.get("window").height / 440) * 80,
     borderRadius: 132,
   },
   subtitle: {
-    fontSize: 24,
+    fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
+    marginBottom: (Dimensions.get("window").height / 440) * 6,
     textAlign: "center",
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
   userEmail: {
-    fontSize: 16,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
-    paddingTop: 16,
     color: "#6B7280",
     fontFamily: "Poppins_400Regular",
   },
   profileEdit: {
     color: "#3B1FA3",
     fontFamily: "Inter_700Bold",
-    fontSize: 14,
+    fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 17,
     backgroundColor: "#F9FAFB",
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#D1D5DB",
     borderRadius: 4,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    marginTop: 16,
-    marginBottom: 32,
+    paddingVertical: (Dimensions.get("window").height / 440) * 10,
+    paddingHorizontal: (Dimensions.get("window").height / 440) * 24,
+    marginTop: (Dimensions.get("window").height / 440) * 12,
+    marginBottom: (Dimensions.get("window").height / 440) * 20,
   },
   settingTitle: {
     fontFamily: "Poppins_700Bold",
     fontSize: 16,
     lineHeight: 24,
-    marginBottom: 32,
+    marginBottom: (Dimensions.get("window").height / 440) * 14,
+  },
+  resetButton: {
+    marginBottom: (Dimensions.get("window").height / 440) * 6,
   },
 });
 

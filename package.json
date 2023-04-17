@@ -7,11 +7,16 @@
     "android": "expo start --android",
     "test": "jest",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 graphql-codegen --config src/graphql/codegen.yml"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.10",
     "@expo-google-fonts/inter": "^0.2.2",
     "@expo-google-fonts/poppins": "^0.2.2",
+    "@graphql-codegen/near-operation-file-preset": "^2.5.0",
+    "@graphql-codegen/typescript-operations": "^3.0.2",
+    "@graphql-codegen/typescript-react-apollo": "^3.3.7",
     "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-community/netinfo": "9.3.5",
     "@react-navigation/bottom-tabs": "^6.5.1",
@@ -58,11 +63,15 @@
     "striptags": "^3.2.0",
     "ts-jest": "^29.0.3",
     "validator": "^13.7.0",
-    "victory-native": "^36.6.8"
+    "victory-native": "^36.6.8",
+    "expo-secure-store": "~12.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@expo/webpack-config": "^18.0.1",
+    "@graphql-codegen/cli": "^3.2.2",
+    "@graphql-codegen/typescript": "^3.0.2",
+    "@graphql-codegen/typescript-resolvers": "^3.1.1",
     "@types/lodash": "^4.14.191",
     "@types/react": "~18.0.14",
     "@types/react-native": "^0.70.8",

@@ -1,0 +1,19 @@
+query UserContentItems(
+  $kind: [ContentKind!]
+  $query: String
+  $sortColumn: SortColumn
+  $sortDirection: SortDirection
+) {
+  UserContentItems(
+    kind: $kind
+    query: $query
+    sortColumn: $sortColumn
+    sortDirection: $sortDirection
+  ) {
+    id
+    asset
+    contentTypeLabel
+    displayCourse
+    title
+  }
+}

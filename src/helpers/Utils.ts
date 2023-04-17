@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import _ from "lodash";
 
 const Utils = {
@@ -15,6 +16,11 @@ const Utils = {
         return val;
       }
     });
+  },
+
+  fetchToken: async () => {
+    const token = await SecureStore.getItemAsync("token");
+    return token;
   },
 
   isLoggedIn: () => {
@@ -44,14 +50,6 @@ const Utils = {
       return false;
     }
   },
-
-  topCategoriesArray: [
-    "Partner",
-    "Enablement",
-    "News",
-    "Release",
-    "Sales Enablement",
-  ],
 
   filterValues: {
     duration: ["1 Hour", "3 - 8 Hours", "9 - 16 Hours", "A couple of days"],

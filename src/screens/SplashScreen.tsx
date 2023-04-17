@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
 import dbObj from "../helpers/Db";
-import Utils from "../helpers/Utils";
+import AppStyle from "../../AppStyle";
+import * as SecureStore from "expo-secure-store";
 
 interface Props {
   navigation: any;
@@ -11,11 +12,16 @@ interface Props {
 const SplashScreen = ({ navigation }: Props) => {
   useEffect(() => {
     dbObj.init().then(() => console.log("Database initiated..."));
-    setTimeout(() => Utils.checkLogin(navigation), 5000);
+    setTimeout(async () => {
+      const response = await SecureStore.getItemAsync("userInfo");
+      response
+        ? navigation.navigate("HomeScreen")
+        : navigation.navigate("Onboarding");
+    }, 5000);
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={{ ...AppStyle.container, backgroundColor: "#3B1FA3" }}>
       <ImageBackground
         source={require("../../assets/start-screen.png")}
         resizeMode="cover"
@@ -30,9 +36,6 @@ const SplashScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   image: {
     flex: 1,
     justifyContent: "center",

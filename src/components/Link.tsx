@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
 
 interface LinkProps {
   title: string;
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 
   linkText: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 16,
+    fontSize: (Dimensions.get("window").width / 440) * 18,
     color: "#3B1FA3",
   },
 });

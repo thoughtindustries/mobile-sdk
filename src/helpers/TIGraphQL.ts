@@ -1,9 +1,14 @@
 import axios from "axios";
-
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import { courseListType, pageType, contentListType, userRecentContentType } from "../../types";
+import {
+  courseListType,
+  pageType,
+  contentListType,
+  userRecentContentType,
+} from "../../types";
 import _ from "lodash";
 import Utils from "../helpers/Utils";
+import * as SecureStore from "expo-secure-store";
 
 interface LoginProps {
   email: string;
@@ -42,12 +47,6 @@ class TIGraphQL {
           }
         })
         .catch(reject);
-    });
-  }
-
-  getTopCategories(): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      resolve(Utils.topCategoriesArray);
     });
   }
 
@@ -91,7 +90,10 @@ class TIGraphQL {
       vars["query"] = `tags:${_.get(params, "tag", "")}`;
     }
 
-    if (!_.isEmpty(_.get(params, "duration", "")) || !_.isEmpty(_.get(params, "difficulty", ""))) {
+    if (
+      !_.isEmpty(_.get(params, "duration", "")) ||
+      !_.isEmpty(_.get(params, "difficulty", ""))
+    ) {
       gql1 = `${gql1},
       $labels: [String!],
       $values: [String!]`;
@@ -147,7 +149,11 @@ class TIGraphQL {
     });
   }
 
-  myLearnings(params: { sortBy?: string; sortDir?: string; tag?: string }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
+  myLearnings(params: {
+    sortBy?: string;
+    sortDir?: string;
+    tag?: string;
+  }): Promise<{ items: courseListType[]; recent: courseListType[] }> {
     let gql1 = `query MyLearning(
       $sortColumn: SortColumn,
       $sortDirection: SortDirection`;
@@ -293,7 +299,9 @@ class TIGraphQL {
             reject(res.data.errors[0].message);
           } else {
             gql2.variables.identifiers = _.flattenDeep(
-              _.map(res.data.data.CourseById.sections, (s) => _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id)))
+              _.map(res.data.data.CourseById.sections, (s) =>
+                _.map(s.lessons, (l) => _.map(l.topics, (t) => t.id))
+              )
             );
           }
         })
@@ -375,7 +383,11 @@ class TIGraphQL {
           if (_.get(res, "data.errors.length", 0) > 0) {
             reject(res.data.errors[0].message);
           } else {
-            content.progress = _.get(res, "data.data.PagesCompletedByCourse", []).map((pc: { id: String }) => pc.id);
+            content.progress = _.get(
+              res,
+              "data.data.PagesCompletedByCourse",
+              []
+            ).map((pc: { id: String }) => pc.id);
             resolve(content);
           }
         })
@@ -634,14 +646,21 @@ class TIGraphQL {
           if (_.get(res, "data.errors.length", 0) > 0) {
             reject(_.get(res, "data.errors.0.message", ""));
           } else {
-            resolve(_.get(res, "data.data.LoadAssessmentAttemptWithQuestions.id", ""));
+            resolve(
+              _.get(res, "data.data.LoadAssessmentAttemptWithQuestions.id", "")
+            );
           }
         })
         .catch(reject);
     });
   }
 
-  saveAssessmentAttempt(attemptId: string, qbody: string, msacc: boolean, selectedChoice: { value: string; correct: boolean }) {
+  saveAssessmentAttempt(
+    attemptId: string,
+    qbody: string,
+    msacc: boolean,
+    selectedChoice: { value: string; correct: boolean }
+  ) {
     const gql = {
       query: `mutation UpdateAssessmentAttempt(
         $activeQuestion: QuestionInput,
@@ -709,24 +728,34 @@ class TIGraphQL {
       },
     };
 
-    return new Promise<{ grade: number; answered: number; correct: number }>((resolve, reject) => {
-      let headers: { headers: { authToken: string } };
-      this.headers()
-        .then((h) => (headers = h))
-        .then(() => axios.post(this.gurl, gql, headers))
-        .then((res) => {
-          if (_.get(res, "data.errors.length", 0) > 0) {
-            reject(_.get(res, "data.errors.0.message", ""));
-          } else {
-            resolve({
-              grade: _.get(res, "data.data.UpdateAssessmentAttempt.grade", 0),
-              answered: _.get(res, "data.data.UpdateAssessmentAttempt.answeredQuestionsCount", 0),
-              correct: _.get(res, "data.data.UpdateAssessmentAttempt.correctQuestionsCount", 0),
-            });
-          }
-        })
-        .catch(reject);
-    });
+    return new Promise<{ grade: number; answered: number; correct: number }>(
+      (resolve, reject) => {
+        let headers: { headers: { authToken: string } };
+        this.headers()
+          .then((h) => (headers = h))
+          .then(() => axios.post(this.gurl, gql, headers))
+          .then((res) => {
+            if (_.get(res, "data.errors.length", 0) > 0) {
+              reject(_.get(res, "data.errors.0.message", ""));
+            } else {
+              resolve({
+                grade: _.get(res, "data.data.UpdateAssessmentAttempt.grade", 0),
+                answered: _.get(
+                  res,
+                  "data.data.UpdateAssessmentAttempt.answeredQuestionsCount",
+                  0
+                ),
+                correct: _.get(
+                  res,
+                  "data.data.UpdateAssessmentAttempt.correctQuestionsCount",
+                  0
+                ),
+              });
+            }
+          })
+          .catch(reject);
+      }
+    );
   }
 }
 
