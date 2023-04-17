@@ -55,7 +55,7 @@ const ContentDetails = () => {
   useEffect(() => {
     const lastId = getLastViewedSection();
     setActiveSection(
-      lastId !== "" ? lastId : data?.CourseById?.sections[0].id || ""
+      lastId !== "" ? lastId : data?.CourseById?.sections?.[0]?.id || ""
     );
   }, [content]);
 
@@ -64,7 +64,7 @@ const ContentDetails = () => {
       <View style={styles.reportRightBox}>
         <Text style={styles.courseTitle}>{data?.CourseById.title}</Text>
         <Text style={styles.courseAuthor}>
-          By {(data?.CourseById.courseGroup.authors).join(",") || "Anonymous"}
+          By {data?.CourseById?.courseGroup?.authors?.join(",") || "Anonymous"}
         </Text>
       </View>
       {data?.CourseById.courseGroup?.asset !== "" && (
@@ -111,6 +111,7 @@ const ContentDetails = () => {
   );
 
   const LessonView = (
+    idx: number,
     lesson: { topics: []; title: string },
     section: string,
     secProgress: number
@@ -122,6 +123,7 @@ const ContentDetails = () => {
       ).length > 0;
     return (
       <Pressable
+        key={idx}
         onPress={() =>
           navigation.navigate("ExploreCourse", {
             cid: cid,
@@ -204,7 +206,9 @@ const ContentDetails = () => {
         </CollapseHeader>
         <CollapseBody>
           <View style={styles.lessonContainer}>
-            {sec.lessons.map((l) => LessonView(l, sec.title, secProgress))}
+            {sec.lessons.map((l, idx) =>
+              LessonView(idx, l, sec.title, secProgress)
+            )}
           </View>
         </CollapseBody>
       </Collapse>
@@ -218,8 +222,8 @@ const ContentDetails = () => {
           <SectionView
             key={idx}
             id={section.id}
-            title={section.title || ""}
-            lessons={section.lessons}
+            title={section?.title || ""}
+            lessons={section.lessons as []}
           />
         ))}
       </View>
@@ -228,9 +232,9 @@ const ContentDetails = () => {
 
   const FloatingContainer = () => {
     const sectionId = getLastViewedSection();
-    let section: any = data?.CourseById.sections[0];
+    let section: any = data?.CourseById.sections?.[0];
     if (sectionId != "") {
-      section = data?.CourseById.sections.find(
+      section = data?.CourseById?.sections?.find(
         (s: { id: string }) => s.id === sectionId
       );
     }
@@ -238,8 +242,8 @@ const ContentDetails = () => {
       <View style={styles.floatingFooter}>
         <View style={styles.FlotingText}>
           <Text style={styles.ftextItem}>UP NEXT</Text>
-          <Text style={styles.fsection}>{section.title}</Text>
-          <Text style={styles.ftopic}>{section.lessons[0].title}</Text>
+          <Text style={styles.fsection}>{section?.title}</Text>
+          <Text style={styles.ftopic}>{section?.lessons?.[0]?.title}</Text>
         </View>
         <TouchableOpacity
           style={styles.button}
@@ -265,12 +269,9 @@ const ContentDetails = () => {
               size={32}
               color="#FFFFFF"
               style={styles.backIcon}
-              onPress={() => navigation.navigate(backToRoute)}
+              onPress={() => navigation.goBack()}
             />
-            <Text
-              style={styles.backBtn}
-              onPress={() => navigation.navigate(backToRoute)}
-            >
+            <Text style={styles.backBtn} onPress={() => navigation.goBack()}>
               Back
             </Text>
           </View>

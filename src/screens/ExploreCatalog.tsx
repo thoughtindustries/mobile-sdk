@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   FlatList,
+  Dimensions,
 } from "react-native";
 
 import _ from "lodash";
@@ -131,7 +132,7 @@ const ExploreCatalog = () => {
   };
 
   return (
-    <GestureRecognizer onSwipe={onSwipe} style={styles.page}>
+    <View>
       <Text style={styles.title}>Explore The Catalog</Text>
 
       <View style={styles.searchboxContainer}>
@@ -153,7 +154,14 @@ const ExploreCatalog = () => {
         </View>
       )}
       {!pageVars.searching && (
-        <Text style={{ ...styles.courseTitle, marginTop: 10, marginLeft: 15 }}>
+        <Text
+          style={{
+            ...styles.courseTitle,
+            marginTop: 15,
+            marginLeft: 30,
+            paddingBottom: 10,
+          }}
+        >
           Results (
           {filteredCourses().length > 0
             ? _.padStart(filteredCourses().length.toString(), 2, "0")
@@ -162,31 +170,28 @@ const ExploreCatalog = () => {
         </Text>
       )}
       {!pageVars.searching && courses.length > 0 && (
-        <View>
-          <FlatList
-            data={filteredCourses()}
-            renderItem={({ item }) => <CourseItem data={item} />}
-            onEndReached={fetchCourses}
-            onEndReachedThreshold={0.5}
-            ListEmptyComponent={
-              <Text style={styles.noRecords}>
-                No records found, try using other filters.
-              </Text>
-            }
-          />
-        </View>
+        <FlatList
+          style={{ height: Dimensions.get("window").height - 350 }}
+          data={filteredCourses()}
+          renderItem={({ item }) => <CourseItem data={item} />}
+          onEndReached={fetchCourses}
+          onEndReachedThreshold={0.5}
+          ListEmptyComponent={
+            <Text style={styles.noRecords}>
+              No records found, try using other filters.
+            </Text>
+          }
+        />
       )}
-    </GestureRecognizer>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-  },
-
   title: {
-    marginVertical: 30,
+    marginTop: 60,
+    marginBottom: 30,
+    marginLeft: 30,
     fontSize: 20,
     lineHeight: 36,
     textAlign: "left",
@@ -198,12 +203,14 @@ const styles = StyleSheet.create({
     height: 50,
     display: "flex",
     flexDirection: "row",
+    marginHorizontal: 30,
   },
 
   courseRow: {
     display: "flex",
     flexDirection: "row",
-    padding: 15,
+    paddingHorizontal: 30,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     paddingBottom: 10,
     borderBottomColor: "#ccc",
@@ -236,6 +243,7 @@ const styles = StyleSheet.create({
 
   searching: {
     marginTop: 20,
+    marginHorizontal: 20,
     backgroundColor: "#3B1FA3",
     borderRadius: 10,
     paddingBottom: 20,

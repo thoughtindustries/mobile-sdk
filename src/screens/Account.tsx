@@ -46,7 +46,7 @@ const Account = () => {
   });
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    (async () => {
       try {
         const info = await SecureStore.getItemAsync("userInfo");
         if (info) {
@@ -55,10 +55,13 @@ const Account = () => {
       } catch (error) {
         console.log("Fetch account info error: ", error);
       }
-    };
-
-    fetchUserInfo();
+    })();
   }, []);
+
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("userInfo");
+    navigation.navigate("Login");
+  };
 
   return (
     <GestureRecognizer onSwipe={onSwipe} style={styles.container}>
@@ -112,7 +115,7 @@ const Account = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => Utils.logMeOut(navigation)}>
+        <TouchableOpacity onPress={() => handleLogout()}>
           <Text style={styles.profileEdit}>Log out</Text>
         </TouchableOpacity>
       </View>

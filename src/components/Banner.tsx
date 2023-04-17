@@ -13,13 +13,12 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { useUserRecentContentQuery } from "../graphql";
-import Loader from "./Loader";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Banner = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const { data, loading, error } = useUserRecentContentQuery({
+  const { data } = useUserRecentContentQuery({
     variables: { limit: 1 },
   });
 
