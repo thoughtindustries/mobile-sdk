@@ -14,26 +14,13 @@ import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
-import GestureRecognizer from "react-native-swipe-gestures";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
 const ExploreCatalog = () => {
   const navigation = useNavigation<ExploreCatalogProps>();
-  const route = useRoute();
-
-  const onSwipe = (gestureName: string) => {
-    switch (gestureName) {
-      case "SWIPE_RIGHT":
-        navigation.navigate("Home");
-        break;
-      case "SWIPE_LEFT":
-        navigation.navigate("My Learning");
-        break;
-    }
-  };
 
   const [filters, setFilters] = useState<filtersType>({
     sortBy: "title",
@@ -144,7 +131,7 @@ const ExploreCatalog = () => {
             }
           />
         </View>
-        <FilterControl onFilter={onFilter} />
+        <FilterControl onFilter={onFilter} currFilters={filters} />
       </View>
 
       {pageVars.searching && (

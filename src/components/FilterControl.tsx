@@ -17,45 +17,34 @@ import Checkbox from "./Checkbox";
 
 import Utils from "../helpers/Utils";
 
-const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
+const FilterControl = (props: {
+  onFilter(flts: filtersType): void;
+  currFilters: filtersType;
+}) => {
   const [show, setShow] = useState<boolean>(false);
 
-  const [filters, setFilters] = useState<filtersType>({
-    sortDir: "asc",
-    duration: "",
-    difficulty: "",
-    tag: "",
-  });
+  const CourseFilter = ({ currFilters }: { currFilters: filtersType }) => {
+    const [filters, setFilters] = useState<filtersType>(currFilters);
 
-  const hasFilterApplied = () => {
-    let applied = 0;
-    applied += filters.duration !== "" ? 1 : 0;
-    applied += filters.difficulty !== "" ? 1 : 0;
-    applied += filters.tag !== "" ? 1 : 0;
+    const clearFilter = () => {
+      const flts: filtersType = {
+        ...filters,
+        duration: "",
+        difficulty: "",
+        tag: "",
+        sortDir: "asc",
+      };
 
-    return applied;
-  };
-
-  const clearFilter = () => {
-    const flts: filtersType = {
-      ...filters,
-      duration: "",
-      difficulty: "",
-      tag: "",
-      sortDir: "asc",
+      setFilters(flts);
+      setShow(false);
+      props.onFilter(flts);
     };
 
-    setFilters(flts);
-    setShow(false);
-    props.onFilter(flts);
-  };
+    const applyFilter = () => {
+      setShow(false);
+      props.onFilter(filters);
+    };
 
-  const applyFilter = () => {
-    setShow(false);
-    props.onFilter(filters);
-  };
-
-  const CourseFilter = () => {
     return (
       <Modal transparent={false} visible={show}>
         <View style={styles.filterContainer}>
@@ -153,7 +142,7 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
   };
 
   return (
-    <>
+    <View>
       <Pressable style={styles.filterbtn} onPress={() => setShow(true)}>
         <MaterialCommunityIcons
           name="filter-variant"
@@ -161,13 +150,8 @@ const FilterControl = (props: { onFilter(flts: filtersType): void }) => {
           color="#232323"
         />
       </Pressable>
-      {hasFilterApplied() > 0 && (
-        <View style={styles.hasFilter}>
-          <Text style={styles.filterCount}>{hasFilterApplied()}</Text>
-        </View>
-      )}
-      <CourseFilter />
-    </>
+      <CourseFilter currFilters={props.currFilters} />
+    </View>
   );
 };
 

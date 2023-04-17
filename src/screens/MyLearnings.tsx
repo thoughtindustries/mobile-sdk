@@ -25,7 +25,6 @@ import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Permissions from "expo-permissions";
-import GestureRecognizer from "react-native-swipe-gestures";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -34,17 +33,6 @@ type MyLearningScreenProps = StackNavigationProp<
 
 const MyLearnings = () => {
   const navigation = useNavigation<MyLearningScreenProps>();
-
-  const onSwipe = (gestureName: string) => {
-    switch (gestureName) {
-      case "SWIPE_RIGHT":
-        navigation.navigate("Explore");
-        break;
-      case "SWIPE_LEFT":
-        navigation.navigate("Account");
-        break;
-    }
-  };
 
   const [filters, setFilters] = useState<{
     sortBy: string;
@@ -496,7 +484,7 @@ const MyLearnings = () => {
   );
 
   return (
-    <GestureRecognizer onSwipe={onSwipe} style={styles.page}>
+    <View style={styles.page}>
       <Text style={styles.title}>My Learning</Text>
 
       {Utils.isOffline() === true && <ContentList />}
@@ -536,7 +524,7 @@ const MyLearnings = () => {
           )}
         </>
       )}
-    </GestureRecognizer>
+    </View>
   );
 };
 

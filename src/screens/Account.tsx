@@ -13,10 +13,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { TI_API_INSTANCE } from "@env";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../../types";
-import Utils from "../helpers/Utils";
 import * as SecureStore from "expo-secure-store";
-
-import GestureRecognizer from "react-native-swipe-gestures";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
 
@@ -29,14 +26,6 @@ interface UserDetailProps {
 
 const Account = () => {
   const navigation = useNavigation<AccountScreenProps>();
-
-  const onSwipe = (gestureName: string) => {
-    switch (gestureName) {
-      case "SWIPE_RIGHT":
-        navigation.navigate("MyLearning");
-        break;
-    }
-  };
 
   const [userInfo, setUserInfo] = useState<UserDetailProps>({
     firstName: "",
@@ -64,7 +53,7 @@ const Account = () => {
   };
 
   return (
-    <GestureRecognizer onSwipe={onSwipe} style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.accountInfo}>
         <Text style={styles.title}>Account</Text>
         <View style={styles.profileInfo}>
@@ -119,7 +108,7 @@ const Account = () => {
           <Text style={styles.profileEdit}>Log out</Text>
         </TouchableOpacity>
       </View>
-    </GestureRecognizer>
+    </View>
   );
 };
 
