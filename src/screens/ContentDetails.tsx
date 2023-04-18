@@ -64,7 +64,7 @@ const ContentDetails = () => {
       <View style={styles.reportRightBox}>
         <Text style={styles.courseTitle}>{data?.CourseById.title}</Text>
         <Text style={styles.courseAuthor}>
-          By {data?.CourseById?.courseGroup?.authors?.join(",") || "Anonymous"}
+          By {data?.CourseById?.courseGroup?.authors?.join(", ") || "Anonymous"}
         </Text>
       </View>
       {data?.CourseById.courseGroup?.asset !== "" && (

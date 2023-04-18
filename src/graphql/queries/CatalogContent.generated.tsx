@@ -1,48 +1,76 @@
-import * as Types from '../global-types';
+import * as Types from "../global-types";
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 const defaultOptions = {} as const;
 export type CatalogContentQueryVariables = Types.Exact<{
-  contentTypes?: Types.InputMaybe<Array<Types.Scalars['String']> | Types.Scalars['String']>;
-  labels?: Types.InputMaybe<Array<Types.Scalars['String']> | Types.Scalars['String']>;
-  page: Types.Scalars['Int'];
-  query?: Types.InputMaybe<Types.Scalars['String']>;
+  contentTypes?: Types.InputMaybe<
+    Array<Types.Scalars["String"]> | Types.Scalars["String"]
+  >;
+  labels?: Types.InputMaybe<
+    Array<Types.Scalars["String"]> | Types.Scalars["String"]
+  >;
+  page: Types.Scalars["Int"];
+  query?: Types.InputMaybe<Types.Scalars["String"]>;
   resultsDisplayType?: Types.InputMaybe<Types.ContentItemDisplayType>;
   sortColumn?: Types.InputMaybe<Types.SortColumn>;
   sortDirection?: Types.InputMaybe<Types.SortDirection>;
-  token?: Types.InputMaybe<Types.Scalars['String']>;
-  values?: Types.InputMaybe<Array<Types.Scalars['String']> | Types.Scalars['String']>;
+  token?: Types.InputMaybe<Types.Scalars["String"]>;
+  values?: Types.InputMaybe<
+    Array<Types.Scalars["String"]> | Types.Scalars["String"]
+  >;
 }>;
 
-
-export type CatalogContentQuery = { __typename?: 'Query', CatalogContent: { __typename?: 'CatalogContent', contentItems?: Array<{ __typename?: 'Content', id: string, asset?: string, authors?: Array<string>, title?: string, displayCourse?: string, contentTypeLabel?: string }> } };
-
+export type CatalogContentQuery = {
+  __typename?: "Query";
+  CatalogContent: {
+    __typename?: "CatalogContent";
+    contentItems?: Array<{
+      __typename?: "Content";
+      id: string;
+      asset?: string;
+      authors?: Array<string>;
+      title?: string;
+      displayCourse?: string;
+      contentTypeLabel?: string;
+    }>;
+  };
+};
 
 export const CatalogContentDocument = gql`
-    query CatalogContent($contentTypes: [String!], $labels: [String!], $page: Int!, $query: String, $resultsDisplayType: ContentItemDisplayType, $sortColumn: SortColumn, $sortDirection: SortDirection, $token: String, $values: [String!]) {
-  CatalogContent(
-    contentTypes: $contentTypes
-    labels: $labels
-    page: $page
-    query: $query
-    resultsDisplayType: $resultsDisplayType
-    sortColumn: $sortColumn
-    sortDirection: $sortDirection
-    token: $token
-    values: $values
+  query CatalogContent(
+    $contentTypes: [String!]
+    $labels: [String!]
+    $page: Int!
+    $query: String
+    $resultsDisplayType: ContentItemDisplayType
+    $sortColumn: SortColumn
+    $sortDirection: SortDirection
+    $token: String
+    $values: [String!]
   ) {
-    contentItems {
-      id
-      asset
-      authors
-      title
-      displayCourse
-      contentTypeLabel
+    CatalogContent(
+      contentTypes: $contentTypes
+      labels: $labels
+      page: $page
+      query: $query
+      resultsDisplayType: $resultsDisplayType
+      sortColumn: $sortColumn
+      sortDirection: $sortDirection
+      token: $token
+      values: $values
+    ) {
+      contentItems {
+        id
+        asset
+        authors
+        title
+        displayCourse
+        contentTypeLabel
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useCatalogContentQuery__
@@ -68,14 +96,37 @@ export const CatalogContentDocument = gql`
  *   },
  * });
  */
-export function useCatalogContentQuery(baseOptions: Apollo.QueryHookOptions<CatalogContentQuery, CatalogContentQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CatalogContentQuery, CatalogContentQueryVariables>(CatalogContentDocument, options);
-      }
-export function useCatalogContentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CatalogContentQuery, CatalogContentQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CatalogContentQuery, CatalogContentQueryVariables>(CatalogContentDocument, options);
-        }
-export type CatalogContentQueryHookResult = ReturnType<typeof useCatalogContentQuery>;
-export type CatalogContentLazyQueryHookResult = ReturnType<typeof useCatalogContentLazyQuery>;
-export type CatalogContentQueryResult = Apollo.QueryResult<CatalogContentQuery, CatalogContentQueryVariables>;
+export function useCatalogContentQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    CatalogContentQuery,
+    CatalogContentQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CatalogContentQuery, CatalogContentQueryVariables>(
+    CatalogContentDocument,
+    options
+  );
+}
+export function useCatalogContentLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CatalogContentQuery,
+    CatalogContentQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CatalogContentQuery, CatalogContentQueryVariables>(
+    CatalogContentDocument,
+    options
+  );
+}
+export type CatalogContentQueryHookResult = ReturnType<
+  typeof useCatalogContentQuery
+>;
+export type CatalogContentLazyQueryHookResult = ReturnType<
+  typeof useCatalogContentLazyQuery
+>;
+export type CatalogContentQueryResult = Apollo.QueryResult<
+  CatalogContentQuery,
+  CatalogContentQueryVariables
+>;

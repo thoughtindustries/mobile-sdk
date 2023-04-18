@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -9,22 +8,19 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-
 import { filtersType } from "../../types";
 import Checkbox from "./Checkbox";
-
 import Utils from "../helpers/Utils";
+import { ExploreCatalogContext } from "../context";
+import { GlobalTypes } from "../graphql";
 
-const FilterControl = (props: {
-  onFilter(flts: filtersType): void;
-  currFilters: filtersType;
-}) => {
+const FilterControl = ({ onFilter }: { onFilter(flts: filtersType): void }) => {
   const [show, setShow] = useState<boolean>(false);
+  const { filters: appliedFilters } = useContext(ExploreCatalogContext);
 
-  const CourseFilter = ({ currFilters }: { currFilters: filtersType }) => {
-    const [filters, setFilters] = useState<filtersType>(currFilters);
+  const CourseFilter = () => {
+    const [filters, setFilters] = useState<filtersType>(appliedFilters);
 
     const clearFilter = () => {
       const flts: filtersType = {
@@ -32,17 +28,17 @@ const FilterControl = (props: {
         duration: "",
         difficulty: "",
         tag: "",
-        sortDir: "asc",
+        sortDir: GlobalTypes.SortDirection.Asc,
       };
 
       setFilters(flts);
       setShow(false);
-      props.onFilter(flts);
+      onFilter(flts);
     };
 
     const applyFilter = () => {
       setShow(false);
-      props.onFilter(filters);
+      onFilter(filters);
     };
 
     return (
@@ -55,21 +51,31 @@ const FilterControl = (props: {
             <View style={styles.row}>
               <Text
                 style={
-                  filters.sortDir === "asc"
+                  filters.sortDir === GlobalTypes.SortDirection.Asc
                     ? styles.sortDirSelected
                     : styles.sortDir
                 }
-                onPress={() => setFilters({ ...filters, sortDir: "asc" })}
+                onPress={() =>
+                  setFilters({
+                    ...filters,
+                    sortDir: GlobalTypes.SortDirection.Asc,
+                  })
+                }
               >
                 A-Z
               </Text>
               <Text
                 style={
-                  filters.sortDir === "desc"
+                  filters.sortDir === GlobalTypes.SortDirection.Desc
                     ? styles.sortDirSelected
                     : styles.sortDir
                 }
-                onPress={() => setFilters({ ...filters, sortDir: "desc" })}
+                onPress={() =>
+                  setFilters({
+                    ...filters,
+                    sortDir: GlobalTypes.SortDirection.Desc,
+                  })
+                }
               >
                 Z-A
               </Text>
@@ -150,7 +156,7 @@ const FilterControl = (props: {
           color="#232323"
         />
       </Pressable>
-      <CourseFilter currFilters={props.currFilters} />
+      <CourseFilter />
     </View>
   );
 };

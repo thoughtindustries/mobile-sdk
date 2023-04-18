@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import _ from "lodash";
-import { useUserContentItemsQuery, useCatalogContentQuery } from "../graphql";
+import { useUserContentItemsQuery } from "../graphql";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -21,39 +21,41 @@ const Recommendation = () => {
 
   return (
     <View>
-      <View style={styles.courseBox}>
-        <Text style={styles.heading}>Recommendations</Text>
-      </View>
       {data && data.UserContentItems && (
-        <ScrollView horizontal={true} style={styles.courseContainer}>
-          {data.UserContentItems.filter(
-            (item) => item.contentTypeLabel === "Course"
-          ).map((course, idx) => (
-            <TouchableOpacity
-              key={idx}
-              onPress={() =>
-                navigation.navigate("ContentDetails", {
-                  cid: course.displayCourse ? course.displayCourse : "",
-                  from: "Home",
-                })
-              }
-            >
-              <View style={styles.recContentBox}>
-                <ImageBackground
-                  key={idx}
-                  source={{ uri: course.asset }}
-                  resizeMode="cover"
-                  style={{ borderRadius: 10 }}
-                  imageStyle={{ borderRadius: 8 }}
-                >
-                  <View style={styles.bannerArea}>
-                    <Text style={styles.courseTitle}>{course.title}</Text>
-                  </View>
-                </ImageBackground>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        <>
+          <View style={styles.courseBox}>
+            <Text style={styles.heading}>Recommendations</Text>
+          </View>
+          <ScrollView horizontal={true} style={styles.courseContainer}>
+            {data.UserContentItems.filter(
+              (item) => item.contentTypeLabel === "Course"
+            ).map((course, idx) => (
+              <TouchableOpacity
+                key={idx}
+                onPress={() =>
+                  navigation.navigate("ContentDetails", {
+                    cid: course.displayCourse ? course.displayCourse : "",
+                    from: "Home",
+                  })
+                }
+              >
+                <View style={styles.recContentBox}>
+                  <ImageBackground
+                    key={idx}
+                    source={{ uri: course.asset }}
+                    resizeMode="cover"
+                    style={{ borderRadius: 10 }}
+                    imageStyle={{ borderRadius: 8 }}
+                  >
+                    <View style={styles.bannerArea}>
+                      <Text style={styles.courseTitle}>{course.title}</Text>
+                    </View>
+                  </ImageBackground>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
       )}
     </View>
   );
