@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,110 +8,72 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
-
-import _ from "lodash";
-import tiGql from "../helpers/TIGraphQL";
-import { courseListType, filtersType } from "../../types";
+import { filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
+import { GlobalTypes } from "../graphql";
+import { ExploreCatalogContext } from "../context";
+import { useCatalogContentQuery } from "../graphql";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
 const ExploreCatalog = () => {
   const navigation = useNavigation<ExploreCatalogProps>();
-
   const [filters, setFilters] = useState<filtersType>({
-    sortBy: "title",
-    sortDir: "asc",
-    duration: "",
-    difficulty: "",
-    tag: "",
+    sortBy: GlobalTypes.SortColumn.Title,
+    sortDir: GlobalTypes.SortDirection.Asc,
+    labels: [],
+    values: [],
+  });
+  const { data, loading } = useCatalogContentQuery({
+    variables: {
+      sortColumn: filters.sortBy,
+      sortDirection: filters.sortDir,
+      page: 1,
+      labels: filters.labels,
+      values: filters.values,
+      contentTypes: "Course",
+    },
   });
 
-  const [courses, setCourses] = useState<courseListType[]>([]);
-  const [pageVars, setPageVars] = useState({
+  const [searchVariables, setSearchVariables] = useState({
     search: "",
     page: 0,
-    searching: false,
+    searching: loading,
     showFilter: false,
   });
-  const [fetchAgain, setFetchAgain] = useState(1);
-
-  const fetchCourses = (
-    isPaginated: Boolean = true,
-    page: number = pageVars.page + 1
-  ) => {
-    if (isPaginated && courses.length < 40) {
-      return;
-    }
-
-    setPageVars({
-      ...pageVars,
-      searching: true,
-      showFilter: false,
-      page: page,
-    });
-    tiGql
-      .fetchCourses({
-        sortBy: filters.sortBy,
-        sortDir: filters.sortDir,
-        duration: filters.duration,
-        difficulty: filters.difficulty,
-        tag: filters.tag,
-        page: page,
-      })
-      .then((data) => {
-        setCourses(isPaginated ? [...courses, ...data] : data);
-      })
-      .catch(console.log)
-      .finally(() =>
-        setPageVars({ ...pageVars, showFilter: false, searching: false })
-      );
-  };
-
-  useEffect(() => fetchCourses(false, 1), [fetchAgain]);
-
-  const onFilter = (flts: filtersType) => {
-    setFilters({ ...filters, ...flts });
-    setCourses([]);
-    setFetchAgain(fetchAgain + 1);
-  };
 
   const filteredCourses = () => {
-    let data = courses.filter(
-      (c) =>
-        c.title.includes(pageVars.search) ||
-        _.get(c, "authors", []).join(",").includes(pageVars.search)
+    const filteredCourses = data?.CatalogContent?.contentItems?.filter(
+      (course) =>
+        course?.title?.includes(searchVariables.search) ||
+        course?.authors?.join(", ").includes(searchVariables.search)
     );
-    return data;
+
+    return filteredCourses || [];
   };
 
-  const CourseItem = (props: { data: courseListType }) => {
+  const CourseItem = ({ item }: { item: GlobalTypes.Content }) => {
     return (
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: _.get(props, "data.displayCourse", ""),
+            cid: item?.displayCourse || "",
             from: "Explore",
           })
         }
       >
         <View style={styles.courseRow}>
           <View style={styles.courseLeftBox}>
-            <Text style={styles.courseTitle}>{props.data.title}</Text>
-            {_.get(props, "data.authors.length", 0) > 0 && (
-              <Text style={styles.courseAuthor}>
-                By {_.get(props, "data.authors", []).join(",")}
-              </Text>
-            )}
+            <Text style={styles.courseTitle}>{item.title}</Text>
+            <Text style={styles.courseAuthor}>
+              By {item.authors?.join(", ") || "Anonymous"}
+            </Text>
           </View>
-          {_.get(props, "data.asset", "na") !== "na" && (
-            <Image
-              source={{ uri: props.data.asset }}
-              style={styles.courseImage}
-            />
+          {item.asset !== "na" && (
+            <Image source={{ uri: item.asset }} style={styles.courseImage} />
           )}
         </View>
       </Pressable>
@@ -120,57 +82,60 @@ const ExploreCatalog = () => {
 
   return (
     <View>
-      <Text style={styles.title}>Explore The Catalog</Text>
-
-      <View style={styles.searchboxContainer}>
-        <View style={{ flexGrow: 1, marginRight: 3 }}>
-          <Searchbar
-            searchText={pageVars.search}
-            onSearch={(str: string) =>
-              setPageVars({ ...pageVars, search: str })
-            }
-          />
+      <ExploreCatalogContext.Provider value={{ setFilters, filters }}>
+        <Text style={styles.title}>Explore The Catalog</Text>
+        <View style={styles.searchboxContainer}>
+          <View style={{ flexGrow: 1, marginRight: 3 }}>
+            <Searchbar
+              searchText={searchVariables.search}
+              onSearch={(text: string) =>
+                setSearchVariables({ ...searchVariables, search: text })
+              }
+            />
+          </View>
+          <FilterControl />
         </View>
-
-        <FilterControl onFilter={onFilter} currFilters={filters} />
-      </View>
-
-      {pageVars.searching && (
-        <View style={styles.searching}>
-          <Text style={styles.searchingText}>Loading data </Text>
-          <Loader size={50} />
-        </View>
-      )}
-      {!pageVars.searching && (
-        <Text
-          style={{
-            ...styles.courseTitle,
-            marginTop: 15,
-            marginLeft: 30,
-            paddingBottom: 10,
-          }}
-        >
-          Results (
-          {filteredCourses().length > 0
-            ? _.padStart(filteredCourses().length.toString(), 2, "0")
-            : 0}
-          )
-        </Text>
-      )}
-      {!pageVars.searching && courses.length > 0 && (
-        <FlatList
-          style={{ height: Dimensions.get("window").height - 350 }}
-          data={filteredCourses()}
-          renderItem={({ item }) => <CourseItem data={item} />}
-          onEndReached={fetchCourses}
-          onEndReachedThreshold={0.5}
-          ListEmptyComponent={
-            <Text style={styles.noRecords}>
-              No records found, try using other filters.
-            </Text>
-          }
-        />
-      )}
+        {loading && (
+          <View style={styles.searching}>
+            <Text style={styles.searchingText}>Loading data </Text>
+            <Loader size={50} />
+          </View>
+        )}
+        {!loading && (
+          <Text
+            style={{
+              ...styles.courseTitle,
+              marginTop: 15,
+              marginLeft: 30,
+              paddingBottom: 10,
+            }}
+          >
+            {`Results (${filteredCourses().length})`}
+          </Text>
+        )}
+        {!loading &&
+          data?.CatalogContent?.contentItems &&
+          data?.CatalogContent?.contentItems?.length > 0 && (
+            <FlatList
+              style={{
+                marginBottom:
+                  ((data?.CatalogContent?.contentItems?.length *
+                    Dimensions.get("window").width) /
+                    440) *
+                  32,
+              }}
+              data={filteredCourses()}
+              scrollEnabled={true}
+              renderItem={({ item }) => <CourseItem item={item} />}
+              onEndReachedThreshold={0.5}
+              ListEmptyComponent={
+                <Text style={styles.noRecords}>
+                  No records found, try using other filters.
+                </Text>
+              }
+            />
+          )}
+      </ExploreCatalogContext.Provider>
     </View>
   );
 };
@@ -224,8 +189,8 @@ const styles = StyleSheet.create({
   },
 
   courseImage: {
-    width: 75,
-    height: 75,
+    width: (Dimensions.get("window").width / 400) * 75,
+    height: (Dimensions.get("window").width / 400) * 75,
     borderRadius: 15,
   },
 

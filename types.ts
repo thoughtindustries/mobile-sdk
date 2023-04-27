@@ -1,4 +1,5 @@
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
+import { GlobalTypes } from "./src/graphql";
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -91,11 +92,10 @@ export type pageType = {
 };
 
 export type filtersType = {
-  sortBy?: string;
-  sortDir: string;
-  duration: string;
-  difficulty: string;
-  tag: string;
+  sortBy?: GlobalTypes.SortColumn;
+  sortDir: GlobalTypes.SortDirection;
+  labels: string[];
+  values: string[];
 };
 
 export type contentListType = {
