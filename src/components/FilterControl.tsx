@@ -9,43 +9,130 @@ import {
   Dimensions,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { filtersType } from "../../types";
 import Checkbox from "./Checkbox";
-import Utils from "../helpers/Utils";
 import { ExploreCatalogContext } from "../context";
 import { GlobalTypes } from "../graphql";
 
-const FilterControl = ({ onFilter }: { onFilter(flts: filtersType): void }) => {
+const FilterControl = () => {
   const [show, setShow] = useState<boolean>(false);
-  const { filters: appliedFilters } = useContext(ExploreCatalogContext);
+  const { filters: appliedFilters, setFilters: setAppliedFilters } = useContext(
+    ExploreCatalogContext
+  );
 
   const CourseFilter = () => {
-    const [filters, setFilters] = useState<filtersType>(appliedFilters);
+    const [filters, setFilters] = useState({
+      sortDir: appliedFilters.sortDir,
+      duration: [
+        { title: "1 Hour", selected: appliedFilters.values.includes("1 Hour") },
+        {
+          title: "3 - 8 Hours",
+          selected: appliedFilters.values.includes("3 - 8 Hours"),
+        },
+        {
+          title: "9 - 16 Hours",
+          selected: appliedFilters.values.includes("9 - 16 Hours"),
+        },
+        {
+          title: "A couple of days",
+          selected: appliedFilters.values.includes("A couple of days"),
+        },
+      ],
+      difficulty: [
+        {
+          title: "Beginner",
+          selected: appliedFilters.values.includes("Beginner"),
+        },
+        {
+          title: "Intermediate",
+          selected: appliedFilters.values.includes("Intermediate"),
+        },
+        {
+          title: "Advanced",
+          selected: appliedFilters.values.includes("Advanced"),
+        },
+      ],
+      tags: [
+        {
+          title: "QuickStart",
+          selected: appliedFilters.values.includes("QuickStart"),
+        },
+        {
+          title: "Business",
+          selected: appliedFilters.values.includes("Business"),
+        },
+      ],
+      myLearningsEvent: [
+        { title: "All", selected: false },
+        { title: "Offline", selected: false },
+      ],
+    });
 
     const clearFilter = () => {
-      const flts: filtersType = {
-        ...filters,
-        duration: "",
-        difficulty: "",
-        tag: "",
+      setAppliedFilters({
+        ...appliedFilters,
         sortDir: GlobalTypes.SortDirection.Asc,
-      };
-
-      setFilters(flts);
+        values: [],
+        labels: [],
+      });
       setShow(false);
-      onFilter(flts);
     };
 
     const applyFilter = () => {
+      // Durations Filter
+      let durations: string[] = [];
+      let durationLabel = "";
+      filters.duration.forEach((item) => {
+        if (item.selected) {
+          durations.push(item.title);
+        }
+      });
+
+      if (durations.length > 0) {
+        durationLabel = "Duration";
+      }
+
+      // Difficulty Filter
+      let difficulty: string[] = [];
+      let difficultyLabel = "";
+      filters.difficulty.forEach((item) => {
+        if (item.selected) {
+          difficulty.push(item.title);
+        }
+      });
+
+      if (difficulty.length > 0) {
+        durationLabel = "Level of Difficulty";
+      }
+
+      // Tag Filter
+      let tags: string[] = [];
+      filters.tags.forEach((item) => {
+        if (item.selected) {
+          tags.push(item.title);
+        }
+      });
+
+      if (difficulty.length > 0) {
+        durationLabel = "Level of Difficulty";
+      }
+
+      setAppliedFilters({
+        ...appliedFilters,
+        sortDir: filters.sortDir,
+        values: [
+          ...new Set(durations),
+          ...new Set(difficulty),
+          ...new Set(tags),
+        ],
+        labels: [durationLabel, difficultyLabel],
+      });
       setShow(false);
-      onFilter(filters);
     };
 
     return (
       <Modal transparent={false} visible={show}>
         <View style={styles.filterContainer}>
           <Text style={styles.filterHeading}>Filters</Text>
-
           <View style={styles.filterBox}>
             <Text style={styles.filterTitle}>Sort By</Text>
             <View style={styles.row}>
@@ -81,35 +168,50 @@ const FilterControl = ({ onFilter }: { onFilter(flts: filtersType): void }) => {
               </Text>
             </View>
           </View>
-
           <ScrollView>
             <View style={styles.filterBox}>
               <Text style={styles.filterTitle}>Duration</Text>
-              {Utils.filterValues.duration.map((dur, idx) => (
-                <Checkbox
-                  key={idx}
-                  title={dur}
-                  selected={filters.duration === dur}
-                  onPress={() =>
-                    setFilters({
-                      ...filters,
-                      duration: filters.duration === dur ? "" : dur,
-                    })
-                  }
-                />
-              ))}
+              {filters.duration.map((duration, idx) => {
+                return (
+                  <Checkbox
+                    key={idx}
+                    title={duration.title}
+                    selected={duration.selected}
+                    onPress={() => {
+                      setFilters({
+                        ...filters,
+                        duration: filters.duration.map((item) => {
+                          return duration.title === item.title
+                            ? {
+                                ...item,
+                                selected: !filters.duration[idx].selected,
+                              }
+                            : item;
+                        }),
+                      });
+                    }}
+                  />
+                );
+              })}
             </View>
             <View style={styles.filterBox}>
               <Text style={styles.filterTitle}>Difficulty Level</Text>
-              {Utils.filterValues.difficulty.map((dif, idx) => (
+              {filters.difficulty.map((difficulty, idx) => (
                 <Checkbox
                   key={idx}
-                  title={dif}
-                  selected={filters.difficulty === dif}
+                  title={difficulty.title}
+                  selected={difficulty.selected}
                   onPress={() =>
                     setFilters({
                       ...filters,
-                      difficulty: filters.difficulty === dif ? "" : dif,
+                      difficulty: filters.difficulty.map((item) => {
+                        return difficulty.title === item.title
+                          ? {
+                              ...item,
+                              selected: !filters.difficulty[idx].selected,
+                            }
+                          : item;
+                      }),
                     })
                   }
                 />
@@ -117,15 +219,22 @@ const FilterControl = ({ onFilter }: { onFilter(flts: filtersType): void }) => {
             </View>
             <View style={styles.filterBox}>
               <Text style={styles.filterTitle}>Tags</Text>
-              {Utils.filterValues.tags.map((tag, idx) => (
+              {filters.tags.map((tag, idx) => (
                 <Checkbox
                   key={idx}
-                  title={tag}
-                  selected={filters.tag === tag}
+                  title={tag.title}
+                  selected={tag.selected}
                   onPress={() =>
                     setFilters({
                       ...filters,
-                      tag: filters.tag === tag ? "" : tag,
+                      tags: filters.tags.map((item) => {
+                        return tag.title === item.title
+                          ? {
+                              ...item,
+                              selected: !filters.tags[idx].selected,
+                            }
+                          : item;
+                      }),
                     })
                   }
                 />

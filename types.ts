@@ -94,9 +94,8 @@ export type pageType = {
 export type filtersType = {
   sortBy?: GlobalTypes.SortColumn;
   sortDir: GlobalTypes.SortDirection;
-  duration: string;
-  difficulty: string;
-  tag: string;
+  labels: string[];
+  values: string[];
 };
 
 export type contentListType = {

@@ -8,7 +8,6 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
-import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -25,15 +24,16 @@ const ExploreCatalog = () => {
   const [filters, setFilters] = useState<filtersType>({
     sortBy: GlobalTypes.SortColumn.Title,
     sortDir: GlobalTypes.SortDirection.Asc,
-    duration: "",
-    difficulty: "",
-    tag: "",
+    labels: [],
+    values: [],
   });
   const { data, loading } = useCatalogContentQuery({
     variables: {
       sortColumn: filters.sortBy,
       sortDirection: filters.sortDir,
       page: 1,
+      labels: filters.labels,
+      values: filters.values,
     },
   });
 
@@ -60,33 +60,9 @@ const ExploreCatalog = () => {
       showFilter: false,
       page: page,
     });
-    tiGql
-      .fetchCourses({
-        sortBy: filters.sortBy,
-        sortDir: filters.sortDir,
-        duration: filters.duration,
-        difficulty: filters.difficulty,
-        tag: filters.tag,
-        page: page,
-      })
-      .then((data) => {
-        setCourses(isPaginated ? [...courses, ...data] : data);
-      })
-      .catch(console.log)
-      .finally(() =>
-        setPageVars({ ...pageVars, showFilter: false, searching: false })
-      );
   };
-
-  console.log(filters);
 
   useEffect(() => fetchCourses(false, 1), [fetchAgain]);
-
-  const onFilter = (flts: filtersType) => {
-    setFilters({ ...filters, ...flts });
-    setCourses([]);
-    setFetchAgain(fetchAgain + 1);
-  };
 
   const filteredCourses = () => {
     const filteredCourses = data?.CatalogContent?.contentItems?.filter(
@@ -136,7 +112,7 @@ const ExploreCatalog = () => {
               }
             />
           </View>
-          <FilterControl onFilter={onFilter} />
+          <FilterControl />
         </View>
         {loading && (
           <View style={styles.searching}>
