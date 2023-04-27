@@ -6,11 +6,8 @@ import {
   StyleSheet,
   FlatList,
   ScrollView,
-  Animated,
-  Permission,
   Pressable,
 } from "react-native";
-
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType, RootStackParamList } from "../../types";
@@ -19,12 +16,12 @@ import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import dbObj from "../helpers/Db";
-
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Permissions from "expo-permissions";
+import { FilterContext } from "../context";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -330,66 +327,69 @@ const MyLearnings = () => {
 
     return (
       <View style={styles.contentRow}>
-        {imgurl && (
-          <Image source={{ uri: imgurl }} style={styles.contentImage} />
-        )}
-        <View style={styles.contentRightBox}>
-          <View style={styles.cTypeRow}>
+        <FilterContext.Provider value={{ setFilters, filters }}>
+          {imgurl && (
+            <Image source={{ uri: imgurl }} style={styles.contentImage} />
+          )}
+          <View style={styles.contentRightBox}>
+            <View style={styles.cTypeRow}>
+              <Text
+                style={{
+                  ...styles.contentTag,
+                  ..._.get(
+                    styles,
+                    _.get(props, "data.contentTypeLabel", "Course"),
+                    {}
+                  ),
+                }}
+              >
+                {props.data.contentTypeLabel}
+              </Text>
+              {props.data.isOffline !== true && !props.isRecommended && (
+                <MaterialCommunityIcons
+                  name="download"
+                  size={22}
+                  color="#232323"
+                  onPress={() => offlineData(props.data, true)}
+                />
+              )}
+              {props.data.isOffline == true && !props.isRecommended && (
+                <MaterialCommunityIcons
+                  name="close-circle-outline"
+                  size={22}
+                  color="#232323"
+                  onPress={() => offlineData(props.data, false)}
+                />
+              )}
+            </View>
             <Text
-              style={{
-                ...styles.contentTag,
-                ..._.get(
-                  styles,
-                  _.get(props, "data.contentTypeLabel", "Course"),
-                  {}
-                ),
+              style={styles.courseTitle}
+              onPress={() => {
+                console.log(props.data.id);
+                navigation.navigate("CourseDetails", {
+                  cid: props.data.id,
+                  title: props.data.title,
+                  asset: props.data.asset,
+                  contentTypeLabel: props.data.contentTypeLabel,
+                });
               }}
             >
-              {props.data.contentTypeLabel}
+              {props.data.title}
             </Text>
-            {props.data.isOffline !== true && !props.isRecommended && (
-              <MaterialCommunityIcons
-                name="download"
-                size={22}
-                color="#232323"
-                onPress={() => offlineData(props.data, true)}
-              />
-            )}
-            {props.data.isOffline == true && !props.isRecommended && (
-              <MaterialCommunityIcons
-                name="close-circle-outline"
-                size={22}
-                color="#232323"
-                onPress={() => offlineData(props.data, false)}
-              />
-            )}
+            {props.data.contentTypeLabel === "Course" &&
+              !props.isRecommended && (
+                <View style={{ flex: 0 }}>
+                  <View style={styles.cTypeRow}>
+                    <Text style={styles.note}>Progress</Text>
+                    <Text style={styles.note}>
+                      {_.get(props, "data.progress", 0)}%
+                    </Text>
+                  </View>
+                  <ProgressBar percent={_.get(props, "data.progress", 0)} />
+                </View>
+              )}
           </View>
-          <Text
-            style={styles.courseTitle}
-            onPress={() => {
-              console.log(props.data.id);
-              navigation.navigate("CourseDetails", {
-                cid: props.data.id,
-                title: props.data.title,
-                asset: props.data.asset,
-                contentTypeLabel: props.data.contentTypeLabel,
-              });
-            }}
-          >
-            {props.data.title}
-          </Text>
-          {props.data.contentTypeLabel === "Course" && !props.isRecommended && (
-            <View style={{ flex: 0 }}>
-              <View style={styles.cTypeRow}>
-                <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>
-                  {_.get(props, "data.progress", 0)}%
-                </Text>
-              </View>
-              <ProgressBar percent={_.get(props, "data.progress", 0)} />
-            </View>
-          )}
-        </View>
+        </FilterContext.Provider>
       </View>
     );
   };
@@ -500,7 +500,7 @@ const MyLearnings = () => {
                 }
               />
             </View>
-            <FilterControl onFilter={onFilter} navigation={navigation} />
+            <FilterControl />
           </View>
 
           {pageVars.searching && (

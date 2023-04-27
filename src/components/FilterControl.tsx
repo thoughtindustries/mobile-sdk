@@ -10,14 +10,13 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Checkbox from "./Checkbox";
-import { ExploreCatalogContext } from "../context";
+import { FilterContext } from "../context";
 import { GlobalTypes } from "../graphql";
 
 const FilterControl = () => {
   const [show, setShow] = useState<boolean>(false);
-  const { filters: appliedFilters, setFilters: setAppliedFilters } = useContext(
-    ExploreCatalogContext
-  );
+  const { filters: appliedFilters, setFilters: setAppliedFilters } =
+    useContext(FilterContext);
 
   const CourseFilter = () => {
     const [filters, setFilters] = useState({

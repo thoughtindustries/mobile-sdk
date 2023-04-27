@@ -14,7 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
 import { GlobalTypes } from "../graphql";
-import { ExploreCatalogContext } from "../context";
+import { FilterContext } from "../context";
 import { useCatalogContentQuery } from "../graphql";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
@@ -82,7 +82,7 @@ const ExploreCatalog = () => {
 
   return (
     <View>
-      <ExploreCatalogContext.Provider value={{ setFilters, filters }}>
+      <FilterContext.Provider value={{ setFilters, filters }}>
         <Text style={styles.title}>Explore The Catalog</Text>
         <View style={styles.searchboxContainer}>
           <View style={{ flexGrow: 1, marginRight: 3 }}>
@@ -135,7 +135,7 @@ const ExploreCatalog = () => {
               }
             />
           )}
-      </ExploreCatalogContext.Provider>
+      </FilterContext.Provider>
     </View>
   );
 };
