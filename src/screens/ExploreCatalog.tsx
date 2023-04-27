@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
-import { courseListType, filtersType } from "../../types";
+import { filtersType } from "../../types";
 import { Loader, Searchbar, FilterControl } from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
@@ -34,41 +34,22 @@ const ExploreCatalog = () => {
       page: 1,
       labels: filters.labels,
       values: filters.values,
+      contentTypes: "Course",
     },
   });
 
-  const [courses, setCourses] = useState<courseListType[]>([]);
-  const [pageVars, setPageVars] = useState({
+  const [searchVariables, setSearchVariables] = useState({
     search: "",
     page: 0,
-    searching: false,
+    searching: loading,
     showFilter: false,
   });
-  const [fetchAgain, setFetchAgain] = useState(1);
-
-  const fetchCourses = (
-    isPaginated: Boolean = true,
-    page: number = pageVars.page + 1
-  ) => {
-    if (isPaginated && courses.length < 40) {
-      return;
-    }
-
-    setPageVars({
-      ...pageVars,
-      searching: true,
-      showFilter: false,
-      page: page,
-    });
-  };
-
-  useEffect(() => fetchCourses(false, 1), [fetchAgain]);
 
   const filteredCourses = () => {
     const filteredCourses = data?.CatalogContent?.contentItems?.filter(
       (course) =>
-        course?.title?.includes(pageVars.search) ||
-        course?.authors?.join(", ").includes(pageVars.search)
+        course?.title?.includes(searchVariables.search) ||
+        course?.authors?.join(", ").includes(searchVariables.search)
     );
 
     return filteredCourses || [];
@@ -106,9 +87,9 @@ const ExploreCatalog = () => {
         <View style={styles.searchboxContainer}>
           <View style={{ flexGrow: 1, marginRight: 3 }}>
             <Searchbar
-              searchText={pageVars.search}
-              onSearch={(str: string) =>
-                setPageVars({ ...pageVars, search: str })
+              searchText={searchVariables.search}
+              onSearch={(text: string) =>
+                setSearchVariables({ ...searchVariables, search: text })
               }
             />
           </View>
@@ -137,12 +118,15 @@ const ExploreCatalog = () => {
           data?.CatalogContent?.contentItems?.length > 0 && (
             <FlatList
               style={{
-                marginBottom: data?.CatalogContent?.contentItems?.length * 20,
+                marginBottom:
+                  ((data?.CatalogContent?.contentItems?.length *
+                    Dimensions.get("window").width) /
+                    440) *
+                  32,
               }}
               data={filteredCourses()}
               scrollEnabled={true}
               renderItem={({ item }) => <CourseItem item={item} />}
-              onEndReached={() => fetchCourses()}
               onEndReachedThreshold={0.5}
               ListEmptyComponent={
                 <Text style={styles.noRecords}>
