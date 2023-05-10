@@ -112,7 +112,9 @@ const Registration = () => {
   };
 
   const Register = async () => {
+    console.log("BOOM 1");
     if (formValidated()) {
+      console.log("BOOM 2");
       try {
         setProcessing(true);
 
@@ -129,6 +131,7 @@ const Registration = () => {
 
         navigation.navigate("Login");
       } catch (error) {
+        console.log("******* Registration Error: ", error);
         setProcessing(false);
         if (
           error ===
@@ -145,7 +148,7 @@ const Registration = () => {
   };
 
   return (
-    <View style={AppStyle.container}>
+    <View style={styles(processing).container}>
       {processing && (
         <Success title="" message="Registration going on, Please wait.. " />
       )}
@@ -168,13 +171,13 @@ const Registration = () => {
           )}
 
           <KeyboardAvoidingView
-            style={styles.keyboardOffset}
+            style={styles(processing).keyboardOffset}
             keyboardVerticalOffset={5}
             behavior={"position"}
           >
-            <View style={styles.prompt}>
+            <View style={styles(processing).prompt}>
               <Logo />
-              <Text style={styles.title}>Create New Account</Text>
+              <Text style={styles(processing).title}>Create New Account</Text>
             </View>
             <View>
               <Text style={AppStyle.label}>Email</Text>
@@ -228,24 +231,27 @@ const Registration = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  prompt: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  keyboardOffset: {
-    width: "100%",
-  },
-
-  title: {
-    fontSize: (Dimensions.get("window").width / 440) * 24,
-    lineHeight: 36,
-    textAlign: "center",
-    color: "#1F2937",
-    marginBottom: 10,
-    fontFamily: "Poppins_700Bold",
-  },
-});
+const styles = (processing: boolean) =>
+  StyleSheet.create({
+    container: {
+      ...AppStyle.container,
+      backgroundColor: processing ? "#3B1FA3" : "#FFFFFF",
+    },
+    prompt: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    keyboardOffset: {
+      width: "100%",
+    },
+    title: {
+      fontSize: (Dimensions.get("window").width / 440) * 24,
+      lineHeight: 36,
+      textAlign: "center",
+      color: "#1F2937",
+      marginBottom: 10,
+      fontFamily: "Poppins_700Bold",
+    },
+  });
 
 export default Registration;
