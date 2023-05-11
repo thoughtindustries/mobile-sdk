@@ -62,6 +62,9 @@ const App = () => {
 
   const httpLink = createHttpLink({
     uri: `${TI_API_INSTANCE}/helium?apiKey=${TI_API_KEY}`,
+    fetchOptions: {
+      mode: "no-cors",
+    },
   });
 
   const authLink = setContext(async (_, { headers }) => {

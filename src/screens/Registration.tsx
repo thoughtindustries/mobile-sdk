@@ -112,9 +112,7 @@ const Registration = () => {
   };
 
   const Register = async () => {
-    console.log("BOOM 1");
     if (formValidated()) {
-      console.log("BOOM 2");
       try {
         setProcessing(true);
 
