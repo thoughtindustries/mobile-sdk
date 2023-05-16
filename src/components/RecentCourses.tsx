@@ -18,7 +18,7 @@ type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const { data, loading, error } = useUserRecentContentQuery({
+  const { data } = useUserRecentContentQuery({
     variables: { limit: 5 },
   });
 

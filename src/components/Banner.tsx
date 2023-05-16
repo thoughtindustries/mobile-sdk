@@ -27,24 +27,24 @@ const Banner = () => {
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: data?.UserRecentContent[0].id || "",
+            cid: data?.UserRecentContent[0]?.id || "",
             from: "Home",
           })
         }
       >
         <View style={styles.bannerContainer}>
           <ImageBackground
-            source={{ uri: data?.UserRecentContent[0].asset }}
+            source={{ uri: data?.UserRecentContent[0]?.asset }}
             resizeMode="cover"
             imageStyle={{ borderRadius: 8 }}
           >
             <View style={styles.bannerArea}>
               <Text style={styles.bannerTitle}>
-                {data?.UserRecentContent[0].title}
+                {data?.UserRecentContent[0]?.title}
               </Text>
               <Text style={styles.bannerText}>
                 {_.truncate(
-                  striptags(data?.UserRecentContent[0].description || ""),
+                  striptags(data?.UserRecentContent[0]?.description || ""),
                   {
                     length: 70,
                   }
