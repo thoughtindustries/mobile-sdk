@@ -13,8 +13,7 @@ import {
 import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { TI_API_INSTANCE } from "@env";
-import tiApi from "../helpers/TIApi";
+import { TI_API_INSTANCE, TI_API_KEY } from "@env";
 import dbObj from "../helpers/Db";
 import Success from "./Success";
 import { useNavigation } from "@react-navigation/native";
@@ -108,63 +107,77 @@ const Login = () => {
           },
         });
 
-        // Retrieve auth token and store
-        const token = data?.Login;
-        await SecureStore.setItemAsync("token", token || "");
+        if (data) {
+          // Retrieve auth token and store
+          const token = data.Login;
+          await SecureStore.setItemAsync("token", token || "");
 
-        // Query user's information and store
-        const userInfo = await tiApi.userDetails(form.email.value);
-        await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
+          // Query user's information and store
+          const response = await fetch(
+            `${TI_API_INSTANCE}/incoming/v2/users/${form.email.value}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: "Bearer " + TI_API_KEY,
+              },
+            }
+          );
 
-        // Look user id and store
-        const userId = await dbObj.userLookup(form.email.value);
-        await SecureStore.setItemAsync("userId", JSON.stringify(userId));
+          const userInfo = await response.json();
+          await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
 
-        // Navigate to home screen
-        navigation.navigate("HomeScreen");
+          // Look user id and store
+          const userId = await dbObj.userLookup(form.email.value);
+          await SecureStore.setItemAsync("userId", JSON.stringify(userId));
 
-        // Clear input fields
-        setForm({
-          ...form,
-          email: { ...form.email, value: "", error: "" },
-          password: { ...form.password, value: "", error: "" },
-        });
+          // Navigate to home screen
+          navigation.navigate("HomeScreen");
+
+          // Clear input fields
+          setForm({
+            ...form,
+            email: { ...form.email, value: "", error: "" },
+            password: { ...form.password, value: "", error: "" },
+          });
+        }
       }
-    } catch ({ message }) {
-      if (message === "401 Unauthorized") {
-        setResponseError({
-          title: "Invalid email or password.",
-          message:
-            "If you do not have an account you can register for a new one.",
-        });
-      }
-      if (message === "423 Locked") {
-        setResponseError({
-          title: "Account Locked",
-          message:
-            "Your account has been disabled. Please contact your account administrator.",
-        });
-      }
-      if (message === "User Throttled") {
-        setResponseError({
-          title: "Too Many Attemps",
-          message:
-            "You have made too many log in attempts. Please try again in 30 minutes.",
-        });
-      }
-      if (message === "Password reset required") {
-        setResponseError({
-          title: "Reset Required",
-          message:
-            "To gain access to your account, you will have to reset your password. Please check your email to continue the password reset process. After resetting your password, you'll be able to login.",
-        });
-      }
-      if (message === "Email verification required") {
-        setResponseError({
-          title: "Verify Email",
-          message:
-            "This account requires validation via email confirmation. An email has been sent to you with instructions to validate your email address. After you cofirm your account, you will be able to sign in and access your learning.",
-        });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "401 Unauthorized") {
+          setResponseError({
+            title: "Invalid email or password.",
+            message:
+              "If you do not have an account you can register for a new one.",
+          });
+        }
+        if (error.message === "423 Locked") {
+          setResponseError({
+            title: "Account Locked",
+            message:
+              "Your account has been disabled. Please contact your account administrator.",
+          });
+        }
+        if (error.message === "User Throttled") {
+          setResponseError({
+            title: "Too Many Attemps",
+            message:
+              "You have made too many log in attempts. Please try again in 30 minutes.",
+          });
+        }
+        if (error.message === "Password reset required") {
+          setResponseError({
+            title: "Reset Required",
+            message:
+              "To gain access to your account, you will have to reset your password. Please check your email to continue the password reset process. After resetting your password, you'll be able to login.",
+          });
+        }
+        if (error.message === "Email verification required") {
+          setResponseError({
+            title: "Verify Email",
+            message:
+              "This account requires validation via email confirmation. An email has been sent to you with instructions to validate your email address. After you cofirm your account, you will be able to sign in and access your learning.",
+          });
+        }
       }
     }
   };
