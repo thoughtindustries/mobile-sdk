@@ -23,42 +23,45 @@ const FilterControl = () => {
     const [filters, setFilters] = useState({
       sortDir: appliedFilters.sortDir,
       duration: [
-        { title: "1 Hour", selected: appliedFilters.values.includes("1 Hour") },
+        {
+          title: "1 Hour",
+          selected: appliedFilters?.values?.includes("1 Hour"),
+        },
         {
           title: "3 - 8 Hours",
-          selected: appliedFilters.values.includes("3 - 8 Hours"),
+          selected: appliedFilters?.values?.includes("3 - 8 Hours"),
         },
         {
           title: "9 - 16 Hours",
-          selected: appliedFilters.values.includes("9 - 16 Hours"),
+          selected: appliedFilters?.values?.includes("9 - 16 Hours"),
         },
         {
           title: "A couple of days",
-          selected: appliedFilters.values.includes("A couple of days"),
+          selected: appliedFilters?.values?.includes("A couple of days"),
         },
       ],
       difficulty: [
         {
           title: "Beginner",
-          selected: appliedFilters.values.includes("Beginner"),
+          selected: appliedFilters?.values?.includes("Beginner"),
         },
         {
           title: "Intermediate",
-          selected: appliedFilters.values.includes("Intermediate"),
+          selected: appliedFilters?.values?.includes("Intermediate"),
         },
         {
           title: "Advanced",
-          selected: appliedFilters.values.includes("Advanced"),
+          selected: appliedFilters?.values?.includes("Advanced"),
         },
       ],
       tags: [
         {
           title: "QuickStart",
-          selected: appliedFilters.values.includes("QuickStart"),
+          selected: appliedFilters?.values?.includes("QuickStart"),
         },
         {
           title: "Business",
-          selected: appliedFilters.values.includes("Business"),
+          selected: appliedFilters?.values?.includes("Business"),
         },
       ],
       myLearningsEvent: [
