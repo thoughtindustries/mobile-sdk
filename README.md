@@ -45,7 +45,8 @@ To run locally, run the following command:
 ```bash
 npm run start
 ```
+You will be prompted for your instance url, instance API key, and instance nickname. These values will be used to generate and store your environment variables.
 
-You will have to the options to scan the QR code to run the application on your mobile device, run the application on an iOS simulator, or run the application on an Android Emulator.
+Once the Metro Bundler has started, you will have to the options to scan the QR code to run the application on your mobile device, run the application on an iOS simulator, or run the application on an Android Emulator.
 
 To select a specific iOS device press `Shift + i` and to select a specific Android Emulator press `Shift + a`

@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { existsSync } from "fs";
 
 const isAbsoluteUrl = (url) => {
   return new Promise((resolve, reject) => {
@@ -56,9 +57,12 @@ const prompts = async () => {
 };
 
 (async () => {
-  const instance = await prompts();
-  const fileName = path.resolve(process.cwd(), ".env");
-  const data = `TI_INSTANCE_NAME=${instance.nickname}\nTI_API_INSTANCE=${instance.instanceUrl}\nTI_API_KEY=${instance.apiKey}`;
+  if (!existsSync(".env")) {
+    const instance = await prompts();
+    console.log("Generating env file...");
+    const fileName = path.resolve(process.cwd(), ".env");
+    const data = `TI_INSTANCE_NAME=${instance.nickname}\nTI_API_INSTANCE=${instance.instanceUrl}\nTI_API_KEY=${instance.apiKey}`;
 
-  return writeFile(fileName, data);
+    return writeFile(fileName, data);
+  }
 })();
