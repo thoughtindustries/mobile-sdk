@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Image, View, Text, StyleSheet, Dimensions } from "react-native";
+import { UserDetailType } from "../../types";
 import * as SecureStore from "expo-secure-store";
 
-interface UserDetailProps {
-  firstName: string;
-  lastName: string;
-  asset: string;
-}
-
 const UserHeader = () => {
-  const [userInfo, setUserInfo] = useState<UserDetailProps>({
+  const [userInfo, setUserInfo] = useState<UserDetailType>({
+    id: "",
     firstName: "",
     lastName: "",
+    email: "",
+    address1: "",
+    address2: "",
     asset: "",
+    roleKey: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    telephone: "",
+    externalCustomerId: "",
+    lang: "",
+    ref1: "",
+    ref2: "",
+    ref3: "",
+    ref4: "",
+    ref5: "",
+    ref6: "",
+    ref7: "",
+    ref8: "",
+    ref9: "",
+    ref10: "",
   });
 
   useEffect(() => {

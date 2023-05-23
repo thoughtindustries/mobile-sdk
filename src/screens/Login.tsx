@@ -18,7 +18,7 @@ import dbObj from "../helpers/Db";
 import Success from "./Success";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
+import { RootStackParamList, ErrorMessageType } from "../../types";
 import { useLoginMutation } from "../graphql";
 import * as SecureStore from "expo-secure-store";
 
@@ -39,10 +39,10 @@ const Login = () => {
   const navigation = useNavigation<LoginScreenProps>();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
   const [loginMutation, { loading }] = useLoginMutation();
-  const [responseError, setResponseError] = useState<{
-    title: string;
-    message: string;
-  }>({ title: "", message: "" });
+  const [responseError, setResponseError] = useState<ErrorMessageType>({
+    title: "",
+    message: "",
+  });
   const [form, setForm] = useState<FormProps>({
     email: { value: "", error: "" },
     password: { value: "", error: "" },

@@ -119,3 +119,8 @@ export type questionChoice = {
   response?: string;
   value: string;
 };
+
+export type ErrorMessageType = {
+  title: string;
+  message: string;
+};

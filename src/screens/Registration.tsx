@@ -14,7 +14,7 @@ import tiApiObj from "../helpers/TIApi";
 import { TI_INSTANCE_NAME } from "@env";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
+import { RootStackParamList, ErrorMessageType } from "../../types";
 
 type RegistrationScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -38,10 +38,10 @@ interface FormProps {
 
 const Registration = () => {
   const [processing, setProcessing] = useState<boolean>(false);
-  const [responseError, setResponseError] = useState<{
-    title: string;
-    message: string;
-  }>({ title: "", message: "" });
+  const [responseError, setResponseError] = useState<ErrorMessageType>({
+    title: "",
+    message: "",
+  });
   const [message, setMessage] = useState<any>("");
   const navigation = useNavigation<RegistrationScreenProps>();
   const [form, setForm] = useState<FormProps>({
@@ -129,21 +129,7 @@ const Registration = () => {
 
         navigation.navigate("Login");
       } catch (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log("Error", error.message);
-        }
+        console.log("Registration Error: ", error);
         setProcessing(false);
         if (
           error ===

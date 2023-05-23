@@ -7,31 +7,47 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  LogBox,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TI_API_INSTANCE } from "@env";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { RootStackParamList } from "../../types";
+import { RootStackParamList, UserDetailType } from "../../types";
 import * as SecureStore from "expo-secure-store";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
 
-interface UserDetailProps {
-  firstName: string;
-  lastName: string;
-  email: string;
-  asset: string;
-}
-
 const Account = () => {
+  LogBox.ignoreLogs(["Require cycle:"]);
   const navigation = useNavigation<AccountScreenProps>();
 
-  const [userInfo, setUserInfo] = useState<UserDetailProps>({
+  const [userInfo, setUserInfo] = useState<UserDetailType>({
+    id: "",
     firstName: "",
     lastName: "",
     email: "",
+    address1: "",
+    address2: "",
     asset: "",
+    roleKey: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    telephone: "",
+    externalCustomerId: "",
+    lang: "",
+    ref1: "",
+    ref2: "",
+    ref3: "",
+    ref4: "",
+    ref5: "",
+    ref6: "",
+    ref7: "",
+    ref8: "",
+    ref9: "",
+    ref10: "",
   });
 
   useEffect(() => {

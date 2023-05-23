@@ -9,61 +9,105 @@ import {
 import { Logo, Button, Message } from "../components";
 import Success from "./Success";
 import AppStyle from "../../AppStyle";
-import tiApiObj from "../helpers/TIApi";
-import _ from "lodash";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import { UserDetailType } from "../../types";
-import Utils from "../helpers/Utils";
+import { UserDetailType, ErrorMessageType } from "../../types";
+import * as SecureStore from "expo-secure-store";
+import { TI_API_INSTANCE, TI_API_KEY } from "@env";
+
+type ProfileEditScreenProps = StackNavigationProp<
+  RootStackParamList,
+  "ProfileEdit"
+>;
 
 const ProfileEdit = () => {
-  const [udata, setUdata] = useState<{
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  }>({
+  const navigation = useNavigation<ProfileEditScreenProps>();
+  const [userInfo, setUserInfo] = useState<UserDetailType>({
     id: "",
     firstName: "",
     lastName: "",
     email: "",
+    address1: "",
+    address2: "",
+    asset: "",
+    roleKey: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    telephone: "",
+    externalCustomerId: "",
+    lang: "",
+    ref1: "",
+    ref2: "",
+    ref3: "",
+    ref4: "",
+    ref5: "",
+    ref6: "",
+    ref7: "",
+    ref8: "",
+    ref9: "",
+    ref10: "",
   });
   const [processing, setProcessing] = useState<boolean>(false);
-  const [message, setMessage] = useState<any>({ error: "", info: "" });
+  const [message, setMessage] = useState<ErrorMessageType>({
+    title: "",
+    message: "",
+  });
 
-  type ProfileEditScreenProps = StackNavigationProp<
-    RootStackParamList,
-    "ProfileEdit"
-  >;
+  useEffect(() => {
+    (async () => {
+      const response = await SecureStore.getItemAsync("userInfo");
+      if (response) {
+        setUserInfo(JSON.parse(response));
+      }
+    })();
+  }, []);
 
-  const navigation = useNavigation<ProfileEditScreenProps>();
-
-  const loadStoredUserData = () => {
-    Utils.fetch("udata").then((val) =>
-      setUdata(_.pick(val, ["id", "firstName", "lastName", "email"]))
-    );
+  const handleModalClose = () => {
+    setMessage({ title: "", message: "" });
+    navigation.navigate("Account");
   };
 
-  useEffect(loadStoredUserData, []);
-
-  const goUpdate = () => {
+  const updateProfile = async () => {
     setProcessing(true);
-
-    tiApiObj
-      .updateUser(udata)
-      .then((res: UserDetailType | string) => {
-        setProcessing(false);
+    try {
+      const response = await fetch(
+        `${TI_API_INSTANCE}/incoming/v2/users/${userInfo.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${TI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            email: userInfo.email,
+          }),
+        }
+      );
+      if (response.ok) {
         setMessage({
-          error: _.isString(res) ? res : "",
-          info: _.isObject(res) ? "User updated successfully" : "",
+          title: "Congrats!",
+          message: "Your profile has been successfully updated!",
         });
-        return Utils.store("udata", res).then(loadStoredUserData);
-      })
-      .catch((err) => {
-        setProcessing(false);
-        setMessage({ info: "", error: _.get(err, "message", err) });
+        await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
+      } else {
+        setMessage({
+          title: "Uh-Oh!",
+          message: "It looks like we had a problem processing your request.",
+        });
+      }
+      setProcessing(false);
+    } catch (error) {
+      setProcessing(false);
+      setMessage({
+        title: "Uh-Oh!",
+        message: "It looks like we had a problem processing your request.",
       });
+    }
   };
 
   return (
@@ -74,12 +118,11 @@ const ProfileEdit = () => {
 
       {!processing && (
         <View style={AppStyle.container}>
-          {(message.error !== "" || message.info !== "") && (
+          {(message.title !== "" || message.message !== "") && (
             <Message
-              type={message.error !== "" ? "error" : "info"}
-              title={message.info !== "" ? "Profile Edit" : "Error Occurred"}
-              message={message.info !== "" ? message.info : message.error}
-              onHide={() => setMessage({ info: "", error: "" })}
+              title={message.title}
+              message={message.message}
+              onHide={() => handleModalClose()}
             />
           )}
 
@@ -98,9 +141,9 @@ const ProfileEdit = () => {
                 textContentType="name"
                 placeholder="First Name"
                 onChangeText={(text: string) => {
-                  setUdata({ ...udata, firstName: text });
+                  setUserInfo({ ...userInfo, firstName: text });
                 }}
-                defaultValue={udata.firstName}
+                defaultValue={userInfo.firstName}
                 style={AppStyle.input}
               />
               <Text style={AppStyle.label}>Last Name</Text>
@@ -108,12 +151,12 @@ const ProfileEdit = () => {
                 textContentType="name"
                 placeholder="Last Name"
                 onChangeText={(text: string) => {
-                  setUdata({ ...udata, lastName: text });
+                  setUserInfo({ ...userInfo, lastName: text });
                 }}
-                defaultValue={udata.lastName}
+                defaultValue={userInfo.lastName}
                 style={AppStyle.input}
               />
-              <Button title="Update" onPress={goUpdate} />
+              <Button title="Update" onPress={updateProfile} />
             </View>
           </KeyboardAvoidingView>
         </View>
