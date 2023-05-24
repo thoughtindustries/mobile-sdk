@@ -5,29 +5,26 @@ import { isEmpty } from "lodash";
 
 interface SearchBarProps {
   searchText: string;
-  onSearch(str: string): void;
+  setSearch(search: string): void;
 }
 
-const Searchbar = ({ searchText, onSearch }: SearchBarProps) => {
-  const saveSearchText = (txt: string) => {
-    searchText = txt;
-  };
-
+const Searchbar = ({ searchText, setSearch }: SearchBarProps) => {
   return (
     <View style={styles.searchboxContainer}>
       <TextInput
-        onChangeText={saveSearchText}
-        defaultValue={searchText}
+        onChangeText={setSearch}
+        value={searchText}
+        defaultValue={""}
         style={styles.searchbox}
         placeholder="Search by Title, Instructor or Tag"
       />
       {isEmpty(searchText) && (
-        <Pressable onPress={() => onSearch(searchText)} style={styles.magnify}>
+        <Pressable onPress={() => setSearch(searchText)} style={styles.magnify}>
           <MaterialCommunityIcons name="magnify" size={22} color="#232323" />
         </Pressable>
       )}
       {!isEmpty(searchText) && (
-        <Pressable onPress={() => onSearch("")} style={styles.magnify}>
+        <Pressable onPress={() => setSearch("")} style={styles.magnify}>
           <MaterialCommunityIcons
             name="close-circle-outline"
             size={22}

@@ -55,7 +55,7 @@ const CourseDetails = () => {
                 name="chevron-left"
                 size={36}
                 color="#374151"
-                onPress={() => navigation.navigate("My Learning")}
+                onPress={() => navigation.goBack()}
               />
             </View>
             <Text style={styles.bannerTitle}>

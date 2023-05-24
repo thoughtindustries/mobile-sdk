@@ -6,11 +6,10 @@ import {
   StyleSheet,
   FlatList,
   ScrollView,
-  Animated,
-  Permission,
   Pressable,
+  Dimensions,
+  TouchableOpacity,
 } from "react-native";
-
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType, RootStackParamList } from "../../types";
@@ -19,12 +18,16 @@ import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import dbObj from "../helpers/Db";
-
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as Permissions from "expo-permissions";
+import {
+  useUserRecentContentQuery,
+  useUserContentItemsQuery,
+  GlobalTypes,
+} from "../graphql";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -34,15 +37,27 @@ type MyLearningScreenProps = StackNavigationProp<
 const MyLearnings = () => {
   const navigation = useNavigation<MyLearningScreenProps>();
 
-  const [filters, setFilters] = useState<{
-    sortBy: string;
-    sortDir: string;
-    tag: string;
-  }>({
-    sortBy: "title",
-    sortDir: "asc",
-    tag: "",
+  const [filters, setFilters] = useState<filtersType>({
+    sortBy: GlobalTypes.SortColumn.Title,
+    sortDir: GlobalTypes.SortDirection.Asc,
+    labels: [],
+    values: [],
   });
+
+  const { data: recentContentData, loading: recentContentDataLoading } =
+    useUserRecentContentQuery({
+      variables: { limit: 5 },
+    });
+
+  const { data: contentItemData, loading: contentItemDataLoading } =
+    useUserContentItemsQuery({
+      variables: {
+        sortColumn: filters.sortBy,
+        sortDirection: filters.sortDir,
+      },
+    });
+
+  const [search, setSearch] = useState<string>("");
 
   const [tab, setTab] = useState<string>("All");
   const [courses, setCourses] = useState<courseListType[]>([]);
@@ -243,30 +258,29 @@ const MyLearnings = () => {
         searching: true,
         showFilter: false,
       });
-      tiGql
-        .myLearnings({
-          sortBy: filters.sortBy,
-          sortDir: filters.sortDir,
-          tag: filters.tag,
-        })
-        .then((data) => {
-          if (data.recent.length === 0) {
-            return fetchCourses(false, 1);
-          } else {
-            return fetchCourseProgresses(data.items)
-              .then((items) => (data.items = items))
-              .then(() => markOfflineStatus(data.items))
-              .then((items) => (data.items = items))
-              .then(() => setContent(data));
-          }
-        })
-        .catch(console.log)
-        .finally(() =>
-          setPageVars({ ...pageVars, showFilter: false, searching: false })
-        );
+      tiGql.myLearnings({
+        sortBy: filters.sortBy,
+        sortDir: filters.sortDir,
+        tag: filters.tag,
+      });
+      // .then((data) => {
+      //   if (data.recent.length === 0) {
+      //     return fetchCourses(false, 1);
+      //   } else {
+      //     return fetchCourseProgresses(data.items)
+      //       .then((items) => (data.items = items))
+      //       .then(() => markOfflineStatus(data.items))
+      //       .then((items) => (data.items = items))
+      //       .then(() => setContent(data));
+      //   }
+      // })
+      // .catch(console.log)
+      // .finally(() =>
+      //   setPageVars({ ...pageVars, showFilter: false, searching: false })
+      // );
     }
   };
-  useEffect(() => fetchMyLearnings(), [fetchAgain]);
+  // useEffect(() => fetchMyLearnings(), [fetchAgain]);
 
   const onFilter = (flts: filtersType) => {
     setFilters({ ...filters, ...flts });
@@ -276,11 +290,13 @@ const MyLearnings = () => {
 
   const filteredContents = () => {
     if (tab === "Offline" || Utils.isOffline()) {
-      return content.items.filter(
-        (c) => c.title.includes(pageVars.search) && c.isOffline
+      return contentItemData?.UserContentItems?.filter(
+        (item) => item?.title?.includes(pageVars.search) /*&& item?.isOffline*/
       );
     } else {
-      return content.items.filter((c) => c.title.includes(pageVars.search));
+      return contentItemData?.UserContentItems?.filter((item) =>
+        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      );
     }
   };
 
@@ -329,7 +345,17 @@ const MyLearnings = () => {
     }
 
     return (
-      <View style={styles.contentRow}>
+      <TouchableOpacity
+        style={styles.contentRow}
+        onPress={() => {
+          navigation.navigate("CourseDetails", {
+            cid: props.data.id,
+            title: props.data.title,
+            asset: props.data.asset,
+            contentTypeLabel: props.data.contentTypeLabel,
+          });
+        }}
+      >
         {imgurl && (
           <Image source={{ uri: imgurl }} style={styles.contentImage} />
         )}
@@ -364,20 +390,7 @@ const MyLearnings = () => {
               />
             )}
           </View>
-          <Text
-            style={styles.courseTitle}
-            onPress={() => {
-              console.log(props.data.id);
-              navigation.navigate("CourseDetails", {
-                cid: props.data.id,
-                title: props.data.title,
-                asset: props.data.asset,
-                contentTypeLabel: props.data.contentTypeLabel,
-              });
-            }}
-          >
-            {props.data.title}
-          </Text>
+          <Text style={styles.courseTitle}>{props.data.title}</Text>
           {props.data.contentTypeLabel === "Course" && !props.isRecommended && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
@@ -390,53 +403,41 @@ const MyLearnings = () => {
             </View>
           )}
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
-  const CategoryFilter = () => (
-    <ScrollView horizontal={true} style={styles.catContainer}>
-      {Utils.filterValues.myLearningsEvent.map((cat, idx) => (
-        <Pressable key={idx} onPress={() => setTab(cat)}>
-          <View
-            style={{
-              ...styles.catBox,
-              ...(tab === cat ? styles.catBoxSelected : styles.catBoxNormal),
-            }}
-          >
-            <Text
+  const CategoryFilter = () => {
+    const events: string[] = ["All", "Offline"];
+    return (
+      <ScrollView horizontal={true} style={styles.catContainer}>
+        {events.map((item, idx) => (
+          <Pressable key={idx} onPress={() => setTab(item)}>
+            <View
               style={{
-                ...styles.catTitle,
-                ...(tab === cat
-                  ? styles.catTitleSelected
-                  : styles.catTitleNormal),
+                ...styles.catBox,
+                ...(tab === item ? styles.catBoxSelected : styles.catBoxNormal),
               }}
             >
-              {cat}
-            </Text>
-          </View>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
-
-  const LatestActive = () => (
-    <>
-      <Text style={styles.title}>Latest Active</Text>
-      <View style={{ ...styles.contentRow, backgroundColor: "#fff" }}>
-        <View style={styles.contentRightBox}>
-          <Text style={styles.courseTitle}>{content.recent[0].title}</Text>
-        </View>
-        <Image
-          source={{ uri: content.recent[0].asset }}
-          style={styles.recentImage}
-        />
-      </View>
-    </>
-  );
+              <Text
+                style={{
+                  ...styles.catTitle,
+                  ...(tab === item
+                    ? styles.catTitleSelected
+                    : styles.catTitleNormal),
+                }}
+              >
+                {item}
+              </Text>
+            </View>
+          </Pressable>
+        ))}
+      </ScrollView>
+    );
+  };
 
   const RecommendedList = () => (
-    <>
+    <View>
       <Text style={{ ...styles.note, paddingTop: 30 }}>
         It's looking a bit empty right now, we know. But this is where you'll
         find your most recent activity, Events, Completed Courses,
@@ -450,18 +451,20 @@ const MyLearnings = () => {
         )}
         onEndReached={fetchCourses}
         onEndReachedThreshold={0.5}
-        style={
-          Utils.isOffline()
-            ? styles.contentListStyleOffline
-            : styles.contentListStyle
-        }
+        style={{
+          marginBottom:
+            ((contentItemData?.UserContentItems?.length *
+              Dimensions.get("window").width) /
+              440) *
+            400,
+        }}
         ListEmptyComponent={
           <Text style={styles.noRecords}>
             No records found, try using other filters.
           </Text>
         }
       />
-    </>
+    </View>
   );
 
   const ContentList = () => (
@@ -470,11 +473,10 @@ const MyLearnings = () => {
       renderItem={({ item }) => (
         <ContentItem data={item} isRecommended={false} />
       )}
-      style={
-        Utils.isOffline()
-          ? styles.contentListStyleOffline
-          : styles.contentListStyle
-      }
+      style={{
+        height: (Dimensions.get("window").height / 440) * 175,
+      }}
+      scrollEnabled={true}
       ListEmptyComponent={
         <Text style={styles.noRecords}>
           No records found, try using other filters.
@@ -486,43 +488,52 @@ const MyLearnings = () => {
   return (
     <View style={styles.page}>
       <Text style={styles.title}>My Learning</Text>
-
       {Utils.isOffline() === true && <ContentList />}
-
       {Utils.isOffline() !== true && (
-        <>
+        <View>
           <View style={styles.searchboxContainer}>
             <View style={{ flexGrow: 1, marginRight: 3 }}>
-              <Searchbar
-                searchText={pageVars.search}
-                onSearch={(str: string) =>
-                  setPageVars({ ...pageVars, search: str })
-                }
-              />
+              <Searchbar searchText={search} setSearch={setSearch} />
             </View>
             <FilterControl onFilter={onFilter} navigation={navigation} />
           </View>
-
-          {pageVars.searching && (
+          {recentContentDataLoading || contentItemDataLoading ? (
             <View style={styles.searching}>
-              <Text style={styles.searchingText}>Loading data </Text>
+              <Text style={styles.searchingText}>Loading data</Text>
               <Loader size={50} />
             </View>
-          )}
-          {!pageVars.searching && (
-            <>
-              {content.recent.length > 0 && (
-                <>
-                  <LatestActive />
+          ) : (
+            <View>
+              {contentItemData?.UserContentItems &&
+              contentItemData.UserContentItems.length > 0 ? (
+                <View>
+                  <View>
+                    <Text style={styles.latestTitle}>Latest Active</Text>
+                    <View
+                      style={{ ...styles.contentRow, backgroundColor: "#fff" }}
+                    >
+                      <View style={styles.contentRightBox}>
+                        <Text style={styles.courseTitle}>
+                          {recentContentData?.UserRecentContent[0].title}
+                        </Text>
+                      </View>
+                      <Image
+                        source={{
+                          uri: recentContentData?.UserRecentContent[0].asset,
+                        }}
+                        style={styles.recentImage}
+                      />
+                    </View>
+                  </View>
                   <CategoryFilter />
                   <ContentList />
-                </>
+                </View>
+              ) : (
+                <RecommendedList />
               )}
-
-              {content.recent.length === 0 && <RecommendedList />}
-            </>
+            </View>
           )}
-        </>
+        </View>
       )}
     </View>
   );
@@ -540,13 +551,19 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
-
+  latestTitle: {
+    marginVertical: 10,
+    fontSize: 20,
+    lineHeight: 36,
+    textAlign: "left",
+    color: "#1F2937",
+    fontFamily: "Poppins_700Bold",
+  },
   searchboxContainer: {
     height: 50,
     display: "flex",
     flexDirection: "row",
   },
-
   catContainer: {
     display: "flex",
     flexDirection: "row",
@@ -554,46 +571,38 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
   },
-
   catBox: {
     borderRadius: 8,
     alignItems: "center",
     minWidth: 104,
     margin: 4,
   },
-
   catBoxSelected: {
     backgroundColor: "#3B1FA3",
   },
-
   catBoxNormal: {
     backgroundColor: "#f9fafv",
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#d1d5db",
   },
-
   catTitle: {
     fontWeight: "400",
     fontSize: 14,
     lineHeight: 24,
     padding: 4,
   },
-
   catTitleSelected: {
     color: "#ffffff",
   },
-
   catTitleNormal: {
     color: "#1f2937",
   },
-
   listStyle: {
     marginBottom: 170,
     marginLeft: -10,
     marginRight: -10,
   },
-
   courseRow: {
     display: "flex",
     flexDirection: "row",
@@ -602,11 +611,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomColor: "#ccc",
   },
-
   courseLeftBox: {
     flexGrow: 1,
   },
-
   courseTitle: {
     fontSize: 16,
     maxWidth: "80%",
@@ -615,29 +622,23 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
-
   courseAuthor: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     color: "#6B7280",
   },
-
   courseImage: {
     width: 75,
     height: 75,
     borderRadius: 15,
   },
-
   contentListStyle: {
-    height: "45%",
-    marginBottom: 170,
+    height: 200,
   },
-
   contentListStyleOffline: {
     height: "90%",
     marginBottom: 170,
   },
-
   contentRow: {
     display: "flex",
     flexDirection: "row",
@@ -648,7 +649,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
   },
-
   contentRightBox: {
     flexGrow: 1,
     minHeight: 100,
@@ -656,13 +656,11 @@ const styles = StyleSheet.create({
     marginRight: 20,
     maxWidth: "70%",
   },
-
   cTypeRow: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
-
   contentTag: {
     marginLeft: -5,
     borderRadius: 15,
@@ -673,40 +671,32 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     fontFamily: "Inter_400Regular",
   },
-
   Course: {
     backgroundColor: "#FDE68A",
   },
-
   Blog: {
     backgroundColor: "#A7F3D0",
   },
-
   Article: {
     backgroundColor: "#A7F3D0",
   },
-
   "Learning Path": {
     backgroundColor: "#DDD6FE",
   },
-
   Video: {
     backgroundColor: "#DDD6FE",
   },
-
   contentImage: {
     width: 100,
     height: "100%",
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
   },
-
   recentImage: {
     width: 70,
     borderRadius: 8,
     margin: 20,
   },
-
   searching: {
     backgroundColor: "#3B1FA3",
     borderRadius: 10,
@@ -717,7 +707,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   searchingText: {
     fontSize: 16,
     lineHeight: 24,
@@ -726,7 +715,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     padding: 20,
   },
-
   noRecords: {
     paddingTop: 40,
     textAlign: "center",
@@ -735,7 +723,6 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     fontFamily: "Poppins_700Bold",
   },
-
   note: {
     padding: 15,
     paddingBottom: 0,
@@ -744,14 +731,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Inter_400Regular",
   },
-
   progressBar: {
     height: 20,
     flexDirection: "row",
     backgroundColor: "#D1D5DB",
     borderRadius: 10,
   },
-
   progressStrip: {
     position: "absolute",
     height: 20,

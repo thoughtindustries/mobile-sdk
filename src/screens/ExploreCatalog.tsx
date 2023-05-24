@@ -27,6 +27,8 @@ const ExploreCatalog = () => {
     labels: [],
     values: [],
   });
+  const [search, setSearch] = useState<string>("");
+
   const { data, loading } = useCatalogContentQuery({
     variables: {
       sortColumn: filters.sortBy,
@@ -38,18 +40,11 @@ const ExploreCatalog = () => {
     },
   });
 
-  const [searchVariables, setSearchVariables] = useState({
-    search: "",
-    page: 0,
-    searching: loading,
-    showFilter: false,
-  });
-
   const filteredCourses = () => {
     const filteredCourses = data?.CatalogContent?.contentItems?.filter(
       (course) =>
-        course?.title?.includes(searchVariables.search) ||
-        course?.authors?.join(", ").includes(searchVariables.search)
+        course?.title?.includes(search) ||
+        course?.authors?.join(", ").includes(search)
     );
 
     return filteredCourses || [];
@@ -86,12 +81,7 @@ const ExploreCatalog = () => {
         <Text style={styles.title}>Explore The Catalog</Text>
         <View style={styles.searchboxContainer}>
           <View style={{ flexGrow: 1, marginRight: 3 }}>
-            <Searchbar
-              searchText={searchVariables.search}
-              onSearch={(text: string) =>
-                setSearchVariables({ ...searchVariables, search: text })
-              }
-            />
+            <Searchbar searchText={search} setSearch={setSearch} />
           </View>
           <FilterControl />
         </View>
