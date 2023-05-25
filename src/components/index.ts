@@ -14,6 +14,7 @@ import Recommendation from "./Recommendation";
 import RecentCourses from "./RecentCourses";
 import ResourceControl from "./ResourceControl";
 import CourseQuiz from "./CourseQuiz";
+import LoadingBanner from "./LoadingBanner";
 
 export {
   Button,
@@ -32,4 +33,5 @@ export {
   RecentCourses,
   ResourceControl,
   CourseQuiz,
+  LoadingBanner,
 };

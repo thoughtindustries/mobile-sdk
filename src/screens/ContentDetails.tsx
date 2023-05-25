@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   Image,
   Animated,
   ScrollView,
@@ -11,7 +10,7 @@ import {
   Pressable,
 } from "react-native";
 import { get, last, intersection } from "lodash";
-import { Loader } from "../components";
+import { LoadingBanner } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, contentListType } from "../../types";
@@ -284,9 +283,8 @@ const ContentDetails = () => {
         </View>
 
         {loading && (
-          <View style={styles.searching}>
-            <Text style={styles.searchingText}>Loading data </Text>
-            <Loader size={50} />
+          <View style={styles.loader}>
+            <LoadingBanner />
           </View>
         )}
 
@@ -301,6 +299,9 @@ const styles = StyleSheet.create({
   sectionList: {
     marginTop: 20,
     marginBottom: 150,
+  },
+  loader: {
+    marginHorizontal: 30,
   },
   collapse: {
     backgroundColor: "#FAFAFA",

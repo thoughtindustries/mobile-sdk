@@ -13,7 +13,7 @@ import {
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType, RootStackParamList } from "../../types";
-import { Loader, Searchbar, FilterControl } from "../components";
+import { Searchbar, FilterControl, LoadingBanner } from "../components";
 import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -26,8 +26,10 @@ import * as Permissions from "expo-permissions";
 import {
   useUserRecentContentQuery,
   useUserContentItemsQuery,
+  useCatalogContentQuery,
   GlobalTypes,
 } from "../graphql";
+import { FilterContext } from "../context";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -54,6 +56,18 @@ const MyLearnings = () => {
       variables: {
         sortColumn: filters.sortBy,
         sortDirection: filters.sortDir,
+      },
+    });
+
+  const { data: catalogData, loading: catalogDataLoading } =
+    useCatalogContentQuery({
+      variables: {
+        sortColumn: filters.sortBy,
+        sortDirection: filters.sortDir,
+        page: 1,
+        labels: filters.labels,
+        values: filters.values,
+        contentTypes: "Course",
       },
     });
 
@@ -109,6 +123,7 @@ const MyLearnings = () => {
   };
   const getOfflineMedia = (file_name: string) => {
     let fileUri: string = FileSystem.documentDirectory + file_name;
+    console.log(fileUri);
     return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);
   };
   const seekPermission = (fileUri: string) => {
@@ -152,7 +167,8 @@ const MyLearnings = () => {
             return c;
           }),
         })
-      );
+      )
+      .catch((error) => console.log(error));
   };
 
   const markOfflineStatus = (items: courseListType[]) => {
@@ -171,38 +187,6 @@ const MyLearnings = () => {
         })
         .catch(() => resolve(items));
     });
-  };
-
-  const fetchCourses = (
-    isPaginated: Boolean = true,
-    page: number = pageVars.page + 1
-  ) => {
-    if (isPaginated && courses.length < 40) {
-      return;
-    }
-
-    setPageVars({
-      ...pageVars,
-      searching: true,
-      showFilter: false,
-      page: page,
-    });
-    tiGql
-      .fetchCourses({
-        sortBy: filters.sortBy,
-        sortDir: filters.sortDir,
-        duration: "",
-        difficulty: "",
-        tag: filters.tag,
-        page: page,
-      })
-      .then((data) => {
-        setCourses(isPaginated ? [...courses, ...data] : data);
-      })
-      .catch(console.log)
-      .finally(() =>
-        setPageVars({ ...pageVars, showFilter: false, searching: false })
-      );
   };
 
   const fetchCourseProgresses = (items: courseListType[]) => {
@@ -234,64 +218,10 @@ const MyLearnings = () => {
     });
   };
 
-  const fetchMyLearnings = () => {
-    if (Utils.isOffline()) {
-      Utils.fetch("user_dbid")
-        .then(({ id }) => dbObj.fetchOfflineCourses(id, true))
-        .then((items) => {
-          console.log(items);
-          setContent({
-            ...content,
-            items: items.map((i) => ({
-              id: i.cid,
-              title: i.title,
-              contentTypeLabel: i.contentTypeLabel,
-              progress: parseFloat(i.percentComplete + ""),
-              asset: i.courseThumbnail,
-              isOffline: true,
-            })),
-          });
-        });
-    } else {
-      setPageVars({
-        ...pageVars,
-        searching: true,
-        showFilter: false,
-      });
-      tiGql.myLearnings({
-        sortBy: filters.sortBy,
-        sortDir: filters.sortDir,
-        tag: filters.tag,
-      });
-      // .then((data) => {
-      //   if (data.recent.length === 0) {
-      //     return fetchCourses(false, 1);
-      //   } else {
-      //     return fetchCourseProgresses(data.items)
-      //       .then((items) => (data.items = items))
-      //       .then(() => markOfflineStatus(data.items))
-      //       .then((items) => (data.items = items))
-      //       .then(() => setContent(data));
-      //   }
-      // })
-      // .catch(console.log)
-      // .finally(() =>
-      //   setPageVars({ ...pageVars, showFilter: false, searching: false })
-      // );
-    }
-  };
-  // useEffect(() => fetchMyLearnings(), [fetchAgain]);
-
-  const onFilter = (flts: filtersType) => {
-    setFilters({ ...filters, ...flts });
-    setCourses([]);
-    setFetchAgain(fetchAgain + 1);
-  };
-
-  const filteredContents = () => {
+  const filteredContent = () => {
     if (tab === "Offline" || Utils.isOffline()) {
-      return contentItemData?.UserContentItems?.filter(
-        (item) => item?.title?.includes(pageVars.search) /*&& item?.isOffline*/
+      return contentItemData?.UserContentItems?.filter((item) =>
+        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
       );
     } else {
       return contentItemData?.UserContentItems?.filter((item) =>
@@ -301,27 +231,41 @@ const MyLearnings = () => {
   };
 
   const filteredCourses = () => {
-    let data = courses.filter(
-      (c) =>
-        c.title.includes(pageVars.search) ||
-        c.authors.join(",").includes(pageVars.search)
+    return catalogData?.CatalogContent?.contentItems?.filter((item) =>
+      item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
     );
-    return data;
   };
 
-  const CourseItem = (props: { data: courseListType }) => {
+  const CourseItem = ({ data }: { data: courseListType }) => {
     return (
-      <View style={styles.courseRow}>
-        <View style={styles.courseLeftBox}>
-          <Text style={styles.courseTitle}>{props.data.title}</Text>
-          {props.data.authors.length > 0 && (
-            <Text style={styles.courseAuthor}>
-              By {props.data.authors.join(",")}
-            </Text>
+      <TouchableOpacity
+        style={styles.contentRow}
+        onPress={() => {
+          navigation.navigate("CourseDetails", {
+            cid: data.id,
+            title: data.title,
+            asset: data.asset,
+            contentTypeLabel: data.contentTypeLabel,
+          });
+        }}
+      >
+        <Image source={{ uri: data.asset }} style={styles.contentImage} />
+        <View style={styles.contentRightBox}>
+          <View style={styles.cTypeRow}>
+            <Text style={styles.contentTag}>{data.contentTypeLabel}</Text>
+          </View>
+          <Text style={styles.courseTitle}>{data.title}</Text>
+          {data.contentTypeLabel === "Course" && (
+            <View style={{ flex: 0 }}>
+              <View style={styles.cTypeRow}>
+                <Text style={styles.note}>Progress</Text>
+                <Text style={styles.note}>{_.get(data, "progress", 0)}%</Text>
+              </View>
+              <ProgressBar percent={_.get(data, "progress", 0)} />
+            </View>
           )}
         </View>
-        <Image source={{ uri: props.data.asset }} style={styles.courseImage} />
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -332,74 +276,46 @@ const MyLearnings = () => {
     </View>
   );
 
-  const ContentItem = (props: {
-    data: courseListType;
-    isRecommended: boolean;
-  }) => {
-    let imgurl = props.data.isOffline
-      ? getOfflineMedia(props.data.asset)
-      : props.data.asset;
-
-    if (_.get(props, "data.contentTypeLabel", "Course") === "Class") {
-      _.set(props, "data.contentTypeLabel", "Course");
-    }
-
+  const ContentItem = ({ data }: { data: courseListType }) => {
+    getOfflineMedia(data.asset);
     return (
       <TouchableOpacity
         style={styles.contentRow}
         onPress={() => {
           navigation.navigate("CourseDetails", {
-            cid: props.data.id,
-            title: props.data.title,
-            asset: props.data.asset,
-            contentTypeLabel: props.data.contentTypeLabel,
+            cid: data.id,
+            title: data.title,
+            asset: data.asset,
+            contentTypeLabel: data.contentTypeLabel,
           });
         }}
       >
-        {imgurl && (
-          <Image source={{ uri: imgurl }} style={styles.contentImage} />
-        )}
+        <Image source={{ uri: data.asset }} style={styles.contentImage} />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
               style={{
                 ...styles.contentTag,
-                ..._.get(
-                  styles,
-                  _.get(props, "data.contentTypeLabel", "Course"),
-                  {}
-                ),
+                ..._.get(styles, _.get(data, "contentTypeLabel", "Course"), {}),
               }}
             >
-              {props.data.contentTypeLabel}
+              {data.contentTypeLabel}
             </Text>
-            {props.data.isOffline !== true && !props.isRecommended && (
-              <MaterialCommunityIcons
-                name="download"
-                size={22}
-                color="#232323"
-                onPress={() => offlineData(props.data, true)}
-              />
-            )}
-            {props.data.isOffline == true && !props.isRecommended && (
-              <MaterialCommunityIcons
-                name="close-circle-outline"
-                size={22}
-                color="#232323"
-                onPress={() => offlineData(props.data, false)}
-              />
-            )}
+            <MaterialCommunityIcons
+              name={`${data.isOffline ? "download" : "close-circle-outline"}`}
+              size={22}
+              color="#232323"
+              onPress={() => offlineData(data, data.isOffline ? false : true)}
+            />
           </View>
-          <Text style={styles.courseTitle}>{props.data.title}</Text>
-          {props.data.contentTypeLabel === "Course" && !props.isRecommended && (
+          <Text style={styles.courseTitle}>{data.title}</Text>
+          {data.contentTypeLabel === "Course" && (
             <View style={{ flex: 0 }}>
               <View style={styles.cTypeRow}>
                 <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>
-                  {_.get(props, "data.progress", 0)}%
-                </Text>
+                <Text style={styles.note}>{_.get(data, "progress", 0)}%</Text>
               </View>
-              <ProgressBar percent={_.get(props, "data.progress", 0)} />
+              <ProgressBar percent={_.get(data, "progress", 0)} />
             </View>
           )}
         </View>
@@ -446,17 +362,11 @@ const MyLearnings = () => {
       <Text style={styles.title}>Recommended Learning</Text>
       <FlatList
         data={filteredCourses()}
-        renderItem={({ item }) => (
-          <ContentItem data={item} isRecommended={true} />
-        )}
-        onEndReached={fetchCourses}
+        renderItem={({ item }) => <CourseItem data={item} />}
         onEndReachedThreshold={0.5}
+        showsVerticalScrollIndicator={false}
         style={{
-          marginBottom:
-            ((contentItemData?.UserContentItems?.length *
-              Dimensions.get("window").width) /
-              440) *
-            400,
+          height: (Dimensions.get("window").height / 440) * 200,
         }}
         ListEmptyComponent={
           <Text style={styles.noRecords}>
@@ -469,13 +379,12 @@ const MyLearnings = () => {
 
   const ContentList = () => (
     <FlatList
-      data={filteredContents()}
-      renderItem={({ item }) => (
-        <ContentItem data={item} isRecommended={false} />
-      )}
+      data={filteredContent()}
+      renderItem={({ item }) => <ContentItem data={item} />}
       style={{
         height: (Dimensions.get("window").height / 440) * 175,
       }}
+      showsVerticalScrollIndicator={false}
       scrollEnabled={true}
       ListEmptyComponent={
         <Text style={styles.noRecords}>
@@ -495,35 +404,47 @@ const MyLearnings = () => {
             <View style={{ flexGrow: 1, marginRight: 3 }}>
               <Searchbar searchText={search} setSearch={setSearch} />
             </View>
-            <FilterControl onFilter={onFilter} navigation={navigation} />
+            <FilterContext.Provider value={{ filters, setFilters }}>
+              <FilterControl />
+            </FilterContext.Provider>
           </View>
           {recentContentDataLoading || contentItemDataLoading ? (
-            <View style={styles.searching}>
-              <Text style={styles.searchingText}>Loading data</Text>
-              <Loader size={50} />
-            </View>
+            <LoadingBanner />
           ) : (
             <View>
-              {contentItemData?.UserContentItems &&
-              contentItemData.UserContentItems.length > 0 ? (
+              {recentContentData?.UserRecentContent &&
+              recentContentData.UserRecentContent.length > 0 ? (
                 <View>
                   <View>
                     <Text style={styles.latestTitle}>Latest Active</Text>
-                    <View
-                      style={{ ...styles.contentRow, backgroundColor: "#fff" }}
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("ContentDetails", {
+                          cid:
+                            recentContentData?.UserRecentContent[0]?.id || "",
+                          from: "My Learnings",
+                        })
+                      }
                     >
-                      <View style={styles.contentRightBox}>
-                        <Text style={styles.courseTitle}>
-                          {recentContentData?.UserRecentContent[0].title}
-                        </Text>
-                      </View>
-                      <Image
-                        source={{
-                          uri: recentContentData?.UserRecentContent[0].asset,
+                      <View
+                        style={{
+                          ...styles.contentRow,
+                          backgroundColor: "#fff",
                         }}
-                        style={styles.recentImage}
-                      />
-                    </View>
+                      >
+                        <View style={styles.contentRightBox}>
+                          <Text style={styles.courseTitle}>
+                            {recentContentData?.UserRecentContent[0].title}
+                          </Text>
+                        </View>
+                        <Image
+                          source={{
+                            uri: recentContentData?.UserRecentContent[0].asset,
+                          }}
+                          style={styles.recentImage}
+                        />
+                      </View>
+                    </TouchableOpacity>
                   </View>
                   <CategoryFilter />
                   <ContentList />

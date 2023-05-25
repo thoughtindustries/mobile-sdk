@@ -9,12 +9,12 @@ import {
   Dimensions,
 } from "react-native";
 import { filtersType } from "../../types";
-import { Loader, Searchbar, FilterControl } from "../components";
+import { Searchbar, FilterControl, LoadingBanner } from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
 import { GlobalTypes } from "../graphql";
-import { ExploreCatalogContext } from "../context";
+import { FilterContext } from "../context";
 import { useCatalogContentQuery } from "../graphql";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
@@ -77,55 +77,54 @@ const ExploreCatalog = () => {
 
   return (
     <View>
-      <ExploreCatalogContext.Provider value={{ setFilters, filters }}>
-        <Text style={styles.title}>Explore The Catalog</Text>
-        <View style={styles.searchboxContainer}>
-          <View style={{ flexGrow: 1, marginRight: 3 }}>
-            <Searchbar searchText={search} setSearch={setSearch} />
-          </View>
-          <FilterControl />
+      <Text style={styles.title}>Explore The Catalog</Text>
+      <View style={styles.searchboxContainer}>
+        <View style={{ flexGrow: 1, marginRight: 3 }}>
+          <Searchbar searchText={search} setSearch={setSearch} />
         </View>
-        {loading && (
-          <View style={styles.searching}>
-            <Text style={styles.searchingText}>Loading data </Text>
-            <Loader size={50} />
-          </View>
-        )}
-        {!loading && (
-          <Text
+        <FilterContext.Provider value={{ filters, setFilters }}>
+          <FilterControl />
+        </FilterContext.Provider>
+      </View>
+      {loading && (
+        <View style={styles.loader}>
+          <LoadingBanner />
+        </View>
+      )}
+      {!loading && (
+        <Text
+          style={{
+            ...styles.courseTitle,
+            marginTop: 15,
+            marginLeft: 30,
+            paddingBottom: 10,
+          }}
+        >
+          {`Results (${filteredCourses().length})`}
+        </Text>
+      )}
+      {!loading &&
+        data?.CatalogContent?.contentItems &&
+        data?.CatalogContent?.contentItems?.length > 0 && (
+          <FlatList
             style={{
-              ...styles.courseTitle,
-              marginTop: 15,
-              marginLeft: 30,
-              paddingBottom: 10,
+              marginBottom:
+                ((data?.CatalogContent?.contentItems?.length *
+                  Dimensions.get("window").width) /
+                  440) *
+                32,
             }}
-          >
-            {`Results (${filteredCourses().length})`}
-          </Text>
+            data={filteredCourses()}
+            scrollEnabled={true}
+            renderItem={({ item }) => <CourseItem item={item} />}
+            onEndReachedThreshold={0.5}
+            ListEmptyComponent={
+              <Text style={styles.noRecords}>
+                No records found, try using other filters.
+              </Text>
+            }
+          />
         )}
-        {!loading &&
-          data?.CatalogContent?.contentItems &&
-          data?.CatalogContent?.contentItems?.length > 0 && (
-            <FlatList
-              style={{
-                marginBottom:
-                  ((data?.CatalogContent?.contentItems?.length *
-                    Dimensions.get("window").width) /
-                    440) *
-                  32,
-              }}
-              data={filteredCourses()}
-              scrollEnabled={true}
-              renderItem={({ item }) => <CourseItem item={item} />}
-              onEndReachedThreshold={0.5}
-              ListEmptyComponent={
-                <Text style={styles.noRecords}>
-                  No records found, try using other filters.
-                </Text>
-              }
-            />
-          )}
-      </ExploreCatalogContext.Provider>
     </View>
   );
 };
@@ -141,7 +140,9 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
-
+  loader: {
+    marginHorizontal: 30,
+  },
   searchboxContainer: {
     height: 50,
     display: "flex",

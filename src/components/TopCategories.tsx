@@ -26,7 +26,11 @@ const TopCategories = () => {
           onPress={() => navigation.navigate("TopCategories")}
         />
       </View>
-      <ScrollView horizontal={true} style={styles.catContainer}>
+      <ScrollView
+        horizontal={true}
+        style={styles.catContainer}
+        showsHorizontalScrollIndicator={false}
+      >
         {categories.map((cat, idx) => (
           <View key={idx} style={styles.catBox}>
             <Text style={styles.catTitle}>{cat}</Text>

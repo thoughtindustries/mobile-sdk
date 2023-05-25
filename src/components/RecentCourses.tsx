@@ -29,7 +29,11 @@ const RecentCourses = () => {
           <View style={styles.courseBox}>
             <Text style={styles.heading}>Recently Launched Courses</Text>
           </View>
-          <ScrollView horizontal={true} style={styles.courseContainer}>
+          <ScrollView
+            horizontal={true}
+            style={styles.courseContainer}
+            showsHorizontalScrollIndicator={false}
+          >
             {data.UserRecentContent.map((course, idx) => (
               <Pressable
                 key={idx}

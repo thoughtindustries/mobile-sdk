@@ -26,7 +26,11 @@ const Recommendation = () => {
           <View style={styles.courseBox}>
             <Text style={styles.heading}>Recommendations</Text>
           </View>
-          <ScrollView horizontal={true} style={styles.courseContainer}>
+          <ScrollView
+            horizontal={true}
+            style={styles.courseContainer}
+            showsHorizontalScrollIndicator={false}
+          >
             {data.UserContentItems.filter(
               (item) => item.contentTypeLabel === "Course"
             ).map((course, idx) => (

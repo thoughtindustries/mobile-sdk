@@ -10,58 +10,57 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Checkbox from "./Checkbox";
-import { ExploreCatalogContext } from "../context";
+import { FilterContext } from "../context";
 import { GlobalTypes } from "../graphql";
 
 const FilterControl = () => {
   const [show, setShow] = useState<boolean>(false);
-  const { filters: appliedFilters, setFilters: setAppliedFilters } = useContext(
-    ExploreCatalogContext
-  );
+  const { filters: contextFilters, setFilters: setContextFilters } =
+    useContext(FilterContext);
 
   const CourseFilter = () => {
     const [filters, setFilters] = useState({
-      sortDir: appliedFilters.sortDir,
+      sortDir: contextFilters.sortDir,
       duration: [
         {
           title: "1 Hour",
-          selected: appliedFilters?.values?.includes("1 Hour"),
+          selected: contextFilters?.values?.includes("1 Hour"),
         },
         {
           title: "3 - 8 Hours",
-          selected: appliedFilters?.values?.includes("3 - 8 Hours"),
+          selected: contextFilters?.values?.includes("3 - 8 Hours"),
         },
         {
           title: "9 - 16 Hours",
-          selected: appliedFilters?.values?.includes("9 - 16 Hours"),
+          selected: contextFilters?.values?.includes("9 - 16 Hours"),
         },
         {
           title: "A couple of days",
-          selected: appliedFilters?.values?.includes("A couple of days"),
+          selected: contextFilters?.values?.includes("A couple of days"),
         },
       ],
       difficulty: [
         {
           title: "Beginner",
-          selected: appliedFilters?.values?.includes("Beginner"),
+          selected: contextFilters?.values?.includes("Beginner"),
         },
         {
           title: "Intermediate",
-          selected: appliedFilters?.values?.includes("Intermediate"),
+          selected: contextFilters?.values?.includes("Intermediate"),
         },
         {
           title: "Advanced",
-          selected: appliedFilters?.values?.includes("Advanced"),
+          selected: contextFilters?.values?.includes("Advanced"),
         },
       ],
       tags: [
         {
           title: "QuickStart",
-          selected: appliedFilters?.values?.includes("QuickStart"),
+          selected: contextFilters?.values?.includes("QuickStart"),
         },
         {
           title: "Business",
-          selected: appliedFilters?.values?.includes("Business"),
+          selected: contextFilters?.values?.includes("Business"),
         },
       ],
       myLearningsEvent: [
@@ -71,8 +70,8 @@ const FilterControl = () => {
     });
 
     const clearFilter = () => {
-      setAppliedFilters({
-        ...appliedFilters,
+      setContextFilters({
+        ...contextFilters,
         sortDir: GlobalTypes.SortDirection.Asc,
         values: [],
         labels: [],
@@ -119,8 +118,8 @@ const FilterControl = () => {
         durationLabel = "Level of Difficulty";
       }
 
-      setAppliedFilters({
-        ...appliedFilters,
+      setContextFilters({
+        ...contextFilters,
         sortDir: filters.sortDir,
         values: [
           ...new Set(durations),
