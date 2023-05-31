@@ -4,11 +4,11 @@
   "main": "node_modules/expo/AppEntry.js",
   "type": "module",
   "scripts": {
-    "start": "node src/cli/init.js && expo start",
-    "android": "node src/cli/init.js && expo start --android",
+    "start": "node src/tooling/cli/src/authenticate.js && expo start",
+    "android": "node src/tooling/cli/src/authenticate.js && expo start --android",
     "test": "jest",
-    "ios": "node src/cli/init.js && expo start --ios",
-    "web": "node src/cli/init.js && expo start --web",
+    "ios": "node src/tooling/cli/src/authenticate.js && expo start --ios",
+    "web": "node src/tooling/cli/src/authenticate.js && expo start --web",
     "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 graphql-codegen --config src/graphql/codegen.yml"
   },
   "dependencies": {
@@ -43,7 +43,6 @@
     "expo-splash-screen": "^0.17.5",
     "expo-sqlite": "~11.0.0",
     "expo-status-bar": "~1.4.2",
-    "inquirer": "^9.2.5",
     "lodash": "^4.17.21",
     "path": "^0.12.7",
     "react": "18.1.0",
@@ -77,7 +76,6 @@
     "@graphql-codegen/cli": "^3.2.2",
     "@graphql-codegen/typescript": "^3.0.2",
     "@graphql-codegen/typescript-resolvers": "^3.1.1",
-    "@types/inquirer": "^9.0.3",
     "@types/lodash": "^4.14.191",
     "@types/react": "~18.0.14",
     "@types/react-native": "^0.70.8",

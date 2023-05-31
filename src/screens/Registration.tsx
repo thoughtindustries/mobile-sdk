@@ -141,6 +141,12 @@ const Registration = () => {
               "Sorry, that email address is already in use. Please try another one or log in if you already have an account.",
           });
         }
+        if (error === "Response not successful: Received status code 404") {
+          setResponseError({
+            title: "We're Sorry",
+            message: "We are unable to process your request at this time.",
+          });
+        }
       }
     }
   };
