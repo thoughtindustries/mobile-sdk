@@ -8,4 +8,5 @@ export type StackNavigationProps = {
 
 export type PageWrapperProps = {
   children: ReactNode;
+  styles: ViewStyle;
 };

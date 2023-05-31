@@ -41,7 +41,11 @@ const App = () => {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <PageWrapper>
+      <PageWrapper
+        styles={{
+          backgroundColor: "#F3F4F6",
+        }}
+      >
         <StackNavigation styles={{ backgroundColor: "#F3F4F6" }}>
           <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen
