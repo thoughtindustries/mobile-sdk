@@ -10,7 +10,6 @@ import {
   ContentDetails,
   ProfileEdit,
 } from "./src/screens";
-import { View } from "react-native";
 import { LogBox } from "react-native";
 import { FooterMenu } from "./src/components";
 import {
@@ -23,7 +22,7 @@ import { ApolloProvider } from "@apollo/client";
 import { makeApolloClient } from "./src/tooling/helium-mobile-server/src";
 import { PageWrapper, StackNavigation } from "./src/tooling/renderer/src";
 
-const App = async () => {
+const App = () => {
   LogBox.ignoreLogs(["Require cycle:"]);
 
   let [fontsLoaded] = useFonts({
@@ -37,7 +36,7 @@ const App = async () => {
     return null;
   }
 
-  const apolloClient = await makeApolloClient();
+  const apolloClient = makeApolloClient();
   const Stack = createNativeStackNavigator();
 
   return (

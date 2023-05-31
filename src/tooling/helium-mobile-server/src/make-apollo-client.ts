@@ -5,7 +5,7 @@ import * as SecureStore from "expo-secure-store";
 
 const makeApolloClient = () => {
   const httpLink = createHttpLink({
-    uri: `${TI_API_INSTANCE}/helium?apiKey=${TI_API_KEY}`,
+    uri: `${TI_API_INSTANCE}helium?apiKey=${TI_API_KEY}`,
   });
 
   const authLink = setContext(async (_, { headers }) => {

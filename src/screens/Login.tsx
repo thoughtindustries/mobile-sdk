@@ -178,6 +178,14 @@ const Login = () => {
               "This account requires validation via email confirmation. An email has been sent to you with instructions to validate your email address. After you cofirm your account, you will be able to sign in and access your learning.",
           });
         }
+        if (
+          error.message === "Response not successful: Received status code 404"
+        ) {
+          setResponseError({
+            title: "We're Sorry",
+            message: "We are unable to process your request at this time.",
+          });
+        }
       }
     }
   };
