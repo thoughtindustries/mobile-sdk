@@ -1,11 +1,11 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { TI_API_INSTANCE, TI_API_KEY } from "@env";
+import { TI_API_INSTANCE, TI_API_KEY, TI_INSTANCE_NAME } from "@env";
 import * as SecureStore from "expo-secure-store";
 
 const makeApolloClient = () => {
   const httpLink = createHttpLink({
-    uri: `${TI_API_INSTANCE}helium?apiKey=${TI_API_KEY}`,
+    uri: `${TI_API_INSTANCE}/helium?apiKey=${TI_API_KEY}`,
   });
 
   const authLink = setContext(async (_, { headers }) => {

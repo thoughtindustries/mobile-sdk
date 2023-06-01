@@ -3,6 +3,11 @@ import path from "path";
 import { writeFile } from "fs/promises";
 import { existsSync } from "fs";
 
+const extractRootUrl = (url) => {
+  const root = new URL(url);
+  return `${root.protocol}//${root.hostname}`;
+};
+
 const isAbsoluteUrl = (url) => {
   return new Promise((resolve, reject) => {
     if (typeof url !== "string") {
@@ -61,7 +66,11 @@ const prompts = async () => {
     const instance = await prompts();
     console.log("Generating env file...");
     const fileName = path.resolve(process.cwd(), ".env");
-    const data = `TI_INSTANCE_NAME=${instance.nickname}\nTI_API_INSTANCE=${instance.instanceUrl}\nTI_API_KEY=${instance.apiKey}`;
+    const data = `TI_INSTANCE_NAME=${
+      instance.nickname
+    }\nTI_API_INSTANCE=${extractRootUrl(instance.instanceUrl)}\nTI_API_KEY=${
+      instance.apiKey
+    }`;
 
     return writeFile(fileName, data);
   }
