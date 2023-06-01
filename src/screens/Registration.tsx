@@ -127,7 +127,9 @@ const Registration = () => {
         );
         setProcessing(false);
 
-        navigation.navigate("Login");
+        setTimeout(() => {
+          navigation.navigate("Login");
+        }, 3000);
       } catch (error) {
         console.log("Registration Error: ", error);
         setProcessing(false);
@@ -152,7 +154,7 @@ const Registration = () => {
   };
 
   return (
-    <View style={styles(processing).container}>
+    <View style={styles(message, processing).container}>
       {processing && (
         <Success title="" message="Registration going on, Please wait.. " />
       )}
@@ -175,13 +177,15 @@ const Registration = () => {
           )}
 
           <KeyboardAvoidingView
-            style={styles(processing).keyboardOffset}
+            style={styles(message, processing).keyboardOffset}
             keyboardVerticalOffset={5}
             behavior={"position"}
           >
-            <View style={styles(processing).prompt}>
+            <View style={styles(message, processing).prompt}>
               <Logo />
-              <Text style={styles(processing).title}>Create New Account</Text>
+              <Text style={styles(message, processing).title}>
+                Create New Account
+              </Text>
             </View>
             <View>
               <Text style={AppStyle.label}>Email</Text>
@@ -235,11 +239,11 @@ const Registration = () => {
   );
 };
 
-const styles = (processing: boolean) =>
+const styles = (message: string, processing: boolean) =>
   StyleSheet.create({
     container: {
       ...AppStyle.container,
-      backgroundColor: processing ? "#3B1FA3" : "#FFFFFF",
+      backgroundColor: processing || message !== "" ? "#3B1FA3" : "#FFFFFF",
     },
     prompt: {
       justifyContent: "center",
