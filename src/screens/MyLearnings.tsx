@@ -72,7 +72,6 @@ const MyLearnings = () => {
     });
 
   const [search, setSearch] = useState<string>("");
-
   const [tab, setTab] = useState<string>("All");
   const [courses, setCourses] = useState<courseListType[]>([]);
   const [content, setContent] = useState<{
@@ -121,11 +120,24 @@ const MyLearnings = () => {
       resolve(true);
     });
   };
-  const getOfflineMedia = (file_name: string) => {
+
+  const getOfflineMedia = async (file_name: string) => {
     let fileUri: string = FileSystem.documentDirectory + file_name;
-    console.log(fileUri);
-    return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);
+    try {
+      const { assets } = await MediaLibrary.getAssetsAsync();
+    } catch (error) {
+      console.log(error);
+    }
+    // return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);
   };
+
+  const downloadContent = async (content: courseListType) => {
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const seekPermission = (fileUri: string) => {
     let fname = "";
     return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
@@ -219,15 +231,9 @@ const MyLearnings = () => {
   };
 
   const filteredContent = () => {
-    if (tab === "Offline" || Utils.isOffline()) {
-      return contentItemData?.UserContentItems?.filter((item) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-      );
-    } else {
-      return contentItemData?.UserContentItems?.filter((item) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-      );
-    }
+    return contentItemData?.UserContentItems?.filter((item) =>
+      item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+    );
   };
 
   const filteredCourses = () => {
@@ -301,12 +307,13 @@ const MyLearnings = () => {
             >
               {data.contentTypeLabel}
             </Text>
-            <MaterialCommunityIcons
-              name={`${data.isOffline ? "download" : "close-circle-outline"}`}
-              size={22}
-              color="#232323"
-              onPress={() => offlineData(data, data.isOffline ? false : true)}
-            />
+            <TouchableOpacity onPress={() => downloadContent(data)}>
+              <MaterialCommunityIcons
+                name="download"
+                size={22}
+                color="#232323"
+              />
+            </TouchableOpacity>
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
           {data.contentTypeLabel === "Course" && (
@@ -325,10 +332,11 @@ const MyLearnings = () => {
 
   const CategoryFilter = () => {
     const events: string[] = ["All", "Offline"];
+
     return (
       <ScrollView horizontal={true} style={styles.catContainer}>
         {events.map((item, idx) => (
-          <Pressable key={idx} onPress={() => setTab(item)}>
+          <TouchableOpacity key={idx} onPress={() => setTab(item)}>
             <View
               style={{
                 ...styles.catBox,
@@ -346,7 +354,7 @@ const MyLearnings = () => {
                 {item}
               </Text>
             </View>
-          </Pressable>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     );
