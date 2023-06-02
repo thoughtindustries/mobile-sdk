@@ -12,7 +12,12 @@ import {
 } from "react-native";
 import _ from "lodash";
 import tiGql from "../helpers/TIGraphQL";
-import { courseListType, filtersType, RootStackParamList } from "../../types";
+import {
+  contentListType,
+  courseListType,
+  filtersType,
+  RootStackParamList,
+} from "../../types";
 import { Searchbar, FilterControl, LoadingBanner } from "../components";
 import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
@@ -30,6 +35,7 @@ import {
   GlobalTypes,
 } from "../graphql";
 import { FilterContext } from "../context";
+import { saveContent, getContent, removeContent } from "../db/db";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -86,6 +92,15 @@ const MyLearnings = () => {
   });
   const [fetchAgain, setFetchAgain] = useState(1);
 
+  const [offlineContent, setOfflineContent] = useState<courseListType[]>();
+
+  useEffect(() => {
+    (async () => {
+      const downloadedContent = await getContent();
+      setOfflineContent(downloadedContent as courseListType[]);
+    })();
+  }, []);
+
   const saveAsset = (asset: string) => {
     // download code for asset
     let path: string[] = asset.split("/");
@@ -131,10 +146,23 @@ const MyLearnings = () => {
     // return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);
   };
 
-  const downloadContent = async (content: courseListType) => {
+  const downloadContent = async (data: courseListType) => {
     try {
+      await saveContent(data);
+      const downloadedContent = await getContent();
+      setOfflineContent(downloadedContent as courseListType[]);
     } catch (error) {
-      console.log(error);
+      console.log("Download Content Error: ", error);
+    }
+  };
+
+  const deleteContent = async (data: courseListType) => {
+    try {
+      await removeContent(data);
+      const downloadedContent = await getContent();
+      setOfflineContent(downloadedContent as courseListType[]);
+    } catch (error) {
+      console.log("Remove Content Error: ", error);
     }
   };
 
@@ -231,9 +259,19 @@ const MyLearnings = () => {
   };
 
   const filteredContent = () => {
-    return contentItemData?.UserContentItems?.filter((item) =>
-      item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-    );
+    if (tab === "All") {
+      return contentItemData?.UserContentItems?.filter((item) =>
+        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      );
+    } else {
+      return contentItemData?.UserContentItems?.filter(
+        (item, idx) =>
+          item?.title
+            ?.toLocaleLowerCase()
+            .includes(search.toLocaleLowerCase()) &&
+          offlineContent?.some((content) => content.id === item.id)
+      );
+    }
   };
 
   const filteredCourses = () => {
@@ -284,6 +322,9 @@ const MyLearnings = () => {
 
   const ContentItem = ({ data }: { data: courseListType }) => {
     getOfflineMedia(data.asset);
+
+    const index = offlineContent?.findIndex((item) => item.id === data.id) || 0;
+
     return (
       <TouchableOpacity
         style={styles.contentRow}
@@ -307,9 +348,19 @@ const MyLearnings = () => {
             >
               {data.contentTypeLabel}
             </Text>
-            <TouchableOpacity onPress={() => downloadContent(data)}>
+            <TouchableOpacity
+              onPress={() =>
+                data.id !== offlineContent?.[index]?.id
+                  ? downloadContent(data)
+                  : deleteContent(data)
+              }
+            >
               <MaterialCommunityIcons
-                name="download"
+                name={
+                  data.id !== offlineContent?.[index]?.id
+                    ? "download"
+                    : "close-circle-outline"
+                }
                 size={22}
                 color="#232323"
               />
