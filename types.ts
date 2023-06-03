@@ -65,13 +65,12 @@ export type UserDetailType = {
 
 export type courseListType = {
   id: string;
-  asset: string;
+  asset?: string;
   authors?: string[];
-  title: string;
-  displayCourse: string;
+  title?: string;
+  displayCourse?: string;
   contentTypeLabel?: string;
   progress?: Float;
-  isOffline?: boolean;
 };
 
 export type topicType = {

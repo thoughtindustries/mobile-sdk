@@ -94,7 +94,7 @@ export const saveContent = ({
     db.transaction((tx) => {
       tx.executeSql(
         `INSERT INTO content (id, title, asset, contentTypeLabel, progress) VALUES (?, ?, ?, ?, ?)`,
-        [id, title, asset, contentTypeLabel || "", progress || 0],
+        [id, title || "", asset || "", contentTypeLabel || "", progress || 0],
         (_, result) => {
           resolve(result);
         },
