@@ -3,12 +3,12 @@ import { TI_INSTANCE_NAME } from "@env";
 import { courseListType } from "../../types";
 
 const db = SQLite.openDatabase(`${TI_INSTANCE_NAME}.db`);
+db.exec([{ sql: "PRAGMA foreign_keys = ON;", args: [] }], false, () => null);
 
 export const initDB = async () => {
   try {
     await createUsersTable();
     await createContentTable();
-    // await dropTables();
     console.log("Database successfully initiated!");
   } catch (error) {
     console.log("Database initialization failed: ", error);
@@ -19,7 +19,7 @@ export const checkUsersTable = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT name FROM sqlite_master WHERE type='table' AND name='Users';`,
+        `SELECT name FROM sqlite_master WHERE type='table' AND name='users';`,
         [],
         (_, result) => {
           const rowCount = result.rows.length;
@@ -40,15 +40,17 @@ const createUsersTable = () => {
     db.transaction((tx) => {
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            id TEXT UNIQUE PRIMARY KEY,
+            firstName TEXT NOT NULL,
+            lastName TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL
           );`,
         [],
         (result) => {
           resolve(result);
         },
-        (error) => {
+        (_, error) => {
+          console.log(error.message);
           reject(error);
           return false;
         }
@@ -62,19 +64,50 @@ const createContentTable = () => {
     db.transaction((tx) => {
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS content (
-            id TEXT UNIQUE,
+            id TEXT UNIQUE PRIMARY KEY,
+            user_id TEXT UNIQUE,
             title TEXT NOT NULL,
             asset TEXT,
             contentTypeLabel TEXT,
             progress TEXT,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-            user_id REFERENCES Users(id)
+            FOREIGN KEY (user_id) REFERENCES users(id)
           );`,
         [],
         (result) => {
           resolve(result);
         },
-        (error) => {
+        (_, error) => {
+          console.log(error.message);
+          reject(error);
+          return false;
+        }
+      );
+    });
+  });
+};
+
+export const createUser = ({
+  id,
+  firstName,
+  lastName,
+  email,
+}: {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}) => {
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT OR IGNORE INTO users (id, firstName, lastName, email) VALUES (?, ?, ?, ?)",
+        [id, firstName, lastName, email],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, error) => {
+          console.log(error.message);
           reject(error);
           return false;
         }
@@ -114,8 +147,25 @@ export const removeContent = ({ id }: courseListType) => {
         `DELETE FROM content WHERE id = ?`,
         [id],
         (_, result) => {
-          console.log("Record successfully removed!");
           resolve(result);
+        },
+        (_, error) => {
+          reject(error);
+          return false;
+        }
+      );
+    });
+  });
+};
+
+export const getContent = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM content`,
+        [],
+        (_, { rows }) => {
+          resolve(rows._array);
         },
         (_, error) => {
           reject(error);
@@ -129,7 +179,7 @@ export const removeContent = ({ id }: courseListType) => {
 // const dropTables = () => {
 //   db.transaction((tx) => {
 //     tx.executeSql(
-//       "DROP TABLE content",
+//       "DROP TABLE users",
 //       [],
 //       (_, resultSet) => {
 //         console.log("All tables deleted successfully");
@@ -158,21 +208,3 @@ export const removeContent = ({ id }: courseListType) => {
 //     );
 //   });
 // };
-
-export const getContent = () => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM content`,
-        [],
-        (_, { rows }) => {
-          resolve(rows._array);
-        },
-        (_, error) => {
-          reject(error);
-          return false;
-        }
-      );
-    });
-  });
-};

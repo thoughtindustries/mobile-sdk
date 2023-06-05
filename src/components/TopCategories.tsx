@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     padding: 5,
+    marginHorizontal: -4,
   },
   catTitle: {
     color: "#1f2937",

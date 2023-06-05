@@ -41,7 +41,7 @@ const Recommendation = () => {
           key={idx}
           onPress={() =>
             navigation.navigate("ContentDetails", {
-              cid: course.id,
+              cid: course?.displayCourse || "",
               from: "Home",
             })
           }
@@ -77,7 +77,7 @@ const Recommendation = () => {
           key={idx}
           onPress={() =>
             navigation.navigate("ContentDetails", {
-              cid: course.displayCourse ? course.displayCourse : "",
+              cid: course.displayCourse || "",
               from: "Home",
             })
           }
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     padding: 5,
+    marginHorizontal: -12,
   },
   recContentBox: {
     backgroundColor: "#FAFAFA",

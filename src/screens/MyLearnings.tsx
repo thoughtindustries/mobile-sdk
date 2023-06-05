@@ -124,17 +124,6 @@ const MyLearnings = () => {
   );
 
   const CourseItem = ({ data }: { data: courseListType }) => {
-    const index = offlineContent?.findIndex((item) => item.id === data.id) || 0;
-    const { data: percentCompleteData } = useUserCourseProgressQuery({
-      variables: {
-        id: data.id,
-      },
-    });
-
-    const percentCompleted = Number(
-      percentCompleteData?.UserCourseProgress?.percentComplete
-    );
-
     return (
       <TouchableOpacity
         style={styles.contentRow}
@@ -153,15 +142,6 @@ const MyLearnings = () => {
             <Text style={styles.contentTag}>{data.contentTypeLabel}</Text>
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
-          {data.contentTypeLabel === "Course" && (
-            <View style={{ flex: 0 }}>
-              <View style={styles.cTypeRow}>
-                <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>{percentCompleted}%</Text>
-              </View>
-              <ProgressBar percent={percentCompleted} />
-            </View>
-          )}
         </View>
       </TouchableOpacity>
     );
@@ -171,6 +151,13 @@ const MyLearnings = () => {
     const index: number =
       offlineContent?.findIndex((item) => item.id === data.id) || 0;
     const contentLabel: string | undefined = data?.contentTypeLabel;
+    const { data: percentCompleteData } = useUserCourseProgressQuery({
+      variables: {
+        id: data.id,
+      },
+    });
+    const percentCompleted =
+      Number(percentCompleteData?.UserCourseProgress?.percentComplete) || 0;
     const contentLabelStyle =
       contentLabel === "Article"
         ? styles.Article
@@ -179,15 +166,6 @@ const MyLearnings = () => {
         : contentLabel === "Blog"
         ? styles.Blog
         : styles.Video;
-    const { data: percentCompleteData } = useUserCourseProgressQuery({
-      variables: {
-        id: data.id,
-      },
-    });
-
-    const percentCompleted = Number(
-      percentCompleteData?.UserCourseProgress?.percentComplete
-    );
 
     return (
       <TouchableOpacity
@@ -516,6 +494,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     flexGrow: 0,
     fontFamily: "Inter_400Regular",
+    backgroundColor: "#DDD6FE",
   },
   Course: {
     backgroundColor: "#FDE68A",
