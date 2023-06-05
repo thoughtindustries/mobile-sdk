@@ -64,8 +64,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     backgroundColor: "#F3F4F6",
-    paddingTop: 50,
+    paddingTop: 60,
     paddingBottom: 20,
+    marginHorizontal: 30,
   },
 
   name: {

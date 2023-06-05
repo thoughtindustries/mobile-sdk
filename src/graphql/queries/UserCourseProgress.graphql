@@ -1,0 +1,7 @@
+query UserCourseProgress($id: ID!) {
+  UserCourseProgress(id: $id) {
+    totalViews
+    totalTime
+    percentComplete
+  }
+}

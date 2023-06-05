@@ -12,14 +12,29 @@ import striptags from "striptags";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import { useUserRecentContentQuery } from "../graphql";
+import {
+  useUserRecentContentQuery,
+  useCatalogContentQuery,
+  GlobalTypes,
+} from "../graphql";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Banner = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const { data } = useUserRecentContentQuery({
+  const { data: recentContentData } = useUserRecentContentQuery({
     variables: { limit: 1 },
+  });
+
+  const { data: catalogData } = useCatalogContentQuery({
+    variables: {
+      sortColumn: GlobalTypes.SortColumn.Title,
+      sortDirection: GlobalTypes.SortDirection.Asc,
+      page: 1,
+      labels: [],
+      values: [],
+      contentTypes: "Course",
+    },
   });
 
   return (
@@ -27,24 +42,34 @@ const Banner = () => {
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: data?.UserRecentContent[0]?.id || "",
+            cid:
+              recentContentData?.UserRecentContent[0]?.id ||
+              catalogData?.CatalogContent?.contentItems?.[0]?.id ||
+              "",
             from: "Home",
           })
         }
       >
         <View style={styles.bannerContainer}>
           <ImageBackground
-            source={{ uri: data?.UserRecentContent[0]?.asset }}
+            source={{
+              uri:
+                recentContentData?.UserRecentContent[0]?.asset ||
+                catalogData?.CatalogContent?.contentItems?.[0]?.asset,
+            }}
             resizeMode="cover"
             imageStyle={{ borderRadius: 8 }}
           >
             <View style={styles.bannerArea}>
               <Text style={styles.bannerTitle}>
-                {data?.UserRecentContent[0]?.title}
+                {recentContentData?.UserRecentContent[0]?.title ||
+                  catalogData?.CatalogContent?.contentItems?.[0].title}
               </Text>
               <Text style={styles.bannerText}>
                 {_.truncate(
-                  striptags(data?.UserRecentContent[0]?.description || ""),
+                  striptags(
+                    recentContentData?.UserRecentContent[0]?.description || ""
+                  ),
                   {
                     length: 70,
                   }

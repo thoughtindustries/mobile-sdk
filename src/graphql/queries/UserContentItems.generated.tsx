@@ -1,35 +1,48 @@
-import * as Types from '../global-types';
+import * as Types from "../global-types";
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 const defaultOptions = {} as const;
 export type UserContentItemsQueryVariables = Types.Exact<{
   kind?: Types.InputMaybe<Array<Types.ContentKind> | Types.ContentKind>;
-  query?: Types.InputMaybe<Types.Scalars['String']>;
+  query?: Types.InputMaybe<Types.Scalars["String"]>;
   sortColumn?: Types.InputMaybe<Types.SortColumn>;
   sortDirection?: Types.InputMaybe<Types.SortDirection>;
 }>;
 
-
-export type UserContentItemsQuery = { __typename?: 'Query', UserContentItems?: Array<{ __typename?: 'Content', id: string, asset?: string, contentTypeLabel?: string, displayCourse?: string, title?: string }> };
-
+export type UserContentItemsQuery = {
+  __typename?: "Query";
+  UserContentItems?: Array<{
+    __typename?: "Content";
+    id: string;
+    asset?: string;
+    contentTypeLabel?: string;
+    displayCourse?: string;
+    title?: string;
+  }>;
+};
 
 export const UserContentItemsDocument = gql`
-    query UserContentItems($kind: [ContentKind!], $query: String, $sortColumn: SortColumn, $sortDirection: SortDirection) {
-  UserContentItems(
-    kind: $kind
-    query: $query
-    sortColumn: $sortColumn
-    sortDirection: $sortDirection
+  query UserContentItems(
+    $kind: [ContentKind!]
+    $query: String
+    $sortColumn: SortColumn
+    $sortDirection: SortDirection
   ) {
-    id
-    asset
-    contentTypeLabel
-    displayCourse
-    title
+    UserContentItems(
+      kind: $kind
+      query: $query
+      sortColumn: $sortColumn
+      sortDirection: $sortDirection
+    ) {
+      id
+      asset
+      contentTypeLabel
+      displayCourse
+      title
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useUserContentItemsQuery__
@@ -50,14 +63,37 @@ export const UserContentItemsDocument = gql`
  *   },
  * });
  */
-export function useUserContentItemsQuery(baseOptions?: Apollo.QueryHookOptions<UserContentItemsQuery, UserContentItemsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UserContentItemsQuery, UserContentItemsQueryVariables>(UserContentItemsDocument, options);
-      }
-export function useUserContentItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserContentItemsQuery, UserContentItemsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UserContentItemsQuery, UserContentItemsQueryVariables>(UserContentItemsDocument, options);
-        }
-export type UserContentItemsQueryHookResult = ReturnType<typeof useUserContentItemsQuery>;
-export type UserContentItemsLazyQueryHookResult = ReturnType<typeof useUserContentItemsLazyQuery>;
-export type UserContentItemsQueryResult = Apollo.QueryResult<UserContentItemsQuery, UserContentItemsQueryVariables>;
+export function useUserContentItemsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserContentItemsQuery,
+    UserContentItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserContentItemsQuery, UserContentItemsQueryVariables>(
+    UserContentItemsDocument,
+    options
+  );
+}
+export function useUserContentItemsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserContentItemsQuery,
+    UserContentItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserContentItemsQuery,
+    UserContentItemsQueryVariables
+  >(UserContentItemsDocument, options);
+}
+export type UserContentItemsQueryHookResult = ReturnType<
+  typeof useUserContentItemsQuery
+>;
+export type UserContentItemsLazyQueryHookResult = ReturnType<
+  typeof useUserContentItemsLazyQuery
+>;
+export type UserContentItemsQueryResult = Apollo.QueryResult<
+  UserContentItemsQuery,
+  UserContentItemsQueryVariables
+>;

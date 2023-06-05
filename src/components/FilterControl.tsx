@@ -103,7 +103,7 @@ const FilterControl = () => {
       });
 
       if (difficulty.length > 0) {
-        durationLabel = "Level of Difficulty";
+        difficultyLabel = "Level of Difficulty";
       }
 
       // Tag Filter
@@ -115,7 +115,7 @@ const FilterControl = () => {
       });
 
       if (difficulty.length > 0) {
-        durationLabel = "Level of Difficulty";
+        difficultyLabel = "Level of Difficulty";
       }
 
       setContextFilters({

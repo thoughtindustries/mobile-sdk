@@ -24,8 +24,8 @@ const RecentCourses = () => {
 
   return (
     <View>
-      {data?.UserRecentContent && (
-        <>
+      {data?.UserRecentContent?.length !== 0 && (
+        <View>
           <View style={styles.courseBox}>
             <Text style={styles.heading}>Recently Launched Courses</Text>
           </View>
@@ -34,7 +34,7 @@ const RecentCourses = () => {
             style={styles.courseContainer}
             showsHorizontalScrollIndicator={false}
           >
-            {data.UserRecentContent.map((course, idx) => (
+            {data?.UserRecentContent.map((course, idx) => (
               <Pressable
                 key={idx}
                 onPress={() =>
@@ -64,7 +64,7 @@ const RecentCourses = () => {
               </Pressable>
             ))}
           </ScrollView>
-        </>
+        </View>
       )}
     </View>
   );

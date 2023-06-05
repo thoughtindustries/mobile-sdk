@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, ScrollView, View, Dimensions } from "react-native";
 import {
   UserHeader,
   Banner,
@@ -10,25 +10,22 @@ import {
 
 const Home = () => {
   return (
-    <ScrollView
-      style={styles.page}
-      showsVerticalScrollIndicator={false}
-      stickyHeaderIndices={[0]}
-    >
+    <View>
       <UserHeader />
-      <Banner />
-      <TopCategories />
-      <Recommendation />
-      <RecentCourses />
-    </ScrollView>
+      <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+        <Banner />
+        <TopCategories />
+        <Recommendation />
+        <RecentCourses />
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   page: {
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
+    marginHorizontal: 30,
+    height: Dimensions.get("window").height - 220,
   },
 });
 

@@ -6,30 +6,25 @@ import {
   StyleSheet,
   FlatList,
   ScrollView,
-  Pressable,
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import _ from "lodash";
-import tiGql from "../helpers/TIGraphQL";
 import { courseListType, filtersType, RootStackParamList } from "../../types";
 import { Searchbar, FilterControl, LoadingBanner } from "../components";
 import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import dbObj from "../helpers/Db";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import * as Permissions from "expo-permissions";
 import {
   useUserRecentContentQuery,
   useUserContentItemsQuery,
   useCatalogContentQuery,
   GlobalTypes,
+  useUserCourseProgressQuery,
 } from "../graphql";
 import { FilterContext } from "../context";
+import { saveContent, getContent, removeContent } from "../db/db";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -38,7 +33,9 @@ type MyLearningScreenProps = StackNavigationProp<
 
 const MyLearnings = () => {
   const navigation = useNavigation<MyLearningScreenProps>();
-
+  const [offlineContent, setOfflineContent] = useState<courseListType[]>();
+  const [search, setSearch] = useState<string>("");
+  const [tab, setTab] = useState<string>("All");
   const [filters, setFilters] = useState<filtersType>({
     sortBy: GlobalTypes.SortColumn.Title,
     sortDir: GlobalTypes.SortDirection.Asc,
@@ -59,173 +56,56 @@ const MyLearnings = () => {
       },
     });
 
-  const { data: catalogData, loading: catalogDataLoading } =
-    useCatalogContentQuery({
-      variables: {
-        sortColumn: filters.sortBy,
-        sortDirection: filters.sortDir,
-        page: 1,
-        labels: filters.labels,
-        values: filters.values,
-        contentTypes: "Course",
-      },
-    });
-
-  const [search, setSearch] = useState<string>("");
-
-  const [tab, setTab] = useState<string>("All");
-  const [courses, setCourses] = useState<courseListType[]>([]);
-  const [content, setContent] = useState<{
-    items: courseListType[];
-    recent: courseListType[];
-  }>({ items: [], recent: [] });
-  const [pageVars, setPageVars] = useState({
-    search: "",
-    page: 0,
-    searching: false,
-    showFilter: false,
+  const { data: catalogData } = useCatalogContentQuery({
+    variables: {
+      sortColumn: filters.sortBy,
+      sortDirection: filters.sortDir,
+      page: 1,
+      labels: filters.labels,
+      values: filters.values,
+      contentTypes: "Course",
+    },
   });
-  const [fetchAgain, setFetchAgain] = useState(1);
 
-  const saveAsset = (asset: string) => {
-    // download code for asset
-    let path: string[] = asset.split("/");
-    const file_name: string = path[path.length - 1];
-    let fileUri: string = FileSystem.documentDirectory + file_name;
-    return FileSystem.downloadAsync(asset, fileUri)
-      .then(() => seekPermission(fileUri))
-      .then(() => {
-        console.log("Downloaded file is ", file_name);
-        return file_name;
-      })
-      .catch((error) => {
-        console.error(error);
-        return "";
-      });
+  useEffect(() => {
+    (async () => {
+      const downloadedContent = await getContent();
+      setOfflineContent(downloadedContent as courseListType[]);
+    })();
+  }, []);
+
+  const downloadContent = async (data: courseListType) => {
+    try {
+      await saveContent(data);
+      const downloadedContent = await getContent();
+      setOfflineContent(downloadedContent as courseListType[]);
+    } catch (error) {
+      console.log("Download Content Error: ", error);
+    }
   };
 
-  const deleteAsset = (file_name: string) => {
-    return new Promise((resolve, reject) => {
-      let fileUri: string = FileSystem.documentDirectory + file_name;
-      Permissions.askAsync(Permissions.MEDIA_LIBRARY).then((permissions) => {
-        if (!permissions.granted) {
-          throw "Permission denied";
-        } else {
-          MediaLibrary.createAssetAsync(fileUri).then((asset) => {
-            MediaLibrary.deleteAssetsAsync(asset).then(() => {
-              console.log("deleted........", asset);
-            });
-          });
-        }
-      });
-      resolve(true);
-    });
-  };
-  const getOfflineMedia = (file_name: string) => {
-    let fileUri: string = FileSystem.documentDirectory + file_name;
-    console.log(fileUri);
-    return MediaLibrary.createAssetAsync(fileUri).then((asset) => asset.uri);
-  };
-  const seekPermission = (fileUri: string) => {
-    let fname = "";
-    return Permissions.askAsync(Permissions.MEDIA_LIBRARY).then(
-      (permissions) => {
-        if (!permissions.granted) {
-          throw "Permission denied";
-        } else {
-          MediaLibrary.createAssetAsync(fileUri).then((asset) => {
-            MediaLibrary.createAlbumAsync("Helium", asset, false).then(() => {
-              console.log("downloaded........", asset);
-            });
-          });
-        }
-      }
-    );
-  };
-
-  const offlineData = (course: courseListType, mode: boolean) => {
-    let user_id: number;
-    Utils.fetch("user_dbid")
-      .then(({ id }) => (user_id = id))
-      .then(() => {
-        if (mode) {
-          return saveAsset(course.asset).then(
-            (asset) => (course.asset = asset)
-          );
-        } else {
-          return dbObj.fetchAsset(user_id, course.id).then(deleteAsset);
-        }
-      })
-      .then(() => dbObj.saveCourse(user_id, course, mode))
-      .then(() =>
-        setContent({
-          ...content,
-          items: content.items.map((c) => {
-            if (c.id === course.id) {
-              c.isOffline = mode;
-            }
-            return c;
-          }),
-        })
-      )
-      .catch((error) => console.log(error));
-  };
-
-  const markOfflineStatus = (items: courseListType[]) => {
-    return new Promise<courseListType[]>((resolve, reject) => {
-      Utils.fetch("user_dbid")
-        .then(({ id }) => dbObj.fetchOfflineCourses(id, false))
-        .then((courses: { cid: string }[]) => {
-          const cids = courses.map((c) => c.cid);
-          if (cids.length > 0) {
-            items = items.map((c) => {
-              c.isOffline = cids.includes(c.id);
-              return c;
-            });
-          }
-          resolve(items);
-        })
-        .catch(() => resolve(items));
-    });
-  };
-
-  const fetchCourseProgresses = (items: courseListType[]) => {
-    return new Promise<courseListType[]>((resolve, reject) => {
-      const cids = items
-        .filter((c) => c.contentTypeLabel === "Course")
-        .map((c) => c.id);
-      let idx: number = -1;
-      const fetchCourseProgress = () => {
-        if (cids.length <= ++idx) {
-          resolve(items);
-        } else {
-          tiGql
-            .courseProgress(cids[idx])
-            .then((cp) => {
-              items = items.map((c) => {
-                if (c.id === cids[idx]) {
-                  _.set(c, "progress", cp);
-                }
-                return c;
-              });
-            })
-            .then(fetchCourseProgress)
-            .catch(fetchCourseProgress);
-        }
-      };
-
-      fetchCourseProgress();
-    });
+  const deleteContent = async (data: courseListType) => {
+    try {
+      await removeContent(data);
+      const downloadedContent = await getContent();
+      setOfflineContent(downloadedContent as courseListType[]);
+    } catch (error) {
+      console.log("Remove Content Error: ", error);
+    }
   };
 
   const filteredContent = () => {
-    if (tab === "Offline" || Utils.isOffline()) {
+    if (tab === "All") {
       return contentItemData?.UserContentItems?.filter((item) =>
         item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
       );
     } else {
-      return contentItemData?.UserContentItems?.filter((item) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      return contentItemData?.UserContentItems?.filter(
+        (item, idx) =>
+          item?.title
+            ?.toLocaleLowerCase()
+            .includes(search.toLocaleLowerCase()) &&
+          offlineContent?.some((content) => content.id === item.id)
       );
     }
   };
@@ -236,6 +116,13 @@ const MyLearnings = () => {
     );
   };
 
+  const ProgressBar = ({ percent }: { percent: Float }) => (
+    <View>
+      <View style={styles.progressBar}></View>
+      <View style={{ ...styles.progressStrip, width: `${percent}%` }} />
+    </View>
+  );
+
   const CourseItem = ({ data }: { data: courseListType }) => {
     return (
       <TouchableOpacity
@@ -243,8 +130,8 @@ const MyLearnings = () => {
         onPress={() => {
           navigation.navigate("CourseDetails", {
             cid: data.id,
-            title: data.title,
-            asset: data.asset,
+            title: data.title || "",
+            asset: data.asset || "",
             contentTypeLabel: data.contentTypeLabel,
           });
         }}
@@ -255,37 +142,39 @@ const MyLearnings = () => {
             <Text style={styles.contentTag}>{data.contentTypeLabel}</Text>
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
-          {data.contentTypeLabel === "Course" && (
-            <View style={{ flex: 0 }}>
-              <View style={styles.cTypeRow}>
-                <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>{_.get(data, "progress", 0)}%</Text>
-              </View>
-              <ProgressBar percent={_.get(data, "progress", 0)} />
-            </View>
-          )}
         </View>
       </TouchableOpacity>
     );
   };
 
-  const ProgressBar = (props: { percent: Float }) => (
-    <View>
-      <View style={styles.progressBar}></View>
-      <View style={{ ...styles.progressStrip, width: `${props.percent}%` }} />
-    </View>
-  );
-
   const ContentItem = ({ data }: { data: courseListType }) => {
-    getOfflineMedia(data.asset);
+    const index: number =
+      offlineContent?.findIndex((item) => item.id === data.id) || 0;
+    const contentLabel: string | undefined = data?.contentTypeLabel;
+    const { data: percentCompleteData } = useUserCourseProgressQuery({
+      variables: {
+        id: data.id,
+      },
+    });
+    const percentCompleted =
+      Number(percentCompleteData?.UserCourseProgress?.percentComplete) || 0;
+    const contentLabelStyle =
+      contentLabel === "Article"
+        ? styles.Article
+        : contentLabel === "Course"
+        ? styles.Course
+        : contentLabel === "Blog"
+        ? styles.Blog
+        : styles.Video;
+
     return (
       <TouchableOpacity
         style={styles.contentRow}
         onPress={() => {
           navigation.navigate("CourseDetails", {
             cid: data.id,
-            title: data.title,
-            asset: data.asset,
+            title: data.title || "",
+            asset: data.asset || "",
             contentTypeLabel: data.contentTypeLabel,
           });
         }}
@@ -296,26 +185,37 @@ const MyLearnings = () => {
             <Text
               style={{
                 ...styles.contentTag,
-                ..._.get(styles, _.get(data, "contentTypeLabel", "Course"), {}),
+                ...contentLabelStyle,
               }}
             >
               {data.contentTypeLabel}
             </Text>
-            <MaterialCommunityIcons
-              name={`${data.isOffline ? "download" : "close-circle-outline"}`}
-              size={22}
-              color="#232323"
-              onPress={() => offlineData(data, data.isOffline ? false : true)}
-            />
+            <TouchableOpacity
+              onPress={() =>
+                data.id !== offlineContent?.[index]?.id
+                  ? downloadContent(data)
+                  : deleteContent(data)
+              }
+            >
+              <MaterialCommunityIcons
+                name={
+                  data.id !== offlineContent?.[index]?.id
+                    ? "download"
+                    : "close-circle-outline"
+                }
+                size={22}
+                color="#232323"
+              />
+            </TouchableOpacity>
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
           {data.contentTypeLabel === "Course" && (
-            <View style={{ flex: 0 }}>
+            <View>
               <View style={styles.cTypeRow}>
                 <Text style={styles.note}>Progress</Text>
-                <Text style={styles.note}>{_.get(data, "progress", 0)}%</Text>
+                <Text style={styles.note}>{percentCompleted}%</Text>
               </View>
-              <ProgressBar percent={_.get(data, "progress", 0)} />
+              <ProgressBar percent={percentCompleted} />
             </View>
           )}
         </View>
@@ -325,10 +225,11 @@ const MyLearnings = () => {
 
   const CategoryFilter = () => {
     const events: string[] = ["All", "Offline"];
+
     return (
       <ScrollView horizontal={true} style={styles.catContainer}>
         {events.map((item, idx) => (
-          <Pressable key={idx} onPress={() => setTab(item)}>
+          <TouchableOpacity key={idx} onPress={() => setTab(item)}>
             <View
               style={{
                 ...styles.catBox,
@@ -346,36 +247,38 @@ const MyLearnings = () => {
                 {item}
               </Text>
             </View>
-          </Pressable>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     );
   };
 
-  const RecommendedList = () => (
-    <View>
-      <Text style={{ ...styles.note, paddingTop: 30 }}>
-        It's looking a bit empty right now, we know. But this is where you'll
-        find your most recent activity, Events, Completed Courses,
-        Certifications and Offline Downloaded Courses.{" "}
-      </Text>
-      <Text style={styles.title}>Recommended Learning</Text>
-      <FlatList
-        data={filteredCourses()}
-        renderItem={({ item }) => <CourseItem data={item} />}
-        onEndReachedThreshold={0.5}
-        showsVerticalScrollIndicator={false}
-        style={{
-          height: (Dimensions.get("window").height / 440) * 200,
-        }}
-        ListEmptyComponent={
-          <Text style={styles.noRecords}>
-            No records found, try using other filters.
-          </Text>
-        }
-      />
-    </View>
-  );
+  const RecommendedList = () => {
+    return (
+      <View>
+        <Text style={{ ...styles.note, paddingTop: 30 }}>
+          It's looking a bit empty right now, we know. But this is where you'll
+          find your most recent activity, Events, Completed Courses,
+          Certifications and Offline Downloaded Courses.{" "}
+        </Text>
+        <Text style={styles.title}>Recommended Learning</Text>
+        <FlatList
+          data={filteredCourses()}
+          renderItem={({ item }) => <CourseItem data={item} />}
+          onEndReachedThreshold={0.5}
+          showsVerticalScrollIndicator={false}
+          style={{
+            height: (Dimensions.get("window").height / 440) * 200,
+          }}
+          ListEmptyComponent={
+            <Text style={styles.noRecords}>
+              No records found, try using other filters.
+            </Text>
+          }
+        />
+      </View>
+    );
+  };
 
   const ContentList = () => (
     <FlatList
@@ -591,6 +494,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     flexGrow: 0,
     fontFamily: "Inter_400Regular",
+    backgroundColor: "#DDD6FE",
   },
   Course: {
     backgroundColor: "#FDE68A",

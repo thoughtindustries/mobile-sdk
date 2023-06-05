@@ -21,6 +21,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 import { useLoginMutation } from "../graphql";
 import * as SecureStore from "expo-secure-store";
+import { createUser } from "../db/db";
 
 type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
@@ -110,7 +111,7 @@ const Login = () => {
         if (data) {
           // Retrieve auth token and store
           const token = data.Login;
-          await SecureStore.setItemAsync("token", token || "");
+          await SecureStore.setItemAsync("token", token);
 
           // Query user's information and store
           const response = await fetch(
@@ -124,6 +125,7 @@ const Login = () => {
           );
 
           const userInfo = await response.json();
+          await createUser(userInfo);
           await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
 
           // Look user id and store
