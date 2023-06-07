@@ -107,7 +107,6 @@ export const createUser = ({
           resolve(result);
         },
         (_, error) => {
-          console.log(error.message);
           reject(error);
           return false;
         }
@@ -179,7 +178,7 @@ export const getContent = () => {
 // const dropTables = () => {
 //   db.transaction((tx) => {
 //     tx.executeSql(
-//       "DROP TABLE users",
+//       "DROP TABLE content",
 //       [],
 //       (_, resultSet) => {
 //         console.log("All tables deleted successfully");

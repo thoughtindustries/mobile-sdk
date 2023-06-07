@@ -230,7 +230,9 @@ const Registration = () => {
                 }
               />
               <Text style={AppStyle.inlineError}>{form.lastName.error}</Text>
-              <Button title="Sign up" onPress={Register} />
+              <View style={styles(message, processing).button}>
+                <Button title="Sign up" onPress={Register} />
+              </View>
             </View>
           </KeyboardAvoidingView>
         </View>
@@ -259,6 +261,9 @@ const styles = (message: string, processing: boolean) =>
       color: "#1F2937",
       marginBottom: 10,
       fontFamily: "Poppins_700Bold",
+    },
+    button: {
+      marginVertical: 20,
     },
   });
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
@@ -10,24 +10,12 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import _ from "lodash";
-import { useUserContentItemsQuery, useCatalogContentQuery } from "../graphql";
-import { GlobalTypes } from "../graphql";
+import { DataContext } from "../context";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
-  const { data: contentData } = useUserContentItemsQuery();
-  const { data: catalogData } = useCatalogContentQuery({
-    variables: {
-      sortColumn: GlobalTypes.SortColumn.Title,
-      sortDirection: GlobalTypes.SortDirection.Asc,
-      page: 1,
-      labels: [],
-      values: [],
-      contentTypes: "Course",
-    },
-  });
+  const { catalogData, contentData } = useContext(DataContext);
   const navigation = useNavigation<HomeScreenProps>();
 
   const CourseList = () => (
@@ -36,7 +24,7 @@ const Recommendation = () => {
       style={styles.courseContainer}
       showsHorizontalScrollIndicator={false}
     >
-      {catalogData?.CatalogContent?.contentItems?.map((course, idx) => (
+      {catalogData?.map((course, idx) => (
         <TouchableOpacity
           key={idx}
           onPress={() =>
@@ -70,33 +58,33 @@ const Recommendation = () => {
       style={styles.courseContainer}
       showsHorizontalScrollIndicator={false}
     >
-      {contentData?.UserContentItems?.filter(
-        (item) => item.contentTypeLabel === "Course"
-      ).map((course, idx) => (
-        <TouchableOpacity
-          key={idx}
-          onPress={() =>
-            navigation.navigate("ContentDetails", {
-              cid: course.displayCourse || "",
-              from: "Home",
-            })
-          }
-        >
-          <View style={styles.recContentBox}>
-            <ImageBackground
-              key={idx}
-              source={{ uri: course.asset }}
-              resizeMode="cover"
-              style={{ borderRadius: 10 }}
-              imageStyle={{ borderRadius: 8 }}
-            >
-              <View style={styles.bannerArea}>
-                <Text style={styles.courseTitle}>{course.title}</Text>
-              </View>
-            </ImageBackground>
-          </View>
-        </TouchableOpacity>
-      ))}
+      {contentData
+        ?.filter((item) => item.contentTypeLabel === "Course")
+        .map((content, idx) => (
+          <TouchableOpacity
+            key={idx}
+            onPress={() =>
+              navigation.navigate("ContentDetails", {
+                cid: content.displayCourse || "",
+                from: "Home",
+              })
+            }
+          >
+            <View style={styles.recContentBox}>
+              <ImageBackground
+                key={idx}
+                source={{ uri: content.asset }}
+                resizeMode="cover"
+                style={{ borderRadius: 10 }}
+                imageStyle={{ borderRadius: 8 }}
+              >
+                <View style={styles.bannerArea}>
+                  <Text style={styles.courseTitle}>{content.title}</Text>
+                </View>
+              </ImageBackground>
+            </View>
+          </TouchableOpacity>
+        ))}
     </ScrollView>
   );
 
@@ -105,11 +93,7 @@ const Recommendation = () => {
       <View style={styles.courseBox}>
         <Text style={styles.heading}>Recommendations</Text>
       </View>
-      {contentData?.UserContentItems?.length !== 0 ? (
-        <ContentList />
-      ) : (
-        <CourseList />
-      )}
+      {contentData?.length !== 0 ? <ContentList /> : <CourseList />}
     </View>
   );
 };

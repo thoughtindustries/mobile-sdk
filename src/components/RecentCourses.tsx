@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -7,24 +7,27 @@ import {
   StyleSheet,
   Pressable,
 } from "react-native";
-import _ from "lodash";
-import striptags from "striptags";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList, userRecentContentType } from "../../types";
-import { useUserRecentContentQuery } from "../graphql";
+import { RootStackParamList } from "../../types";
+import { DataContext } from "../context";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const { data } = useUserRecentContentQuery({
-    variables: { limit: 5 },
-  });
+  const { recentContent } = useContext(DataContext);
+
+  const showDescription = (description: string | undefined, length: number) => {
+    const words = description?.split(" ");
+    const truncatedWords = words?.splice(0, length);
+    const summary = truncatedWords?.join(" ");
+    return summary;
+  };
 
   return (
     <View>
-      {data?.UserRecentContent?.length !== 0 && (
+      {recentContent?.length !== 0 && (
         <View>
           <View style={styles.courseBox}>
             <Text style={styles.heading}>Recently Launched Courses</Text>
@@ -34,7 +37,7 @@ const RecentCourses = () => {
             style={styles.courseContainer}
             showsHorizontalScrollIndicator={false}
           >
-            {data?.UserRecentContent.map((course, idx) => (
+            {recentContent?.map((course, idx) => (
               <Pressable
                 key={idx}
                 onPress={() =>
@@ -55,9 +58,10 @@ const RecentCourses = () => {
                   <View style={styles.contentArea}>
                     <Text style={styles.recCourseTitle}>{course.title}</Text>
                     <Text style={styles.courseDes}>
-                      {_.truncate(striptags(course.description || ""), {
-                        length: 100,
-                      })}
+                      {`${showDescription(
+                        course.description ? course.description : "",
+                        12
+                      )}...`}
                     </Text>
                   </View>
                 </View>

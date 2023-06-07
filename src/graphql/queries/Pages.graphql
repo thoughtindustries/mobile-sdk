@@ -1,0 +1,26 @@
+query Pages($identifiers: [String!]!) {
+  Pages(identifiers: $identifiers) {
+    ... on ArticlePage {
+      videoAsset
+      languages {
+        language
+        label
+        title
+        subtitle
+        body
+        copyright
+        allowAudioDownload
+        audioAsset
+        audioAssetUrl
+        externalUrl
+        externalUrlCallToAction
+        pdfAsset
+        pdfAssetSecondary
+        pdfAssetSecondaryUrl
+        pdfAssetTitle
+        pdfAssetTitleSecondary
+        pdfAssetUrl
+      }
+    }
+  }
+}

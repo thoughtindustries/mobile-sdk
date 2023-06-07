@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -7,45 +7,30 @@ import {
   Pressable,
   Dimensions,
 } from "react-native";
-import _ from "lodash";
-import striptags from "striptags";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import {
-  useUserRecentContentQuery,
-  useCatalogContentQuery,
-  GlobalTypes,
-} from "../graphql";
+import { DataContext } from "../context";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Banner = () => {
+  const { recentContent, catalogData } = useContext(DataContext);
   const navigation = useNavigation<HomeScreenProps>();
-  const { data: recentContentData } = useUserRecentContentQuery({
-    variables: { limit: 1 },
-  });
 
-  const { data: catalogData } = useCatalogContentQuery({
-    variables: {
-      sortColumn: GlobalTypes.SortColumn.Title,
-      sortDirection: GlobalTypes.SortDirection.Asc,
-      page: 1,
-      labels: [],
-      values: [],
-      contentTypes: "Course",
-    },
-  });
+  const showSummary = (description: string | undefined, length: number) => {
+    const words = description?.split(" ");
+    const truncatedWords = words?.splice(0, length);
+    const summary = truncatedWords?.join(" ");
+    return summary;
+  };
 
   return (
     <View>
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid:
-              recentContentData?.UserRecentContent[0]?.id ||
-              catalogData?.CatalogContent?.contentItems?.[0]?.id ||
-              "",
+            cid: recentContent?.[0]?.id || catalogData?.[0]?.id || "",
             from: "Home",
           })
         }
@@ -53,27 +38,17 @@ const Banner = () => {
         <View style={styles.bannerContainer}>
           <ImageBackground
             source={{
-              uri:
-                recentContentData?.UserRecentContent[0]?.asset ||
-                catalogData?.CatalogContent?.contentItems?.[0]?.asset,
+              uri: recentContent?.[0]?.asset || catalogData?.[0]?.asset,
             }}
             resizeMode="cover"
             imageStyle={{ borderRadius: 8 }}
           >
             <View style={styles.bannerArea}>
               <Text style={styles.bannerTitle}>
-                {recentContentData?.UserRecentContent[0]?.title ||
-                  catalogData?.CatalogContent?.contentItems?.[0].title}
+                {recentContent?.[0]?.title || catalogData?.[0]?.title}
               </Text>
               <Text style={styles.bannerText}>
-                {_.truncate(
-                  striptags(
-                    recentContentData?.UserRecentContent[0]?.description || ""
-                  ),
-                  {
-                    length: 70,
-                  }
-                )}
+                {`${showSummary(recentContent?.[0]?.description, 12)}...`}
               </Text>
             </View>
           </ImageBackground>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -14,14 +14,14 @@ import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import dbObj from "../helpers/Db";
 import Success from "./Success";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 import { useLoginMutation } from "../graphql";
 import * as SecureStore from "expo-secure-store";
-import { createUser } from "../db/db";
+import { createUser, initDB } from "../db/db";
+import { DataContext } from "../context";
 
 type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
@@ -38,8 +38,17 @@ interface FormProps {
 
 const Login = () => {
   const navigation = useNavigation<LoginScreenProps>();
+  const {
+    recentContent,
+    refetchRecentContent,
+    catalogData,
+    refetchCatalogData,
+    contentData,
+    refetchContentData,
+  } = useContext(DataContext);
   const [showPassword, setShowpPassword] = useState<boolean>(false);
-  const [loginMutation, { loading }] = useLoginMutation();
+  const [loginMutation] = useLoginMutation();
+  const [loading, setLoading] = useState<boolean>(false);
   const [responseError, setResponseError] = useState<ErrorMessageType>({
     title: "",
     message: "",
@@ -100,6 +109,7 @@ const Login = () => {
   const onSignIn = async () => {
     try {
       if (formValidated()) {
+        setLoading(true);
         // Login user
         const { data } = await loginMutation({
           variables: {
@@ -125,22 +135,26 @@ const Login = () => {
           );
 
           const userInfo = await response.json();
+          await initDB();
           await createUser(userInfo);
           await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
 
-          // Look user id and store
-          const userId = await dbObj.userLookup(form.email.value);
-          await SecureStore.setItemAsync("userId", JSON.stringify(userId));
-
           // Navigate to home screen
-          navigation.navigate("HomeScreen");
-
-          // Clear input fields
-          setForm({
-            ...form,
-            email: { ...form.email, value: "", error: "" },
-            password: { ...form.password, value: "", error: "" },
-          });
+          setTimeout(() => {
+            if (recentContent && catalogData && contentData) {
+              navigation.navigate("HomeScreen");
+              setForm({
+                ...form,
+                email: { ...form.email, value: "", error: "" },
+                password: { ...form.password, value: "", error: "" },
+              });
+              setLoading(false);
+            } else {
+              refetchContentData();
+              refetchCatalogData();
+              refetchRecentContent();
+            }
+          }, 3000);
         }
       }
     } catch (error) {
@@ -261,7 +275,9 @@ const Login = () => {
                 </Pressable>
               </View>
               <Text style={AppStyle.inlineError}>{form.password.error}</Text>
-              <Button title="Sign In" onPress={onSignIn} />
+              <View style={styles(loading).button}>
+                <Button title="Sign In" onPress={onSignIn} />
+              </View>
               <Link
                 title="Forgot Password?"
                 onPress={() =>
@@ -293,6 +309,9 @@ const styles = (loading: boolean) =>
       color: "#1F2937",
       marginBottom: 10,
       fontFamily: "Poppins_700Bold",
+    },
+    button: {
+      marginVertical: 20,
     },
   });
 
