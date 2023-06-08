@@ -135,26 +135,32 @@ const Login = () => {
           );
 
           const userInfo = await response.json();
-          await initDB();
-          await createUser(userInfo);
-          await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
+          if (userInfo) {
+            await initDB();
+            await createUser(userInfo);
+            await SecureStore.setItemAsync(
+              "userInfo",
+              JSON.stringify(userInfo)
+            );
 
-          // Navigate to home screen
-          setTimeout(() => {
-            if (recentContent && catalogData && contentData) {
-              navigation.navigate("HomeScreen");
-              setForm({
-                ...form,
-                email: { ...form.email, value: "", error: "" },
-                password: { ...form.password, value: "", error: "" },
-              });
-              setLoading(false);
-            } else {
-              refetchContentData();
-              refetchCatalogData();
-              refetchRecentContent();
-            }
-          }, 3000);
+            // Navigate to home screen
+            setTimeout(() => {
+              if (recentContent && catalogData && contentData) {
+                navigation.navigate("HomeScreen");
+                setForm({
+                  ...form,
+                  email: { ...form.email, value: "", error: "" },
+                  password: { ...form.password, value: "", error: "" },
+                });
+                setLoading(false);
+              } else {
+                console.log("BOOM");
+                refetchContentData();
+                refetchCatalogData();
+                refetchRecentContent();
+              }
+            }, 3000);
+          }
         }
       }
     } catch (error) {
@@ -209,7 +215,7 @@ const Login = () => {
   return (
     <View style={styles(loading).container}>
       {loading && (
-        <Success title="" message="Trying to login, Please wait.. " />
+        <Success title="" message="Trying to login, Please wait... " />
       )}
       {!loading && (
         <View>

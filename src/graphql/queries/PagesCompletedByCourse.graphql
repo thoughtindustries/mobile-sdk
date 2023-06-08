@@ -1,0 +1,48 @@
+query PagesCompletedByCourse($courseId: ID!) {
+  PagesCompletedByCourse(courseId: $courseId) {
+    ... on ArticlePage {
+      accessibilityAudioAsset
+      accessibilityAudioAssetTitle
+      accessibilityAudioAssetUrl
+      catalogAsset
+      clientId
+      companyId
+      completionTimeSeconds
+      contentDescription
+      contentEstimate
+      contentTime
+      createdAt
+      editableByChildren
+      id
+      indentationLevel
+      lessonId
+      publishDate
+      title
+      type
+      updatedAt
+      videoAsset
+    }
+    ... on TextPage {
+      accessibilityAudioAsset
+      accessibilityAudioAssetTitle
+      accessibilityAudioAssetUrl
+      body
+      catalogAsset
+      clientId
+      companyId
+      completionTimeSeconds
+      contentDescription
+      contentEstimate
+      contentTime
+      createdAt
+      editableByChildren
+      id
+      indentationLevel
+      lessonId
+      sidebarIsHidden
+      title
+      type
+      updatedAt
+    }
+  }
+}

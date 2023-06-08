@@ -76,14 +76,14 @@ const ContentDetails = () => {
   );
 
   const AboutCourse = () => (
-    <>
-      <View style={styles.aboutSection}>
-        <Text style={styles.courseSubTitle}>About this Course</Text>
+    <View style={styles.aboutSection}>
+      <Text style={styles.courseSubTitle}>About this Course</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.courseDesc}>
           {data?.CourseById.courseGroup?.description}
         </Text>
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 
   const toggleSection = (id: string) => {
@@ -214,9 +214,9 @@ const ContentDetails = () => {
     );
   };
 
-  const SectionList = () => {
-    return (
-      <View style={styles.sectionList}>
+  const SectionList = () => (
+    <View style={styles.sectionList}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {data?.CourseById.sections?.map((section, idx) => (
           <SectionView
             key={idx}
@@ -225,9 +225,9 @@ const ContentDetails = () => {
             lessons={section.lessons as []}
           />
         ))}
-      </View>
-    );
-  };
+      </ScrollView>
+    </View>
+  );
 
   const FloatingContainer = () => {
     const sectionId = getLastViewedSection();
@@ -255,53 +255,57 @@ const ContentDetails = () => {
     );
   };
 
-  return (
-    <SafeAreaView>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
+  const Nav = () => (
+    <TouchableOpacity style={styles.row}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#374151",
+          borderRadius: 8,
+          width: 36,
+          height: 36,
+        }}
       >
-        <View style={styles.page}>
-          <View style={styles.row}>
-            <MaterialCommunityIcons
-              name="chevron-left"
-              size={32}
-              color="#FFFFFF"
-              style={styles.backIcon}
-              onPress={() => navigation.goBack()}
-            />
-            <Text style={styles.backBtn} onPress={() => navigation.goBack()}>
-              Back
-            </Text>
-          </View>
-          {!loading && <CustomReport />}
-          {!loading && (
-            <ScrollView style={{ height: 150 }}>
-              <AboutCourse />
-            </ScrollView>
-          )}
+        <MaterialCommunityIcons
+          name="chevron-left"
+          size={32}
+          color="#FFFFFF"
+          onPress={() => navigation.goBack()}
+        />
+      </View>
+      <Text style={styles.backBtn} onPress={() => navigation.goBack()}>
+        Back
+      </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      {loading ? (
+        <View style={styles.loader}>
+          <LoadingBanner />
         </View>
-
-        {loading && (
-          <View style={styles.loader}>
-            <LoadingBanner />
-          </View>
-        )}
-
-        {!loading && <SectionList />}
-      </ScrollView>
-      {!loading && <FloatingContainer />}
-    </SafeAreaView>
+      ) : (
+        <View style={{ flex: 1 }}>
+          <Nav />
+          <CustomReport />
+          <AboutCourse />
+          <SectionList />
+          <FloatingContainer />
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   sectionList: {
-    marginTop: 20,
-    marginBottom: 150,
+    flex: 4,
   },
   loader: {
     marginHorizontal: 30,
+    marginTop: 60,
   },
   collapse: {
     backgroundColor: "#FAFAFA",
@@ -324,6 +328,7 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     fontSize: 12,
     fontFamily: "Inter_400Regular",
+    paddingVertical: 4,
   },
   sectionProgress: {
     height: 8,
@@ -369,15 +374,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F7",
   },
   row: {
+    marginTop: 60,
+    marginLeft: 30,
+    marginBottom: 30,
+    alignItems: "center",
     paddingTop: 0,
     display: "flex",
     flexDirection: "row",
-  },
-  backIcon: {
-    backgroundColor: "#374151",
-    borderRadius: 8,
-    width: 32,
-    height: 32,
   },
   backBtn: {
     paddingTop: 2,
@@ -385,13 +388,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   reportRow: {
-    display: "flex",
+    flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     borderBottomColor: "#D1D5DB",
     borderBottomWidth: 1,
     marginBottom: 20,
+    marginHorizontal: 30,
   },
   reportRightBox: {
     flexGrow: 0,
@@ -421,10 +425,12 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
   aboutSection: {
-    paddingTop: 10,
+    marginHorizontal: 30,
+    flex: 2,
   },
   courseSubTitle: {
     fontSize: 12,
+    paddingBottom: 12,
     lineHeight: 15,
     textAlign: "left",
     color: "#1F2937",
@@ -460,12 +466,11 @@ const styles = StyleSheet.create({
   },
   floatingFooter: {
     position: "absolute",
-    width: "92%",
     height: 120,
     alignItems: "center",
     right: 16,
     left: 16,
-    bottom: 10,
+    bottom: 30,
     backgroundColor: "#3B1FA3",
     borderColor: "#D1D5DB",
     borderRadius: 8,

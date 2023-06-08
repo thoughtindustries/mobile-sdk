@@ -9,6 +9,7 @@ import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import tiGql from "../helpers/TIGraphQL";
 import WebView from "react-native-webview";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 type ExploreCourseProps = StackNavigationProp<
   RootStackParamList,
@@ -97,7 +98,15 @@ const ExploreCourse = () => {
         stickyHeaderIndices={[0]}
       >
         <View>
-          <View style={{ ...styles.row, padding: 8, paddingTop: 40 }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              ...styles.row,
+              padding: 8,
+              paddingTop: 40,
+              alignItems: "center",
+            }}
+          >
             <MaterialCommunityIcons
               name="chevron-left"
               size={36}
@@ -110,7 +119,6 @@ const ExploreCourse = () => {
               }
             />
             <Text
-              style={styles.backBtn}
               onPress={() =>
                 navigation.navigate("ContentDetails", {
                   cid: get(route, "params.cid", ""),
@@ -120,7 +128,7 @@ const ExploreCourse = () => {
             >
               Back
             </Text>
-          </View>
+          </TouchableOpacity>
 
           <View style={styles.courseHeading}>
             <View style={{ ...styles.row, paddingTop: 0 }}>
@@ -206,10 +214,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     display: "flex",
     flexDirection: "row",
-  },
-  backBtn: {
-    paddingTop: 7,
-    marginLeft: 0,
   },
   courseHeading: {
     borderBottomWidth: 1,
