@@ -118,14 +118,7 @@ const ExploreCourse = () => {
                 })
               }
             />
-            <Text
-              onPress={() =>
-                navigation.navigate("ContentDetails", {
-                  cid: get(route, "params.cid", ""),
-                  from: get(route, "params.from", ""),
-                })
-              }
-            >
+            <Text style={{ fontSize: 16, fontFamily: "Poppins_400Regular" }}>
               Back
             </Text>
           </TouchableOpacity>

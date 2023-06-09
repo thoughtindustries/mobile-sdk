@@ -95,100 +95,6 @@ export type CatalogContentQuery = {
   };
 };
 
-export enum AlternativePricingType {
-  Membership = "membership",
-}
-
-export type Ribbon = {
-  __typename?: "Ribbon";
-  color?: Maybe<Scalars["String"]>;
-  contrastColor?: Maybe<Scalars["String"]>;
-  darkerColor?: Maybe<Scalars["String"]>;
-  label?: Maybe<Scalars["String"]>;
-  slug: Scalars["Slug"];
-};
-
-export type Tag = {
-  __typename?: "Tag";
-  id: Scalars["ID"];
-  isFolder: Scalars["Boolean"];
-  label?: Maybe<Scalars["String"]>;
-  updatedAt?: Maybe<Scalars["Date"]>;
-};
-
-export enum Status {
-  Archived = "archived",
-  Authoring = "authoring",
-  Deleted = "deleted",
-  Draft = "draft",
-  LoginRestriction = "loginRestriction",
-  Pending = "pending",
-  Published = "published",
-}
-
-export type Content = {
-  __typename?: "Content";
-  acceptBadgeUrl?: Maybe<Scalars["String"]>;
-  altDescriptionBody?: Maybe<Scalars["String"]>;
-  alternativePricingRef?: Maybe<Scalars["Int"]>;
-  alternativePricingType?: Maybe<AlternativePricingType>;
-  asset?: Maybe<Scalars["String"]>;
-  authors?: Maybe<Array<Maybe<Scalars["String"]>>>;
-  authorsAndInstructors?: Maybe<Array<Scalars["String"]>>;
-  availabilityStatus?: Maybe<Scalars["String"]>;
-  badgeName?: Maybe<Scalars["String"]>;
-  badgeUrl?: Maybe<Scalars["String"]>;
-  bulkPurchasingEnabled?: Maybe<Scalars["Boolean"]>;
-  canAddToQueue?: Maybe<Scalars["Boolean"]>;
-  contentTypeAssetAspectRatio?: Maybe<Scalars["String"]>;
-  contentTypeLabel?: Maybe<Scalars["String"]>;
-  courseEndDate?: Maybe<Scalars["Date"]>;
-  courseGroup?: Maybe<Scalars["String"]>;
-  courseStartDate?: Maybe<Scalars["Date"]>;
-  createdAt?: Maybe<Scalars["Date"]>;
-  credlyBadgeExpiresAt?: Maybe<Scalars["Date"]>;
-  currentUserUnmetCoursePrerequisites?: Maybe<Array<Maybe<Scalars["ID"]>>>;
-  currentUserUnmetLearningPathPrerequisites?: Maybe<
-    Array<Maybe<Scalars["ID"]>>
-  >;
-  customFields?: Maybe<Scalars["JSON"]>;
-  description?: Maybe<Scalars["String"]>;
-  displayCourse?: Maybe<Scalars["ID"]>;
-  displayCourseSlug?: Maybe<Scalars["Slug"]>;
-  displayDate?: Maybe<Scalars["Date"]>;
-  embeddedEnabled?: Maybe<Scalars["Boolean"]>;
-  enrollmentCount?: Maybe<Scalars["Int"]>;
-  enrollmentEndDate?: Maybe<Scalars["Date"]>;
-  enrollmentStartDate?: Maybe<Scalars["Date"]>;
-  expiresAt?: Maybe<Scalars["Date"]>;
-  id: Scalars["ID"];
-  imageUrl?: Maybe<Scalars["String"]>;
-  issuedAt?: Maybe<Scalars["Date"]>;
-  kind?: Maybe<ContentKind>;
-  language?: Maybe<Scalars["String"]>;
-  location?: Maybe<Location>;
-  meetingStartDate?: Maybe<Scalars["Date"]>;
-  metaDescription?: Maybe<Scalars["String"]>;
-  metaTitle?: Maybe<Scalars["String"]>;
-  priceInCents?: Maybe<Scalars["Int"]>;
-  publishDate?: Maybe<Scalars["Date"]>;
-  rating?: Maybe<Scalars["Int"]>;
-  ribbon?: Maybe<Ribbon>;
-  seatsLimit?: Maybe<Scalars["Int"]>;
-  sessionTitle?: Maybe<Scalars["String"]>;
-  sku?: Maybe<Scalars["String"]>;
-  source?: Maybe<Scalars["String"]>;
-  state?: Maybe<Scalars["String"]>;
-  status?: Maybe<Status>;
-  suggestedRetailPriceInCents?: Maybe<Scalars["Int"]>;
-  tags?: Maybe<Array<Maybe<Tag>>>;
-  timeZone?: Maybe<Scalars["String"]>;
-  title?: Maybe<Scalars["String"]>;
-  updatedAt?: Maybe<Scalars["Date"]>;
-  url?: Maybe<Scalars["AbsoluteOrRelativeURL"]>;
-  waitlistCount?: Maybe<Scalars["Int"]>;
-};
-
 export type CourseByIdQueryVariables = Exact<{
   id: Scalars["ID"];
 }>;
@@ -253,6 +159,7 @@ export type CourseByIdQuery = {
           | { __typename?: "AssignmentPage" }
           | { __typename?: "AudioPage" }
           | { __typename?: "FlipCardPage" }
+          | { __typename?: "GeneralPage" }
           | { __typename?: "HighlightZonePage" }
           | { __typename?: "ListRollPage" }
           | { __typename?: "MatchPairPage" }
@@ -276,9 +183,19 @@ export type CourseByIdQuery = {
   };
 };
 
-export type AssessmentAttemptStatus = {};
+enum AssessmentAttemptStatus {
+  started,
+  finished,
+  pending,
+}
 
-export type AssessmentTopicType = {};
+enum AssessmentTopicType {
+  quiz,
+  test,
+  survey,
+  tally,
+  workbook,
+}
 
 export type LoadAssessmentAttemptWithQuestionsQueryVariables = Exact<{
   assessmentAttemptId?: InputMaybe<Scalars["ID"]>;
@@ -298,6 +215,137 @@ export type LoadAssessmentAttemptWithQuestionsQuery = {
     status: AssessmentAttemptStatus;
     grade?: number;
   };
+};
+
+export type PagesQueryVariables = Exact<{
+  identifiers: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type PagesQuery = {
+  __typename?: "Query";
+  Pages: Array<
+    | {
+        __typename?: "ArticlePage";
+        videoAsset?: string;
+        languages: Array<{
+          __typename?: "ArticlePageLanguage";
+          language?: string;
+          label?: string;
+          title?: string;
+          subtitle?: string;
+          body?: string;
+          copyright?: string;
+          allowAudioDownload?: boolean;
+          audioAsset?: string;
+          audioAssetUrl?: string;
+          externalUrl?: string;
+          externalUrlCallToAction?: string;
+          pdfAsset?: string;
+          pdfAssetSecondary?: string;
+          pdfAssetSecondaryUrl?: string;
+          pdfAssetTitle?: string;
+          pdfAssetTitleSecondary?: string;
+          pdfAssetUrl?: string;
+        }>;
+      }
+    | { __typename?: "AssignmentPage" }
+    | { __typename?: "AudioPage" }
+    | { __typename?: "FlipCardPage" }
+    | { __typename?: "GeneralPage" }
+    | { __typename?: "HighlightZonePage" }
+    | { __typename?: "ListRollPage" }
+    | { __typename?: "MatchPairPage" }
+    | { __typename?: "MeetingPage" }
+    | { __typename?: "NotebookPage" }
+    | { __typename?: "PDFViewerPage" }
+    | { __typename?: "PresentationPage" }
+    | { __typename?: "QuizPage" }
+    | { __typename?: "RecipePage" }
+    | { __typename?: "ScormPage" }
+    | { __typename?: "SlideshowPage" }
+    | { __typename?: "SurveyPage" }
+    | { __typename?: "TallyPage" }
+    | { __typename?: "TestPage" }
+    | { __typename?: "TextPage" }
+    | { __typename?: "VideoPage" }
+    | { __typename?: "WorkbookPage" }
+  >;
+};
+
+export type PagesCompletedByCourseQueryVariables = Exact<{
+  courseId: Scalars["ID"];
+}>;
+
+export type PagesCompletedByCourseQuery = {
+  __typename?: "Query";
+  PagesCompletedByCourse: Array<
+    | {
+        __typename?: "ArticlePage";
+        accessibilityAudioAsset?: string;
+        accessibilityAudioAssetTitle?: string;
+        accessibilityAudioAssetUrl?: string;
+        catalogAsset?: string;
+        clientId?: string;
+        companyId: string;
+        completionTimeSeconds?: number;
+        contentDescription?: string;
+        contentEstimate?: string;
+        contentTime?: string;
+        createdAt: string;
+        editableByChildren?: boolean;
+        id: string;
+        indentationLevel?: number;
+        lessonId: string;
+        publishDate?: string;
+        title?: string;
+        type: TopicType;
+        updatedAt: string;
+        videoAsset?: string;
+      }
+    | { __typename?: "AssignmentPage" }
+    | { __typename?: "AudioPage" }
+    | { __typename?: "FlipCardPage" }
+    | { __typename?: "GeneralPage" }
+    | { __typename?: "HighlightZonePage" }
+    | { __typename?: "ListRollPage" }
+    | { __typename?: "MatchPairPage" }
+    | { __typename?: "MeetingPage" }
+    | { __typename?: "NotebookPage" }
+    | { __typename?: "PDFViewerPage" }
+    | { __typename?: "PresentationPage" }
+    | { __typename?: "QuizPage" }
+    | { __typename?: "RecipePage" }
+    | { __typename?: "ScormPage" }
+    | { __typename?: "SlideshowPage" }
+    | { __typename?: "SurveyPage" }
+    | { __typename?: "TallyPage" }
+    | { __typename?: "TestPage" }
+    | {
+        __typename?: "TextPage";
+        accessibilityAudioAsset?: string;
+        accessibilityAudioAssetTitle?: string;
+        accessibilityAudioAssetUrl?: string;
+        body?: string;
+        catalogAsset?: string;
+        clientId?: string;
+        companyId: string;
+        completionTimeSeconds?: number;
+        contentDescription?: string;
+        contentEstimate?: string;
+        contentTime?: string;
+        createdAt: string;
+        editableByChildren?: boolean;
+        id: string;
+        indentationLevel?: number;
+        lessonId: string;
+        sidebarIsHidden: boolean;
+        title?: string;
+        type: TopicType;
+        updatedAt: string;
+      }
+    | { __typename?: "VideoPage" }
+    | { __typename?: "WorkbookPage" }
+  >;
 };
 
 export enum ContentKind {
@@ -337,6 +385,20 @@ export type UserContentItemsQuery = {
     displayCourse?: string;
     title?: string;
   }>;
+};
+
+export type UserCourseProgressQueryVariables = Exact<{
+  id: Scalars["ID"];
+}>;
+
+export type UserCourseProgressQuery = {
+  __typename?: "Query";
+  UserCourseProgress?: {
+    __typename?: "UserProgress";
+    totalViews?: number;
+    totalTime?: number;
+    percentComplete?: number;
+  };
 };
 
 export type UserRecentContentQueryVariables = Exact<{
@@ -662,6 +724,176 @@ export type LoadAssessmentAttemptWithQuestionsQueryResult = Apollo.QueryResult<
   LoadAssessmentAttemptWithQuestionsQuery,
   LoadAssessmentAttemptWithQuestionsQueryVariables
 >;
+export const PagesDocument = gql`
+  query Pages($identifiers: [String!]!) {
+    Pages(identifiers: $identifiers) {
+      ... on ArticlePage {
+        videoAsset
+        languages {
+          language
+          label
+          title
+          subtitle
+          body
+          copyright
+          allowAudioDownload
+          audioAsset
+          audioAssetUrl
+          externalUrl
+          externalUrlCallToAction
+          pdfAsset
+          pdfAssetSecondary
+          pdfAssetSecondaryUrl
+          pdfAssetTitle
+          pdfAssetTitleSecondary
+          pdfAssetUrl
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __usePagesQuery__
+ *
+ * To run a query within a React component, call `usePagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePagesQuery({
+ *   variables: {
+ *      identifiers: // value for 'identifiers'
+ *   },
+ * });
+ */
+export function usePagesQuery(
+  baseOptions: Apollo.QueryHookOptions<PagesQuery, PagesQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<PagesQuery, PagesQueryVariables>(
+    PagesDocument,
+    options
+  );
+}
+export function usePagesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<PagesQuery, PagesQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<PagesQuery, PagesQueryVariables>(
+    PagesDocument,
+    options
+  );
+}
+export type PagesQueryHookResult = ReturnType<typeof usePagesQuery>;
+export type PagesLazyQueryHookResult = ReturnType<typeof usePagesLazyQuery>;
+export type PagesQueryResult = Apollo.QueryResult<
+  PagesQuery,
+  PagesQueryVariables
+>;
+export const PagesCompletedByCourseDocument = gql`
+  query PagesCompletedByCourse($courseId: ID!) {
+    PagesCompletedByCourse(courseId: $courseId) {
+      ... on ArticlePage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        catalogAsset
+        clientId
+        companyId
+        completionTimeSeconds
+        contentDescription
+        contentEstimate
+        contentTime
+        createdAt
+        editableByChildren
+        id
+        indentationLevel
+        lessonId
+        publishDate
+        title
+        type
+        updatedAt
+        videoAsset
+      }
+      ... on TextPage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        body
+        catalogAsset
+        clientId
+        companyId
+        completionTimeSeconds
+        contentDescription
+        contentEstimate
+        contentTime
+        createdAt
+        editableByChildren
+        id
+        indentationLevel
+        lessonId
+        sidebarIsHidden
+        title
+        type
+        updatedAt
+      }
+    }
+  }
+`;
+
+/**
+ * __usePagesCompletedByCourseQuery__
+ *
+ * To run a query within a React component, call `usePagesCompletedByCourseQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePagesCompletedByCourseQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePagesCompletedByCourseQuery({
+ *   variables: {
+ *      courseId: // value for 'courseId'
+ *   },
+ * });
+ */
+export function usePagesCompletedByCourseQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PagesCompletedByCourseQuery,
+    PagesCompletedByCourseQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PagesCompletedByCourseQuery,
+    PagesCompletedByCourseQueryVariables
+  >(PagesCompletedByCourseDocument, options);
+}
+export function usePagesCompletedByCourseLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PagesCompletedByCourseQuery,
+    PagesCompletedByCourseQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PagesCompletedByCourseQuery,
+    PagesCompletedByCourseQueryVariables
+  >(PagesCompletedByCourseDocument, options);
+}
+export type PagesCompletedByCourseQueryHookResult = ReturnType<
+  typeof usePagesCompletedByCourseQuery
+>;
+export type PagesCompletedByCourseLazyQueryHookResult = ReturnType<
+  typeof usePagesCompletedByCourseLazyQuery
+>;
+export type PagesCompletedByCourseQueryResult = Apollo.QueryResult<
+  PagesCompletedByCourseQuery,
+  PagesCompletedByCourseQueryVariables
+>;
 export const UserContentItemsDocument = gql`
   query UserContentItems(
     $kind: [ContentKind!]
@@ -736,6 +968,66 @@ export type UserContentItemsLazyQueryHookResult = ReturnType<
 export type UserContentItemsQueryResult = Apollo.QueryResult<
   UserContentItemsQuery,
   UserContentItemsQueryVariables
+>;
+export const UserCourseProgressDocument = gql`
+  query UserCourseProgress($id: ID!) {
+    UserCourseProgress(id: $id) {
+      totalViews
+      totalTime
+      percentComplete
+    }
+  }
+`;
+
+/**
+ * __useUserCourseProgressQuery__
+ *
+ * To run a query within a React component, call `useUserCourseProgressQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserCourseProgressQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserCourseProgressQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUserCourseProgressQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UserCourseProgressQuery,
+    UserCourseProgressQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UserCourseProgressQuery,
+    UserCourseProgressQueryVariables
+  >(UserCourseProgressDocument, options);
+}
+export function useUserCourseProgressLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserCourseProgressQuery,
+    UserCourseProgressQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserCourseProgressQuery,
+    UserCourseProgressQueryVariables
+  >(UserCourseProgressDocument, options);
+}
+export type UserCourseProgressQueryHookResult = ReturnType<
+  typeof useUserCourseProgressQuery
+>;
+export type UserCourseProgressLazyQueryHookResult = ReturnType<
+  typeof useUserCourseProgressLazyQuery
+>;
+export type UserCourseProgressQueryResult = Apollo.QueryResult<
+  UserCourseProgressQuery,
+  UserCourseProgressQueryVariables
 >;
 export const UserRecentContentDocument = gql`
   query UserRecentContent($limit: Int) {

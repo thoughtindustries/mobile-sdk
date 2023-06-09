@@ -4,35 +4,58 @@ import { gql } from "@apollo/client";
 import * as Apollo from "@apollo/client";
 const defaultOptions = {} as const;
 export type PagesQueryVariables = Types.Exact<{
-  identifiers: Array<Types.Scalars["String"]>;
+  identifiers: Array<Types.Scalars["String"]> | Types.Scalars["String"];
 }>;
 
 export type PagesQuery = {
   __typename?: "Query";
-  Pages: {
-    __typename?: "Pages";
-    videoAsset: string;
-    languages: Array<{
-      __typename?: "Languages";
-      language: string;
-      label: string;
-      title: string;
-      subtitle: string;
-      body: string;
-      copyright: string;
-      allowAudioDownload: boolean;
-      audioAsset: string;
-      audioAssetUrl: string;
-      externalUrl: string;
-      externalUrlCallToAction: string;
-      pdfAsset: string;
-      pdfAssetSecondary: string;
-      pdfAssetSecondaryUrl: string;
-      pdfAssetTitle: string;
-      pdfAssetTitleSecondary: string;
-      pdfAssetUrl: string;
-    }>;
-  };
+  Pages: Array<
+    | {
+        __typename?: "ArticlePage";
+        videoAsset?: string;
+        languages: Array<{
+          __typename?: "ArticlePageLanguage";
+          language?: string;
+          label?: string;
+          title?: string;
+          subtitle?: string;
+          body?: string;
+          copyright?: string;
+          allowAudioDownload?: boolean;
+          audioAsset?: string;
+          audioAssetUrl?: string;
+          externalUrl?: string;
+          externalUrlCallToAction?: string;
+          pdfAsset?: string;
+          pdfAssetSecondary?: string;
+          pdfAssetSecondaryUrl?: string;
+          pdfAssetTitle?: string;
+          pdfAssetTitleSecondary?: string;
+          pdfAssetUrl?: string;
+        }>;
+      }
+    | { __typename?: "AssignmentPage" }
+    | { __typename?: "AudioPage" }
+    | { __typename?: "FlipCardPage" }
+    | { __typename?: "GeneralPage" }
+    | { __typename?: "HighlightZonePage" }
+    | { __typename?: "ListRollPage" }
+    | { __typename?: "MatchPairPage" }
+    | { __typename?: "MeetingPage" }
+    | { __typename?: "NotebookPage" }
+    | { __typename?: "PDFViewerPage" }
+    | { __typename?: "PresentationPage" }
+    | { __typename?: "QuizPage" }
+    | { __typename?: "RecipePage" }
+    | { __typename?: "ScormPage" }
+    | { __typename?: "SlideshowPage" }
+    | { __typename?: "SurveyPage" }
+    | { __typename?: "TallyPage" }
+    | { __typename?: "TestPage" }
+    | { __typename?: "TextPage" }
+    | { __typename?: "VideoPage" }
+    | { __typename?: "WorkbookPage" }
+  >;
 };
 
 export const PagesDocument = gql`

@@ -5,3 +5,4 @@ export * from "./LoadAssessmentAttemptWithQuestions.generated";
 export * from "./CourseById.generated";
 export * from "./UserCourseProgress.generated";
 export * from "./Pages.generated";
+export * from "./PagesCompletedByCourse.generated";

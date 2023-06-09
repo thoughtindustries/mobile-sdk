@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ImageBackground,
-  Pressable,
+  TouchableOpacity,
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -27,7 +27,7 @@ const Banner = () => {
 
   return (
     <View>
-      <Pressable
+      <TouchableOpacity
         onPress={() =>
           navigation.navigate("ContentDetails", {
             cid: recentContent?.[0]?.id || catalogData?.[0]?.id || "",
@@ -53,7 +53,7 @@ const Banner = () => {
             </View>
           </ImageBackground>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 };

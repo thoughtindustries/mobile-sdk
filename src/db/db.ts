@@ -107,6 +107,7 @@ export const createUser = ({
           resolve(result);
         },
         (_, error) => {
+          console.log(error.message);
           reject(error);
           return false;
         }
