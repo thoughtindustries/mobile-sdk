@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,13 +10,13 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import { DataContext } from "../context";
+import { useDataContext } from "../context";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const { recentContent } = useContext(DataContext);
+  const { recentContent } = useDataContext();
 
   const showDescription = (description: string | undefined, length: number) => {
     const words = description?.split(" ");
@@ -52,7 +52,7 @@ const RecentCourses = () => {
                     <Image
                       key={idx}
                       source={{ uri: course.asset }}
-                      style={{ width: "100%", height: "100%", borderRadius: 5 }}
+                      style={styles.image}
                     />
                   </View>
                   <View style={styles.contentArea}>
@@ -127,6 +127,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "400",
     lineHeight: 18,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 5,
   },
 });
 

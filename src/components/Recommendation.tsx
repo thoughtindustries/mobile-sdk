@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
@@ -10,12 +10,12 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import { DataContext } from "../context";
+import { useDataContext } from "../context";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
-  const { catalogData, contentData } = useContext(DataContext);
+  const { catalogData, contentData } = useDataContext();
   const navigation = useNavigation<HomeScreenProps>();
 
   const CourseList = () => (
@@ -39,8 +39,8 @@ const Recommendation = () => {
               key={idx}
               source={{ uri: course.asset }}
               resizeMode="cover"
-              style={{ borderRadius: 10 }}
-              imageStyle={{ borderRadius: 8 }}
+              style={styles.imageBackground}
+              imageStyle={styles.image}
             >
               <View style={styles.bannerArea}>
                 <Text style={styles.courseTitle}>{course.title}</Text>
@@ -75,8 +75,8 @@ const Recommendation = () => {
                 key={idx}
                 source={{ uri: content.asset }}
                 resizeMode="cover"
-                style={{ borderRadius: 10 }}
-                imageStyle={{ borderRadius: 8 }}
+                style={styles.imageBackground}
+                imageStyle={styles.image}
               >
                 <View style={styles.bannerArea}>
                   <Text style={styles.courseTitle}>{content.title}</Text>
@@ -137,6 +137,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     justifyContent: "flex-start",
     lineHeight: 50,
+  },
+  image: {
+    borderRadius: 8,
+  },
+  imageBackground: {
+    borderRadius: 10,
   },
 });
 
