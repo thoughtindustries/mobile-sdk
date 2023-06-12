@@ -32,7 +32,7 @@
     "accordion-collapse-react-native": "^1.1.1",
     "axios": "^1.2.1",
     "concurrently": "^7.6.0",
-    "expo": "~47.0.7",
+    "expo": "~48.0.19",
     "expo-app-loading": "~2.1.1",
     "expo-asset": "~8.7.0",
     "expo-file-system": "~15.1.1",
