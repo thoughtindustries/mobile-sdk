@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -57,6 +57,7 @@ const Login = () => {
     email: { value: "", error: "" },
     password: { value: "", error: "" },
   });
+  const [refetch, setRefetch] = useState<boolean>(false);
 
   const handleChange = (field: string, value: string) => {
     if (field === "email") {
@@ -106,6 +107,17 @@ const Login = () => {
       : false;
   };
 
+  useEffect(() => {
+    if (recentContent && catalogData && contentData) {
+      navigation.navigate("HomeScreen");
+      setForm({
+        ...form,
+        email: { ...form.email, value: "", error: "" },
+        password: { ...form.password, value: "", error: "" },
+      });
+    }
+  }, [recentContent, catalogData, contentData]);
+
   const onSignIn = async () => {
     try {
       if (formValidated()) {
@@ -143,23 +155,9 @@ const Login = () => {
               JSON.stringify(userInfo)
             );
 
-            // Navigate to home screen
-            setTimeout(() => {
-              if (recentContent && catalogData && contentData) {
-                navigation.navigate("HomeScreen");
-                setForm({
-                  ...form,
-                  email: { ...form.email, value: "", error: "" },
-                  password: { ...form.password, value: "", error: "" },
-                });
-                setLoading(false);
-              } else {
-                console.log("BOOM");
-                refetchContentData();
-                refetchCatalogData();
-                refetchRecentContent();
-              }
-            }, 3000);
+            refetchContentData();
+            refetchCatalogData();
+            refetchRecentContent();
           }
         }
       }
