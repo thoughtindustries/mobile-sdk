@@ -1,5 +1,6 @@
 query UserRecentContent($limit: Int) {
   UserRecentContent(limit: $limit) {
+    id
     title
     description
     asset

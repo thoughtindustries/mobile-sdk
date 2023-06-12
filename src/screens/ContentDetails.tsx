@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import { get, last, intersection } from "lodash";
+import { get, last } from "lodash";
 import { LoadingBanner } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -22,7 +22,7 @@ import {
 } from "accordion-collapse-react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useCourseByIdQuery } from "../graphql";
+import { useCourseByIdQuery, usePagesCompletedByCourseQuery } from "../graphql";
 
 type ContentDetailsScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -32,11 +32,17 @@ type ContentDetailsScreenProps = StackNavigationProp<
 const ContentDetails = () => {
   const route = useRoute();
   const { cid } = route.params;
-  const { data, loading } = useCourseByIdQuery({
+  const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
     variables: {
       id: cid || "",
     },
   });
+  const { data: pagesCompletedData, loading: pagesCompletedDataLoading } =
+    usePagesCompletedByCourseQuery({
+      variables: {
+        courseId: cid || "",
+      },
+    });
 
   let backToRoute = get(route, "params.from", "Home");
   const navigation = useNavigation<ContentDetailsScreenProps>();
@@ -47,28 +53,53 @@ const ContentDetails = () => {
   const [activeSection, setActiveSection] = useState<string>("");
 
   const getLastViewedSection = () => {
-    let secreads = get(content, "course.sections", []).filter(isSectionRead);
+    let secreads = get(content, "course.sections", []).filter(
+      getSectionProgress
+    );
     return get(last(secreads), "id", "");
+  };
+
+  const getSectionProgress = (lessons: []) => {
+    let pagesCompletedIds: string[] = [];
+    let topicIds: string[] = [];
+
+    pagesCompletedData?.PagesCompletedByCourse.map((completedPage: any) => {
+      pagesCompletedIds.push(completedPage.id);
+    });
+
+    lessons.map((lesson: any) => {
+      lesson.topics.filter((topic: any) => {
+        topicIds.push(topic.id);
+      });
+    });
+
+    const lessonsRead = pagesCompletedIds.filter((completedPageId: string) =>
+      topicIds.includes(completedPageId)
+    );
+
+    return lessonsRead;
   };
 
   useEffect(() => {
     const lastId = getLastViewedSection();
     setActiveSection(
-      lastId !== "" ? lastId : data?.CourseById?.sections?.[0]?.id || ""
+      lastId !== "" ? lastId : courseData?.CourseById?.sections?.[0]?.id || ""
     );
   }, [content]);
 
   const CustomReport = () => (
     <View style={styles.reportRow}>
       <View style={styles.reportRightBox}>
-        <Text style={styles.courseTitle}>{data?.CourseById.title}</Text>
+        <Text style={styles.courseTitle}>{courseData?.CourseById.title}</Text>
         <Text style={styles.courseAuthor}>
-          By {data?.CourseById?.courseGroup?.authors?.join(", ") || "Anonymous"}
+          By{" "}
+          {courseData?.CourseById?.courseGroup?.authors?.join(", ") ||
+            "Anonymous"}
         </Text>
       </View>
-      {data?.CourseById.courseGroup?.asset !== "" && (
+      {courseData?.CourseById.courseGroup?.asset !== "" && (
         <Image
-          source={{ uri: data?.CourseById.courseGroup?.asset }}
+          source={{ uri: courseData?.CourseById.courseGroup?.asset }}
           style={styles.recentImage}
         />
       )}
@@ -76,14 +107,14 @@ const ContentDetails = () => {
   );
 
   const AboutCourse = () => (
-    <>
-      <View style={styles.aboutSection}>
-        <Text style={styles.courseSubTitle}>About this Course</Text>
+    <View style={styles.aboutSection}>
+      <Text style={styles.courseSubTitle}>About this Course</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.courseDesc}>
-          {data?.CourseById.courseGroup?.description}
+          {courseData?.CourseById.courseGroup?.description}
         </Text>
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 
   const toggleSection = (id: string) => {
@@ -94,7 +125,7 @@ const ContentDetails = () => {
     }
   };
 
-  const SectionProgress = (percent: Number) => (
+  const SectionProgress = ({ percent }: { percent: number }) => (
     <View style={styles.sectionProgress}>
       <Animated.View
         style={
@@ -109,24 +140,30 @@ const ContentDetails = () => {
     </View>
   );
 
-  const LessonView = (
-    idx: number,
-    lesson: { topics: []; title: string },
-    section: string,
-    secProgress: number
-  ) => {
-    const lessonRead =
-      intersection(
-        content.progress,
-        lesson.topics.map((t: { id: string }) => t.id)
-      ).length > 0;
+  const LessonView = ({
+    idx,
+    lesson,
+    lessonsRead,
+    section,
+    secProgress,
+  }: {
+    idx: number;
+    lesson: { topics: []; title: string };
+    lessonsRead: string[];
+    section: string;
+    secProgress: number;
+  }) => {
+    const lessonRead = lesson.topics.some((topic: any) =>
+      lessonsRead.includes(topic.id)
+    );
+
     return (
-      <Pressable
+      <TouchableOpacity
         key={idx}
         onPress={() =>
           navigation.navigate("ExploreCourse", {
             cid: cid,
-            course: data?.CourseById.title || "",
+            course: courseData?.CourseById.title || "",
             section: section,
             lesson: lesson.title,
             progress: secProgress,
@@ -138,66 +175,55 @@ const ContentDetails = () => {
         <View style={styles.lessonBox}>
           <Text style={styles.lessonTitle}>{lesson.title}</Text>
           <View style={styles.lessonStatus}>
-            {!lessonRead && (
-              <MaterialCommunityIcons
-                name="lock-outline"
-                size={20}
-                color="#000000"
-              />
-            )}
-            {lessonRead && (
-              <MaterialCommunityIcons
-                name="check-circle-outline"
-                size={20}
-                color="#008463"
-              />
-            )}
+            <MaterialCommunityIcons
+              name={`${lessonRead ? "check-circle-outline" : "lock-outline"}`}
+              size={20}
+              color={`${lessonRead ? "#008463" : "#000000"}`}
+            />
           </View>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     );
   };
 
-  const isSectionRead = (sec: { id: string; title: string; lessons: [] }) => {
-    return sec.lessons.filter(
-      (lesson: { topics: { id: string }[] }) =>
-        intersection(
-          content.progress,
-          lesson.topics.map((t) => t.id)
-        ).length > 0
-    ).length;
-  };
-
-  const SectionView = (sec: { id: string; title: string; lessons: [] }) => {
-    const lessonsRead = isSectionRead(sec);
-    const secProgress = (lessonsRead / sec.lessons.length) * 100;
+  const SectionView = ({
+    id,
+    title,
+    lessons,
+  }: {
+    id: string;
+    title: string;
+    lessons: [];
+  }) => {
+    const lessonsRead = getSectionProgress(lessons);
+    const sectionProgress = (lessonsRead.length / lessons.length) * 100;
 
     return (
       <Collapse
-        isExpanded={activeSection === sec.id}
-        onToggle={() => toggleSection(sec.id)}
+        isExpanded={activeSection === id}
+        onToggle={() => toggleSection(id)}
         style={styles.collapse}
       >
         <CollapseHeader>
           <View style={styles.sectionContainer}>
             <View style={{ width: "85%" }}>
-              <Text style={styles.sectionTitle}>{sec.title}</Text>
-              {sec.lessons.length > 0 && (
-                <>
-                  {lessonsRead > 0 && (
+              <Text style={styles.sectionTitle}>{title}</Text>
+              {lessons.length > 0 && (
+                <View>
+                  {lessonsRead.length > 0 && (
                     <Text style={styles.sectionCount}>
-                      {lessonsRead}/{sec.lessons.length} Lessons started
+                      {lessonsRead.length}/{lessons.length} Lessons started
                     </Text>
                   )}
-                  {lessonsRead === 0 && (
+                  {lessonsRead.length === 0 && (
                     <Text style={styles.sectionCount}>No Lessons Started</Text>
                   )}
-                  {SectionProgress(secProgress)}
-                </>
+                  <SectionProgress percent={sectionProgress} />
+                </View>
               )}
             </View>
             <MaterialCommunityIcons
-              name={activeSection === sec.id ? "chevron-up" : "chevron-down"}
+              name={activeSection === id ? "chevron-up" : "chevron-down"}
               size={36}
               color="#374151"
             />
@@ -205,19 +231,26 @@ const ContentDetails = () => {
         </CollapseHeader>
         <CollapseBody>
           <View style={styles.lessonContainer}>
-            {sec.lessons.map((l, idx) =>
-              LessonView(idx, l, sec.title, secProgress)
-            )}
+            {lessons.map((lesson, idx) => (
+              <LessonView
+                key={idx}
+                idx={idx}
+                lesson={lesson}
+                lessonsRead={lessonsRead}
+                section={title}
+                secProgress={sectionProgress}
+              />
+            ))}
           </View>
         </CollapseBody>
       </Collapse>
     );
   };
 
-  const SectionList = () => {
-    return (
-      <View style={styles.sectionList}>
-        {data?.CourseById.sections?.map((section, idx) => (
+  const SectionList = () => (
+    <View style={styles.sectionList}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {courseData?.CourseById.sections?.map((section, idx) => (
           <SectionView
             key={idx}
             id={section.id}
@@ -225,15 +258,15 @@ const ContentDetails = () => {
             lessons={section.lessons as []}
           />
         ))}
-      </View>
-    );
-  };
+      </ScrollView>
+    </View>
+  );
 
   const FloatingContainer = () => {
     const sectionId = getLastViewedSection();
-    let section: any = data?.CourseById.sections?.[0];
+    let section: any = courseData?.CourseById.sections?.[0];
     if (sectionId != "") {
-      section = data?.CourseById?.sections?.find(
+      section = courseData?.CourseById?.sections?.find(
         (s: { id: string }) => s.id === sectionId
       );
     }
@@ -255,53 +288,57 @@ const ContentDetails = () => {
     );
   };
 
-  return (
-    <SafeAreaView>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
+  const Nav = () => (
+    <TouchableOpacity style={styles.row}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#374151",
+          borderRadius: 8,
+          width: 36,
+          height: 36,
+        }}
       >
-        <View style={styles.page}>
-          <View style={styles.row}>
-            <MaterialCommunityIcons
-              name="chevron-left"
-              size={32}
-              color="#FFFFFF"
-              style={styles.backIcon}
-              onPress={() => navigation.goBack()}
-            />
-            <Text style={styles.backBtn} onPress={() => navigation.goBack()}>
-              Back
-            </Text>
-          </View>
-          {!loading && <CustomReport />}
-          {!loading && (
-            <ScrollView style={{ height: 150 }}>
-              <AboutCourse />
-            </ScrollView>
-          )}
+        <MaterialCommunityIcons
+          name="chevron-left"
+          size={32}
+          color="#FFFFFF"
+          onPress={() => navigation.goBack()}
+        />
+      </View>
+      <Text style={styles.backBtn} onPress={() => navigation.goBack()}>
+        Back
+      </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      {courseDataLoading || pagesCompletedDataLoading ? (
+        <View style={styles.loader}>
+          <LoadingBanner />
         </View>
-
-        {loading && (
-          <View style={styles.loader}>
-            <LoadingBanner />
-          </View>
-        )}
-
-        {!loading && <SectionList />}
-      </ScrollView>
-      {!loading && <FloatingContainer />}
-    </SafeAreaView>
+      ) : (
+        <View style={{ flex: 1 }}>
+          <Nav />
+          <CustomReport />
+          <AboutCourse />
+          <SectionList />
+          <FloatingContainer />
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   sectionList: {
-    marginTop: 20,
-    marginBottom: 150,
+    flex: 4,
   },
   loader: {
     marginHorizontal: 30,
+    marginTop: 60,
   },
   collapse: {
     backgroundColor: "#FAFAFA",
@@ -324,6 +361,7 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     fontSize: 12,
     fontFamily: "Inter_400Regular",
+    paddingVertical: 4,
   },
   sectionProgress: {
     height: 8,
@@ -369,15 +407,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F7",
   },
   row: {
+    marginTop: 60,
+    marginLeft: 30,
+    marginBottom: 30,
+    alignItems: "center",
     paddingTop: 0,
     display: "flex",
     flexDirection: "row",
-  },
-  backIcon: {
-    backgroundColor: "#374151",
-    borderRadius: 8,
-    width: 32,
-    height: 32,
   },
   backBtn: {
     paddingTop: 2,
@@ -385,13 +421,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   reportRow: {
-    display: "flex",
+    flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     borderBottomColor: "#D1D5DB",
     borderBottomWidth: 1,
     marginBottom: 20,
+    marginHorizontal: 30,
   },
   reportRightBox: {
     flexGrow: 0,
@@ -421,10 +458,12 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
   aboutSection: {
-    paddingTop: 10,
+    marginHorizontal: 30,
+    flex: 2,
   },
   courseSubTitle: {
     fontSize: 12,
+    paddingBottom: 12,
     lineHeight: 15,
     textAlign: "left",
     color: "#1F2937",
@@ -433,6 +472,7 @@ const styles = StyleSheet.create({
   courseDesc: {
     fontSize: 15,
     lineHeight: 24,
+    paddingBottom: 20,
     textAlign: "left",
     paddingTop: 10,
     color: "#6B7280",
@@ -460,12 +500,11 @@ const styles = StyleSheet.create({
   },
   floatingFooter: {
     position: "absolute",
-    width: "92%",
     height: 120,
     alignItems: "center",
     right: 16,
     left: 16,
-    bottom: 10,
+    bottom: 30,
     backgroundColor: "#3B1FA3",
     borderColor: "#D1D5DB",
     borderRadius: 8,

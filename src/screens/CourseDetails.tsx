@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, FC } from "react";
 import {
   View,
   Text,
@@ -6,16 +6,18 @@ import {
   ImageBackground,
   ScrollView,
   Linking,
+  Dimensions,
 } from "react-native";
 import _ from "lodash";
-import { Button, ResourceControl, LoadingBanner } from "../components";
+import { Button, ResourceControl, LoadingBanner, Hero } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, pageType } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import striptags from "striptags";
 import WebView from "react-native-webview";
-import { useCourseByIdQuery } from "../graphql";
+import { useCourseByIdQuery, usePagesQuery } from "../graphql";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 type MyLearningProps = StackNavigationProp<RootStackParamList, "MyLearning">;
 
@@ -24,87 +26,121 @@ const CourseDetails = () => {
   const route = useRoute();
   const { cid, asset } = route.params;
   const [variant, setVariant] = useState<number>(0);
-  const [fullBody, setFullBody] = useState<Boolean>(false);
-  const [showResources, setShowResources] = useState<Boolean>(false);
+  const [showPage, setShowPage] = useState<boolean>(false);
+  const [showResources, setShowResources] = useState<boolean>(false);
 
-  const { data, loading } = useCourseByIdQuery({
+  const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
     variables: {
       id: cid,
     },
   });
 
+  const { data: pageData, loading: pageDataLoading } = usePagesQuery({
+    variables: {
+      identifiers: ["52a124e9-b5c7-4068-925d-3d9908ef7d6f"],
+    },
+  });
+
+  const CourseDetailsBanner: FC = () => (
+    <Hero asset={courseData?.CourseById.courseGroup?.asset || asset}>
+      <View style={styles.bannerArea}>
+        <View style={styles.btns}>
+          <MaterialCommunityIcons
+            name="chevron-left"
+            size={36}
+            color="#374151"
+            onPress={() => navigation.goBack()}
+          />
+        </View>
+        <Text style={styles.bannerTitle}>{courseData?.CourseById?.title}</Text>
+      </View>
+    </Hero>
+  );
+
+  const CourseDetailsDescription: FC = () => (
+    <View
+      style={{
+        flex: 6,
+      }}
+    >
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
+        <Text style={{ fontWeight: "700", marginBottom: 16 }}>
+          About this Article
+        </Text>
+        <Text style={styles.body}>
+          {courseData?.CourseById.courseGroup?.description}
+        </Text>
+      </ScrollView>
+    </View>
+  );
+
+  const CourseDetailsNav: FC = () => (
+    <TouchableOpacity
+      style={{
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginLeft: 20,
+        marginTop: 60,
+        marginBottom: 20,
+      }}
+      onPress={() => setShowPage(false)}
+    >
+      <MaterialCommunityIcons name="chevron-left" size={32} color="#374151" />
+      <Text style={{ fontSize: 16, fontFamily: "Poppins_400Regular" }}>
+        Back
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <View>
-      {loading ? (
+    <View style={{ flex: 1 }}>
+      {courseDataLoading ? (
         <View style={styles.loader}>
           <LoadingBanner />
         </View>
-      ) : (
+      ) : showPage ? (
         <View>
-          {!fullBody && (
-            <View>
-              <ImageBackground
-                source={{ uri: data?.CourseById.courseGroup?.asset || asset }}
-                resizeMode="cover"
-              >
-                <View style={styles.bannerArea}>
-                  <View style={styles.btns}>
-                    <MaterialCommunityIcons
-                      name="chevron-left"
-                      size={36}
-                      color="#374151"
-                      onPress={() => navigation.goBack()}
-                    />
-                  </View>
-                  <Text style={styles.bannerTitle}>
-                    {data?.CourseById?.title}
-                  </Text>
-                </View>
-              </ImageBackground>
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={styles.content}
-              >
-                <Text style={styles.body}>
-                  {/* {_.truncate(
-                    striptags(_.get(content, "languages[0].body", "")),
-                    {
-                      length: 500,
-                    }
-                  )} */}
-                  BOOM
-                </Text>
-                <View style={styles.button}>
-                  <Button
-                    title="Read Article"
-                    onPress={() => setFullBody(true)}
-                  />
-                </View>
-              </ScrollView>
+          <CourseDetailsNav />
+          <View style={styles.articleHeading}>
+            <Text
+              style={{
+                color: "#3B1FA3",
+                fontFamily: "Poppins_700Bold",
+                padding: 20,
+                backgroundColor: "#F3F4F6",
+              }}
+            >
+              {courseData?.CourseById.title}
+            </Text>
+            {/* <View style={{ ...styles.row, paddingTop: 0 }}>
+              <ResourceControl
+                data={content}
+                variant={variant}
+                onChange={setVariant}
+              />
+              <Text style={styles.headingText}>
+                {_.get(content, `languages[${variant}].label`, "Article Title")}
+              </Text>
+            </View>  */}
+          </View>
+        </View>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <CourseDetailsBanner />
+          <View style={{ flex: 1.5 }}>
+            <CourseDetailsDescription />
+            <View style={{ borderTopWidth: 2, borderTopColor: "#E5E7EB" }} />
+            <View style={styles.button}>
+              <Button title="Read Article" onPress={() => setShowPage(true)} />
             </View>
-          )}
-          {/* {!fullBody && (
-            <View>
-              <View style={{ padding: 32 }}>
-                <Text style={styles.body}>
-                  {_.truncate(
-                    striptags(_.get(content, "languages[0].body", "")),
-                    {
-                      length: 500,
-                    }
-                  )}
-                </Text>
-                <Button
-                  title={_.get(
-                    ctaLabel,
-                    _.get(route, "params.contentTypeLabel", "abc"),
-                    "Read Details"
-                  )}
-                  onPress={() => setFullBody(true)}
-                />
-              </View>
-            </View>
-          )} */}
+          </View>
           {/* {fullBody && (
             <>
               <View style={styles.row}>
@@ -221,15 +257,14 @@ const CourseDetails = () => {
 
 const styles = StyleSheet.create({
   bannerArea: {
+    flex: 1,
     padding: 20,
-    paddingBottom: 32,
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     fontFamily: "Poppins_400Regular",
   },
   button: {
-    position: "absolute",
-    bottom: 0,
-    zIndex: 30,
+    margin: 30,
+    flex: 1,
   },
   content: {
     padding: 30,
@@ -245,7 +280,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 2,
     marginTop: 30,
-    marginBottom: 180,
   },
   bannerTitle: {
     fontSize: 32,
@@ -289,7 +323,7 @@ const styles = StyleSheet.create({
     marginLeft: 0,
   },
   articleHeading: {
-    borderTopWidth: 1,
+    borderTopWidth: 2,
     borderColor: "#E5E7EB",
     backgroundColor: "#FFFFFF",
   },

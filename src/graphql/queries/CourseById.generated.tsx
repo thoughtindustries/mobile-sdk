@@ -32,6 +32,7 @@ export type CourseByIdQuery = {
           | { __typename?: "AssignmentPage" }
           | { __typename?: "AudioPage" }
           | { __typename?: "FlipCardPage" }
+          | { __typename?: "GeneralPage" }
           | { __typename?: "HighlightZonePage" }
           | { __typename?: "ListRollPage" }
           | { __typename?: "MatchPairPage" }

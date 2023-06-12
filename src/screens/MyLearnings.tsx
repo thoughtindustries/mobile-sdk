@@ -96,12 +96,12 @@ const MyLearnings = () => {
 
   const filteredContent = () => {
     if (tab === "All") {
-      return contentItemData?.UserContentItems?.filter((item) =>
+      return contentItemData?.UserContentItems?.filter((item: courseListType) =>
         item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
       );
     } else {
       return contentItemData?.UserContentItems?.filter(
-        (item, idx) =>
+        (item: courseListType, idx: number) =>
           item?.title
             ?.toLocaleLowerCase()
             .includes(search.toLocaleLowerCase()) &&
@@ -111,8 +111,9 @@ const MyLearnings = () => {
   };
 
   const filteredCourses = () => {
-    return catalogData?.CatalogContent?.contentItems?.filter((item) =>
-      item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+    return catalogData?.CatalogContent?.contentItems?.filter(
+      (item: courseListType) =>
+        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
     );
   };
 

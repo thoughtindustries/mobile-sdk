@@ -71,6 +71,7 @@ export type courseListType = {
   displayCourse?: string;
   contentTypeLabel?: string;
   progress?: Float;
+  description?: string;
 };
 
 export type topicType = {

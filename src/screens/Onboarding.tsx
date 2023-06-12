@@ -24,7 +24,12 @@ const Onboarding = () => {
         </Text>
       </View>
       <View style={styles.form}>
-        <Button title="Sign In" onPress={() => navigation.navigate("Login")} />
+        <View style={styles.button}>
+          <Button
+            title="Sign In"
+            onPress={() => navigation.navigate("Login")}
+          />
+        </View>
         <Link
           title="Create new account!"
           onPress={() => navigation.navigate("Registration")}
@@ -50,13 +55,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontFamily: "Poppins_700Bold",
   },
-
   subtitle: {
     fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
     textAlign: "center",
     color: "#6B7280",
     fontFamily: "Poppins_400Regular",
+  },
+  button: {
+    marginVertical: 20,
   },
 });
 

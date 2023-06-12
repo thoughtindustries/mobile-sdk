@@ -22,8 +22,6 @@ const Button = ({ title, onPress, mode }: ButtonProps) => {
 
 const styles = StyleSheet.create({
   button: {
-    marginTop: (Dimensions.get("window").height / 440) * 30,
-    marginBottom: (Dimensions.get("window").height / 440) * 16,
     justifyContent: "center",
     alignItems: "center",
     padding: (Dimensions.get("window").height / 440) * 10,

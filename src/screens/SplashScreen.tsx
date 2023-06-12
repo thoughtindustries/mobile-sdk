@@ -1,22 +1,20 @@
-import React, { useEffect, FC } from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
 import AppStyle from "../../AppStyle";
 import * as SecureStore from "expo-secure-store";
-import { initDB, checkUsersTable } from "../db/db";
 
 const SplashScreen = ({ navigation }: any) => {
   useEffect(() => {
     (async () => {
-      if (!checkUsersTable()) {
-        await initDB();
-      }
-      setTimeout(async () => {
-        const response = await SecureStore.getItemAsync("userInfo");
-        response
+      const user = await SecureStore.getItemAsync("userInfo");
+      const timer = setTimeout(() => {
+        user
           ? navigation.navigate("HomeScreen")
           : navigation.navigate("Onboarding");
-      }, 5000);
+      }, 3000);
+
+      return () => clearTimeout(timer);
     })();
   }, []);
 

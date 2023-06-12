@@ -156,7 +156,9 @@ const ProfileEdit = () => {
                 defaultValue={userInfo.lastName}
                 style={AppStyle.input}
               />
-              <Button title="Update" onPress={updateProfile} />
+              <View style={styles.button}>
+                <Button title="Update" onPress={updateProfile} />
+              </View>
             </View>
           </KeyboardAvoidingView>
         </View>
@@ -171,11 +173,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 100,
   },
-
   keyboardOffset: {
     width: "100%",
   },
-
   title: {
     fontFamily: "Poppins_400Regular",
     fontSize: 24,
@@ -183,6 +183,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#1F2937",
     marginBottom: 10,
+  },
+  button: {
+    marginVertical: 100,
   },
 });
 
