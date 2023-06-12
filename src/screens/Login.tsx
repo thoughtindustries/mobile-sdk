@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import { RootStackParamList, ErrorMessageType } from "../../types";
 import { useLoginMutation } from "../graphql";
 import * as SecureStore from "expo-secure-store";
 import { createUser, initDB } from "../db/db";
-import { DataContext } from "../context";
+import { useDataContext } from "../context";
 
 type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
@@ -45,7 +45,7 @@ const Login = () => {
     refetchCatalogData,
     contentData,
     refetchContentData,
-  } = useContext(DataContext);
+  } = useDataContext();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
   const [loginMutation] = useLoginMutation();
   const [loading, setLoading] = useState<boolean>(false);
@@ -57,7 +57,6 @@ const Login = () => {
     email: { value: "", error: "" },
     password: { value: "", error: "" },
   });
-  const [refetch, setRefetch] = useState<boolean>(false);
 
   const handleChange = (field: string, value: string) => {
     if (field === "email") {
@@ -264,7 +263,7 @@ const Login = () => {
                   secureTextEntry={!showPassword}
                   onChangeText={(value) => handleChange("password", value)}
                   defaultValue={form.password.value}
-                  style={{ margin: 0, padding: 0, width: "93%" }}
+                  style={styles(loading).textInput}
                   placeholder="Enter your password here"
                 />
                 <Pressable
@@ -316,6 +315,11 @@ const styles = (loading: boolean) =>
     },
     button: {
       marginVertical: 20,
+    },
+    textInput: {
+      margin: 0,
+      padding: 0,
+      width: "93%",
     },
   });
 

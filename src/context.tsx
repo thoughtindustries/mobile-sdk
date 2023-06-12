@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode } from "react";
+import { createContext, FC, ReactNode, useContext } from "react";
 import { courseListType, filtersType } from "../types";
 import { GlobalTypes } from "./graphql";
 import {
@@ -15,8 +15,7 @@ interface DataContextProps {
   contentData: courseListType[] | undefined;
   refetchContentData: () => void;
 }
-
-export const DataContext = createContext<DataContextProps>({
+const DataContext = createContext<DataContextProps>({
   recentContent: [],
   refetchRecentContent: () => undefined,
   catalogData: [],
@@ -24,6 +23,8 @@ export const DataContext = createContext<DataContextProps>({
   contentData: [],
   refetchContentData: () => undefined,
 });
+
+export const useDataContext = () => useContext(DataContext);
 
 export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { data: recentContent, refetch: refetchRecentContent } =

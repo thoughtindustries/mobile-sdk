@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, PixelRatio, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Logo, Button, Link } from "../components";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";

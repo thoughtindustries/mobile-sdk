@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -10,15 +10,18 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import { DataContext } from "../context";
+import { useDataContext } from "../context";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Banner = () => {
-  const { recentContent, catalogData } = useContext(DataContext);
+  const { recentContent, catalogData } = useDataContext();
   const navigation = useNavigation<HomeScreenProps>();
 
-  const showSummary = (description: string | undefined, length: number) => {
+  const showSummary = (
+    description: string | undefined,
+    length: number
+  ): string | undefined => {
     const words = description?.split(" ");
     const truncatedWords = words?.splice(0, length);
     const summary = truncatedWords?.join(" ");
@@ -41,7 +44,7 @@ const Banner = () => {
               uri: recentContent?.[0]?.asset || catalogData?.[0]?.asset,
             }}
             resizeMode="cover"
-            imageStyle={{ borderRadius: 8 }}
+            imageStyle={styles.image}
           >
             <View style={styles.bannerArea}>
               <Text style={styles.bannerTitle}>
@@ -82,6 +85,9 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontFamily: "Poppins_400Regular",
     color: "#ccc",
+  },
+  image: {
+    borderRadius: 8,
   },
 });
 
