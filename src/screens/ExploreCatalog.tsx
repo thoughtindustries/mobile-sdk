@@ -14,7 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
 import { GlobalTypes } from "../graphql";
-import { FilterContext } from "../context";
+import { FilterContext, useDataContext } from "../context";
 import { useCatalogContentQuery } from "../graphql";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
@@ -39,6 +39,7 @@ const ExploreCatalog = () => {
       contentTypes: "Course",
     },
   });
+  const { contentData } = useDataContext();
 
   const filteredCourses = () => {
     const filteredCourses = data?.CatalogContent?.contentItems?.filter(
@@ -55,7 +56,7 @@ const ExploreCatalog = () => {
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: item?.displayCourse || "",
+            cid: contentData?.length !== 0 ? item.displayCourse : item.id,
             from: "Explore",
           })
         }

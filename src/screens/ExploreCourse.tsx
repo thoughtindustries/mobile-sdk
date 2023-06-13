@@ -233,14 +233,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: "#1F2937",
     fontFamily: "Inter_700Bold",
-    fontSiz: 14,
+    fontSize: 14,
     paddingRight: 5,
   },
 
   lessonTitle: {
     color: "#3B1FA3",
     fontFamily: "Inter_700Bold",
-    fontSiz: 14,
+    fontSize: 14,
   },
 
   sectionProgress: {
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   topicTitle: {
     color: "#1F2937",
     fontFamily: "Inter_700Bold",
-    fontSiz: 14,
+    fontSize: 14,
     paddingRight: 5,
   },
 

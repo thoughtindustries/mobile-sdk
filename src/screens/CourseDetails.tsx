@@ -7,6 +7,7 @@ import { RootStackParamList } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useCourseByIdQuery } from "../graphql";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useDataContext } from "../context";
 
 type MyLearningProps = StackNavigationProp<RootStackParamList, "MyLearning">;
 
@@ -22,6 +23,11 @@ const CourseDetails = () => {
     },
   });
 
+  const { catalogData } = useDataContext();
+  const [catalogCourse] = useState(
+    catalogData?.find((course) => course.id === cid)
+  );
+
   const CourseDetailsBanner: FC = () => (
     <Hero asset={courseData?.CourseById.courseGroup?.asset || asset}>
       <View style={styles.bannerArea}>
@@ -33,7 +39,9 @@ const CourseDetails = () => {
             onPress={() => navigation.goBack()}
           />
         </View>
-        <Text style={styles.bannerTitle}>{courseData?.CourseById?.title}</Text>
+        <Text style={styles.bannerTitle}>
+          {courseData?.CourseById?.title || catalogCourse?.title}
+        </Text>
       </View>
     </Hero>
   );
@@ -45,7 +53,8 @@ const CourseDetails = () => {
       >{`About this ${contentTypeLabel}`}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.body}>
-          {courseData?.CourseById.courseGroup?.description}
+          {courseData?.CourseById.courseGroup?.description ||
+            catalogCourse?.description}
         </Text>
       </ScrollView>
     </View>
@@ -75,7 +84,7 @@ const CourseDetails = () => {
               <MaterialCommunityIcons name="menu" size={32} color="#6B7280" />
             </TouchableOpacity>
             <Text style={styles.courseTitle}>
-              {courseData?.CourseById.title}
+              {courseData?.CourseById.title || catalogCourse?.title}
             </Text>
           </View>
         </View>
