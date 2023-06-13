@@ -57,6 +57,7 @@ const Login = () => {
     email: { value: "", error: "" },
     password: { value: "", error: "" },
   });
+  const [refetch, setRefetch] = useState<boolean>(false);
 
   const handleChange = (field: string, value: string) => {
     if (field === "email") {
@@ -107,15 +108,17 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (recentContent && catalogData && contentData) {
+    if (recentContent && catalogData && contentData && refetch) {
       navigation.navigate("HomeScreen");
       setForm({
         ...form,
         email: { ...form.email, value: "", error: "" },
         password: { ...form.password, value: "", error: "" },
       });
+      setLoading(false);
+      setRefetch(false);
     }
-  }, [recentContent, catalogData, contentData]);
+  }, [recentContent, catalogData, contentData, refetch]);
 
   const onSignIn = async () => {
     try {
@@ -154,6 +157,7 @@ const Login = () => {
               JSON.stringify(userInfo)
             );
 
+            setRefetch(true);
             refetchContentData();
             refetchCatalogData();
             refetchRecentContent();

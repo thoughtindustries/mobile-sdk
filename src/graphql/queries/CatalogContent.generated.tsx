@@ -31,6 +31,7 @@ export type CatalogContentQuery = {
       asset?: string;
       authors?: Array<string>;
       title?: string;
+      description?: string;
       displayCourse?: string;
       contentTypeLabel?: string;
     }>;
@@ -65,6 +66,7 @@ export const CatalogContentDocument = gql`
         asset
         authors
         title
+        description
         displayCourse
         contentTypeLabel
       }

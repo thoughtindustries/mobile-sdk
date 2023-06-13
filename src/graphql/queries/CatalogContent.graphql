@@ -25,6 +25,7 @@ query CatalogContent(
       asset
       authors
       title
+      description
       displayCourse
       contentTypeLabel
     }

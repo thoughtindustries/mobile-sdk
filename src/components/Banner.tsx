@@ -51,7 +51,11 @@ const Banner = () => {
                 {recentContent?.[0]?.title || catalogData?.[0]?.title}
               </Text>
               <Text style={styles.bannerText}>
-                {`${showSummary(recentContent?.[0]?.description, 12)}...`}
+                {`${showSummary(
+                  recentContent?.[0]?.description ||
+                    catalogData?.[0]?.description,
+                  12
+                )}...`}
               </Text>
             </View>
           </ImageBackground>
