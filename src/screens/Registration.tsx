@@ -12,7 +12,7 @@ import Success from "./Success";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
 import { TI_INSTANCE_NAME } from "@env";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 
@@ -128,7 +128,12 @@ const Registration = () => {
         setProcessing(false);
 
         setTimeout(() => {
-          navigation.navigate("Login");
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 2,
+              routes: [{ name: "Onboarding" }, { name: "Login" }],
+            })
+          );
         }, 3000);
       } catch (error) {
         console.log("Registration Error: ", error);

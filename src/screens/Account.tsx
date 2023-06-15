@@ -9,45 +9,29 @@ import {
   Dimensions,
   LogBox,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { TI_API_INSTANCE } from "@env";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList, UserDetailType } from "../../types";
 import * as SecureStore from "expo-secure-store";
+import { useDataContext } from "../context";
+import { useApolloClient } from "@apollo/client";
+import { closeDB } from "../db/db";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
 
 const Account = () => {
   LogBox.ignoreLogs(["Require cycle:"]);
+  const apolloClient = useApolloClient();
   const navigation = useNavigation<AccountScreenProps>();
-
+  const { setInitialState } = useDataContext();
   const [userInfo, setUserInfo] = useState<UserDetailType>({
     id: "",
     firstName: "",
     lastName: "",
     email: "",
-    address1: "",
-    address2: "",
     asset: "",
-    roleKey: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
-    telephone: "",
-    externalCustomerId: "",
-    lang: "",
-    ref1: "",
-    ref2: "",
-    ref3: "",
-    ref4: "",
-    ref5: "",
-    ref6: "",
-    ref7: "",
-    ref8: "",
-    ref9: "",
-    ref10: "",
   });
 
   useEffect(() => {
@@ -65,7 +49,16 @@ const Account = () => {
 
   const handleLogout = async () => {
     await SecureStore.deleteItemAsync("userInfo");
-    navigation.navigate("Login");
+    await SecureStore.deleteItemAsync("token");
+    setInitialState(true);
+    await apolloClient.clearStore();
+    await closeDB();
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 2,
+        routes: [{ name: "Onboarding" }, { name: "Login" }],
+      })
+    );
   };
 
   return (

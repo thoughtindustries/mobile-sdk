@@ -2,11 +2,14 @@ import * as SQLite from "expo-sqlite";
 import { TI_INSTANCE_NAME } from "@env";
 import { courseListType } from "../../types";
 
-const db = SQLite.openDatabase(`${TI_INSTANCE_NAME}.db`);
+const dbName = TI_INSTANCE_NAME.toLocaleLowerCase().replace(/\s+/g, "_");
+
+let db = SQLite.openDatabase(`${dbName}.db`);
 db.exec([{ sql: "PRAGMA foreign_keys = ON;", args: [] }], false, () => null);
 
 export const initDB = async () => {
   try {
+    db = SQLite.openDatabase(`${dbName}.db`);
     await createUsersTable();
     await createContentTable();
     console.log("Database successfully initiated!");
@@ -98,7 +101,7 @@ export const createUser = ({
   lastName: string;
   email: string;
 }) => {
-  return new Promise<number>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         "INSERT OR IGNORE INTO users (id, firstName, lastName, email) VALUES (?, ?, ?, ?)",
@@ -176,35 +179,6 @@ export const getContent = () => {
   });
 };
 
-// const dropTables = () => {
-//   db.transaction((tx) => {
-//     tx.executeSql(
-//       "DROP TABLE content",
-//       [],
-//       (_, resultSet) => {
-//         console.log("All tables deleted successfully");
-//       },
-//       (_, error) => {
-//         console.log("Error retrieving table names:", error);
-//         return false;
-//       }
-//     );
-//   });
-// };
-
-// export const getTables = () => {
-//   db.transaction((tx) => {
-//     tx.executeSql(
-//       "SELECT name FROM sqlite_master WHERE type='table';",
-//       [],
-//       (_, resultSet) => {
-//         const tableNames = resultSet.rows._array.map((row) => row.name);
-//         console.log("Tables in the database:", tableNames);
-//       },
-//       (_, error) => {
-//         console.log("Error retrieving table names:", error);
-//         return false;
-//       }
-//     );
-//   });
-// };
+export const closeDB = async () => {
+  await db.closeAsync();
+};
