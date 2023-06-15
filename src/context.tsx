@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useContext } from "react";
+import { createContext, FC, ReactNode, useContext, useState } from "react";
 import { courseListType, filtersType } from "../types";
 import { GlobalTypes } from "./graphql";
 import {
@@ -6,27 +6,39 @@ import {
   useUserContentItemsQuery,
   useCatalogContentQuery,
 } from "./graphql";
+import { FetchPolicy } from "@apollo/client";
+
+type RefetchFunction<data = any, variables = any> = (
+  variables?: variables,
+  fetchPolicy?: FetchPolicy
+) => Promise<data>;
 
 interface DataContextProps {
   recentContent: courseListType[] | undefined;
-  refetchRecentContent: () => void;
+  refetchRecentContent: () => Promise<any>;
   catalogData: courseListType[] | undefined;
-  refetchCatalogData: () => void;
+  refetchCatalogData: RefetchFunction;
   contentData: courseListType[] | undefined;
-  refetchContentData: () => void;
+  refetchContentData: RefetchFunction;
+  setInitialState: (initialState: boolean) => void;
+  initialState: boolean;
 }
 const DataContext = createContext<DataContextProps>({
   recentContent: [],
-  refetchRecentContent: () => undefined,
+  refetchRecentContent: () => new Promise<any>(() => {}),
   catalogData: [],
-  refetchCatalogData: () => undefined,
+  refetchCatalogData: () => new Promise<any>(() => {}),
   contentData: [],
-  refetchContentData: () => undefined,
+  refetchContentData: () => new Promise<any>(() => {}),
+  setInitialState: () => undefined,
+  initialState: false,
 });
 
 export const useDataContext = () => useContext(DataContext);
 
 export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const [initialState, setInitialState] = useState<boolean>(false);
+
   const { data: recentContent, refetch: refetchRecentContent } =
     useUserRecentContentQuery({
       variables: { limit: 5 },
@@ -48,12 +60,16 @@ export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <DataContext.Provider
       value={{
-        recentContent: recentContent?.UserRecentContent,
+        recentContent: !initialState
+          ? recentContent?.UserRecentContent
+          : undefined,
         refetchRecentContent: refetchRecentContent,
-        contentData: contentData?.UserContentItems,
+        contentData: !initialState ? contentData?.UserContentItems : undefined,
         refetchContentData: refetchContentData,
         catalogData: catalogData?.CatalogContent.contentItems,
         refetchCatalogData: refetchCatalogData,
+        setInitialState: setInitialState,
+        initialState: initialState,
       }}
     >
       {children}

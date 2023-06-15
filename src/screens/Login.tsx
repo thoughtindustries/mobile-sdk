@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -39,12 +39,10 @@ interface FormProps {
 const Login = () => {
   const navigation = useNavigation<LoginScreenProps>();
   const {
-    recentContent,
     refetchRecentContent,
-    catalogData,
     refetchCatalogData,
-    contentData,
     refetchContentData,
+    setInitialState,
   } = useDataContext();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
   const [loginMutation] = useLoginMutation();
@@ -57,7 +55,6 @@ const Login = () => {
     email: { value: "", error: "" },
     password: { value: "", error: "" },
   });
-  const [refetch, setRefetch] = useState<boolean>(false);
 
   const handleChange = (field: string, value: string) => {
     if (field === "email") {
@@ -107,23 +104,12 @@ const Login = () => {
       : false;
   };
 
-  useEffect(() => {
-    if (recentContent && catalogData && contentData && refetch) {
-      navigation.navigate("HomeScreen");
-      setForm({
-        ...form,
-        email: { ...form.email, value: "", error: "" },
-        password: { ...form.password, value: "", error: "" },
-      });
-      setLoading(false);
-      setRefetch(false);
-    }
-  }, [recentContent, catalogData, contentData, refetch]);
-
   const onSignIn = async () => {
     try {
       if (formValidated()) {
+        setInitialState(false);
         setLoading(true);
+
         // Login user
         const { data } = await loginMutation({
           variables: {
@@ -157,15 +143,30 @@ const Login = () => {
               JSON.stringify(userInfo)
             );
 
-            setRefetch(true);
-            refetchContentData();
-            refetchCatalogData();
-            refetchRecentContent();
+            const { data: recentContent, loading: recentContentLoading } =
+              await refetchRecentContent();
+            const { data: content, loading: contentLoading } =
+              await refetchContentData();
+            const { data: catalog, loading: catalogLoading } =
+              await refetchCatalogData();
+
+            if (
+              recentContent &&
+              !recentContentLoading &&
+              content &&
+              !contentLoading &&
+              catalog &&
+              !catalogLoading
+            ) {
+              navigation.navigate("HomeScreen");
+              setLoading(false);
+            }
           }
         }
       }
     } catch (error) {
       if (error instanceof Error) {
+        setLoading(false);
         if (error.message === "401 Unauthorized") {
           setResponseError({
             title: "Invalid email or password.",
