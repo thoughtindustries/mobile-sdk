@@ -52,7 +52,7 @@ export type PagesQuery = {
     | { __typename?: "SurveyPage" }
     | { __typename?: "TallyPage" }
     | { __typename?: "TestPage" }
-    | { __typename?: "TextPage" }
+    | { __typename?: "TextPage"; title?: string }
     | { __typename?: "VideoPage" }
     | { __typename?: "WorkbookPage" }
   >;
@@ -82,6 +82,18 @@ export const PagesDocument = gql`
           pdfAssetTitleSecondary
           pdfAssetUrl
         }
+      }
+      ... on TextPage {
+        title
+        body
+        type
+      }
+      ... on VideoPage {
+        title
+        asset
+        body
+        preTextBlock
+        type
       }
     }
   }

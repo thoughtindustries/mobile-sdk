@@ -22,5 +22,17 @@ query Pages($identifiers: [String!]!) {
         pdfAssetUrl
       }
     }
+    ... on TextPage {
+      title
+      body
+      type
+    }
+    ... on VideoPage {
+      title
+      asset
+      body
+      preTextBlock
+      type
+    }
   }
 }
