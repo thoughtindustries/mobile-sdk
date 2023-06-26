@@ -316,16 +316,15 @@ const MyLearnings = () => {
             <LoadingBanner />
           ) : (
             <View>
-              {recentContentData?.UserRecentContent &&
-              recentContentData.UserRecentContent.length > 0 ? (
+              {contentItemData?.UserContentItems &&
+              contentItemData?.UserContentItems.length !== 0 ? (
                 <View>
                   <View>
                     <Text style={styles.latestTitle}>Latest Active</Text>
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate("ContentDetails", {
-                          cid:
-                            recentContentData?.UserRecentContent[0]?.id || "",
+                          cid: contentItemData?.UserContentItems?.[0]?.id || "",
                           from: "My Learnings",
                         })
                       }
@@ -338,12 +337,12 @@ const MyLearnings = () => {
                       >
                         <View style={styles.contentRightBox}>
                           <Text style={styles.courseTitle}>
-                            {recentContentData?.UserRecentContent[0].title}
+                            {contentItemData?.UserContentItems?.[0].title}
                           </Text>
                         </View>
                         <Image
                           source={{
-                            uri: recentContentData?.UserRecentContent[0].asset,
+                            uri: contentItemData?.UserContentItems?.[0].asset,
                           }}
                           style={styles.recentImage}
                         />
