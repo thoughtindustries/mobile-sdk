@@ -191,23 +191,25 @@ const MyLearnings = () => {
             >
               {data.contentTypeLabel}
             </Text>
-            <TouchableOpacity
-              onPress={() =>
-                data.id !== offlineContent?.[index]?.id
-                  ? downloadContent(data)
-                  : deleteContent(data)
-              }
-            >
-              <MaterialCommunityIcons
-                name={
+            {contentLabel === "Article" && (
+              <TouchableOpacity
+                onPress={() =>
                   data.id !== offlineContent?.[index]?.id
-                    ? "download"
-                    : "close-circle-outline"
+                    ? downloadContent(data)
+                    : deleteContent(data)
                 }
-                size={22}
-                color="#232323"
-              />
-            </TouchableOpacity>
+              >
+                <MaterialCommunityIcons
+                  name={
+                    data.id !== offlineContent?.[index]?.id
+                      ? "download"
+                      : "close-circle-outline"
+                  }
+                  size={22}
+                  color="#232323"
+                />
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
           {data.contentTypeLabel === "Course" && (
@@ -286,7 +288,10 @@ const MyLearnings = () => {
       data={filteredContent()}
       renderItem={({ item }) => <ContentItem data={item} />}
       style={{
-        height: (Dimensions.get("window").height / 440) * 175,
+        height:
+          Dimensions.get("window").height > 667
+            ? (Dimensions.get("window").height / 440) * 150
+            : (Dimensions.get("window").height / 440) * 215,
       }}
       showsVerticalScrollIndicator={false}
       scrollEnabled={true}
@@ -319,36 +324,40 @@ const MyLearnings = () => {
               {contentItemData?.UserContentItems &&
               contentItemData?.UserContentItems.length !== 0 ? (
                 <View>
-                  <View>
-                    <Text style={styles.latestTitle}>Latest Active</Text>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate("ContentDetails", {
-                          cid: contentItemData?.UserContentItems?.[0]?.id || "",
-                          from: "My Learnings",
-                        })
-                      }
-                    >
-                      <View
-                        style={{
-                          ...styles.contentRow,
-                          backgroundColor: "#fff",
-                        }}
+                  {Dimensions.get("window").height > 667 && (
+                    <View>
+                      <Text style={styles.latestTitle}>Latest Active</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("ContentDetails", {
+                            cid:
+                              contentItemData?.UserContentItems?.[0]?.id || "",
+                            from: "My Learnings",
+                          })
+                        }
                       >
-                        <View style={styles.contentRightBox}>
-                          <Text style={styles.courseTitle}>
-                            {contentItemData?.UserContentItems?.[0].title}
-                          </Text>
-                        </View>
-                        <Image
-                          source={{
-                            uri: contentItemData?.UserContentItems?.[0].asset,
+                        <View
+                          style={{
+                            ...styles.recentContent,
+                            backgroundColor: "#fff",
                           }}
-                          style={styles.recentImage}
-                        />
-                      </View>
-                    </TouchableOpacity>
-                  </View>
+                        >
+                          <View style={styles.contentRightBox}>
+                            <Text style={styles.courseTitle}>
+                              {contentItemData?.UserContentItems?.[0].title}
+                            </Text>
+                          </View>
+                          <Image
+                            source={{
+                              uri: contentItemData?.UserContentItems?.[0].asset,
+                            }}
+                            style={styles.recentImage}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
                   <CategoryFilter />
                   <ContentList />
                 </View>
@@ -392,8 +401,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     height: 60,
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 20,
   },
   catBox: {
     borderRadius: 8,
@@ -462,6 +470,15 @@ const styles = StyleSheet.create({
   contentListStyleOffline: {
     height: "90%",
     marginBottom: 170,
+  },
+  recentContent: {
+    display: "flex",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#F5F5F7",
+    justifyContent: "space-between",
   },
   contentRow: {
     display: "flex",
