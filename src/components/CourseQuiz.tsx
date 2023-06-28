@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import {
   View,
   Text,
@@ -31,7 +31,7 @@ interface CourseQuizProps {
   quiz: any;
 }
 
-const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
+const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
   const { data } = useLoadAssessmentAttemptWithQuestionsQuery({
     variables: {
       courseId: courseid,
@@ -41,7 +41,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [qIndex, setQIndex] = useState<number>(0);
+  const [index, setIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<string[]>([]);
   const [attemptId, setAttemptId] = useState<string>("");
@@ -51,27 +51,22 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
     correct: number;
   }>({ grade: 0, answered: 0, correct: 0 });
 
-  const startQuiz = () => {
-    tiGql.createAssessmentAttempt(courseid, quiz.id).then(setAttemptId);
-    setQIndex(1);
-  };
-
   const saveAttempt = (answer: string, isMulti: boolean) => {
     let temp = [...attempts];
 
     if (isMulti) {
       let answers: string[] = [];
-      if (includes(get(temp, qIndex, []), answer)) {
-        answers = filter(get(temp, qIndex, []), (a) => a !== answer);
+      if (includes(get(temp, index, []), answer)) {
+        answers = filter(get(temp, index, []), (a) => a !== answer);
       } else {
         answers.push(answer);
       }
-      set(temp, qIndex, answers);
+      set(temp, index, answers);
     } else {
-      if (!isUndefined(temp[qIndex]) && temp[qIndex] === answer) {
-        remove(temp, (v, idx) => idx === qIndex);
+      if (!isUndefined(temp[index]) && temp[index] === answer) {
+        remove(temp, (v, idx) => idx === index);
       } else {
-        set(temp, qIndex, answer);
+        set(temp, index, answer);
       }
     }
 
@@ -79,8 +74,8 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   };
 
   const goNextQuestion = () => {
-    let question = quiz.questions[qIndex - 1];
-    let answer = attempts[qIndex];
+    let question = quiz.questions[index - 1];
+    let answer = attempts[index];
     answer = isArray(answer) ? answer[0] : answer;
 
     let choice = get(question, "choices", []).filter(
@@ -98,9 +93,9 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
         }
       )
       .then(() => {
-        if (qIndex < quiz.questions.length) {
+        if (index < quiz.questions.length) {
           setLoading(false);
-          setQIndex(qIndex + 1);
+          setIndex(index + 1);
         } else {
           submitQuiz();
         }
@@ -122,7 +117,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   };
 
   const renderQuestion = () => {
-    const question = get(quiz, `questions.${qIndex - 1}`, {});
+    const question = get(quiz, `questions.${index - 1}`, {});
 
     const preText = () => (
       <>
@@ -180,7 +175,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
     return (
       <View>
-        {attempts.length === 0 && renderQuizInfo()}
+        {/* {attempts.length === 0 && renderQuizInfo()} */}
         <View style={styles.questionBox}>
           {preText()}
           {question.type !== "essay" && questionBody()}
@@ -202,7 +197,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
             <View style={{ marginTop: 16 }}>
               <TextInput
                 onChangeText={(txt) => saveAttempt(txt, false)}
-                defaultValue={get(attempts, qIndex, "")}
+                defaultValue={get(attempts, index, "")}
                 style={styles.textArea}
                 multiline={true}
                 numberOfLines={6}
@@ -217,10 +212,10 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
             </View>
           )}
 
-          {qIndex < quiz.questions.length && (
+          {index < quiz.questions.length && (
             <View
               style={
-                quiz.questionSkipEnabled && get(attempts, qIndex, []).length > 0
+                quiz.questionSkipEnabled && get(attempts, index, []).length > 0
                   ? styles.row
                   : {}
               }
@@ -229,11 +224,11 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
                 <Button
                   title="Skip Question"
                   mode={2}
-                  onPress={() => setQIndex(qIndex + 1)}
+                  onPress={() => setIndex(index + 1)}
                 />
               )}
 
-              {get(attempts, qIndex, []).length > 0 && (
+              {get(attempts, index, []).length > 0 && (
                 <Button title="Next Question" onPress={goNextQuestion} />
               )}
             </View>
@@ -241,7 +236,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
           {postText()}
 
-          {qIndex >= quiz.questions.length && (
+          {index >= quiz.questions.length && (
             <Button title="See Results" onPress={goNextQuestion} />
           )}
         </View>
@@ -262,8 +257,8 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
               key={choice.choiceId}
               style={{
                 ...styles.choiceBox,
-                ...(get(attempts, qIndex, []).length > 0 &&
-                get(attempts, qIndex, []).includes(choice.value)
+                ...(get(attempts, index, []).length > 0 &&
+                get(attempts, index, []).includes(choice.value)
                   ? choice.correct
                     ? styles.correctBox
                     : styles.incorrectBox
@@ -288,7 +283,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
                   {isEmpty(choice.altText) ? choice.value : choice.altText}
                 </Text>
 
-                {get(attempts, qIndex, []).includes(choice.value) &&
+                {get(attempts, index, []).includes(choice.value) &&
                   !isEmpty(choice.response) && (
                     <Text style={styles.responseText}>
                       {striptags(get(choice, "response", ""))}
@@ -304,7 +299,28 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
   const renderQuizInfo = () => (
     <View style={styles.row}>
-      {isTimeBound && (
+      <View
+        style={{
+          ...styles.quizBox,
+          width: isAttemptBound ? "49%" : "100%",
+        }}
+      >
+        <View style={{ ...styles.row, justifyContent: "flex-start" }}>
+          <MaterialCommunityIcons
+            name="timer-sand-complete"
+            size={24}
+            color="#374151"
+            style={styles.quizBoxIcon}
+          />
+          <View>
+            <Text style={styles.prenote}>Time Limit</Text>
+            <Text style={styles.boldnote}>
+              {getFormattedTime(quiz.timeLimitInSeconds)}
+            </Text>
+          </View>
+        </View>
+      </View>
+      {/* {quiz.timeLimitInSeconds && (
         <View
           style={{
             ...styles.quizBox,
@@ -326,7 +342,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
             </View>
           </View>
         </View>
-      )}
+      )} */}
 
       {isAttemptBound && (
         <View
@@ -497,24 +513,37 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
 
   return (
     <View>
-      {!loading && qIndex === 0 && (
-        <>
-          <Text style={styles.heading}>{get(quiz, "title", "Quiz")}</Text>
-          {!isEmpty(get(quiz, "startMessage", "")) && (
-            <Text style={styles.startMessage}>
-              {striptags(quiz.startMessage)}
-            </Text>
-          )}
-
-          {renderQuizInfo()}
-
-          {get(quiz, "questions.length", 0) > 0 && (
-            <Button title="Start Quiz" onPress={startQuiz} />
-          )}
-        </>
+      <Text style={styles.heading}>{quiz.title}</Text>
+      {quiz.startMessage && (
+        <Text style={styles.startMessage}>
+          {quiz.startMessage.replace(/(<([^>]+)>)/gi, "")}
+        </Text>
+      )}
+      {quiz.timeLimitInSeconds && (
+        <View style={styles.row}>
+          <View style={styles.quizBox}>
+            <View style={{ ...styles.row, justifyContent: "flex-start" }}>
+              <MaterialCommunityIcons
+                name="timer-sand-complete"
+                size={24}
+                color="#374151"
+                style={styles.quizBoxIcon}
+              />
+              <View>
+                <Text style={styles.prenote}>Time Limit</Text>
+                <Text style={styles.boldnote}>
+                  {getFormattedTime(quiz.timeLimitInSeconds)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
+      {quiz.questions?.length !== 0 && index === 0 && (
+        <Button title="Start Quiz" onPress={() => setIndex(1)} />
       )}
 
-      {!loading && qIndex > 0 && !showResult && renderQuestion()}
+      {!loading && index > 0 && !showResult && renderQuestion()}
 
       {loading && (
         <View style={styles.searching}>
@@ -555,6 +584,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#FCFCFF",
     padding: 10,
+    width: "100%",
   },
 
   quizBoxIcon: {

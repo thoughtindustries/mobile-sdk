@@ -15,7 +15,7 @@ import { useDataContext } from "../context";
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Banner = () => {
-  const { recentContent, catalogData } = useDataContext();
+  const { recentContent, catalogData, contentData } = useDataContext();
   const navigation = useNavigation<HomeScreenProps>();
 
   const showSummary = (
@@ -33,7 +33,11 @@ const Banner = () => {
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: recentContent?.[0]?.id || catalogData?.[0]?.id || "",
+            cid:
+              recentContent?.[0]?.id ||
+              contentData?.[0]?.id ||
+              catalogData?.[0]?.id ||
+              "",
             from: "Home",
           })
         }

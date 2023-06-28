@@ -1,13 +1,13 @@
-import React, { useState, FC } from "react";
+import React, { useState, FC, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { get } from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { CourseQuiz, LoadingBanner } from "../components";
 import { RootStackParamList } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { WebView } from "react-native-webview";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { usePagesQuery } from "../graphql";
 
 type ExploreCourseProps = StackNavigationProp<
@@ -18,68 +18,80 @@ type ExploreCourseProps = StackNavigationProp<
 const ExploreCourse = () => {
   const navigation = useNavigation<ExploreCourseProps>();
   const [topicIndex, setTopicIndex] = useState<number>(0);
-  const [topicData, setTopicData] = useState({});
 
-  const route = useRoute();
+  const route = useRoute<RouteProp<RootStackParamList, "ExploreCourse">>();
   const params = route.params;
-  const { course, section, topics, lesson, progress } = params;
+  const { cid, course, section, topics, lesson, progress } = params;
 
   const { data: pagesData, loading: pageDataLoading } = usePagesQuery({
     variables: {
-      identifiers: [topics[topicIndex]?.id],
+      identifiers: [topics?.[topicIndex]?.id],
     },
   });
 
-  const renderQuiz = () => (
-    <CourseQuiz quiz={topicData} courseid={get(route, "params.cid", "")} />
-  );
-
   const TextPage: FC = () => (
-    <View>
+    <View
+      style={styles(progress, topicIndex, topics.length).videoPageContainer}
+    >
       <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
         {pagesData?.Pages?.[0]?.title}
       </Text>
-      <Text style={styles(progress, topicIndex, topics.length).topicText}>
-        {pagesData?.Pages?.[0]?.body?.replace(/(<([^>]+)>)/gi, "")}
-      </Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Text style={styles(progress, topicIndex, topics.length).topicText}>
+          {pagesData?.Pages?.[0]?.body?.replace(/(<([^>]+)>)/gi, "")}
+        </Text>
+      </ScrollView>
     </View>
   );
 
-  const VideoPage: FC = () => (
-    <View>
-      {pagesData?.Pages?.[0]?.title && (
-        <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
-          {pagesData.Pages[0].title}
-        </Text>
-      )}
-      {pagesData?.Pages?.[0]?.preTextBlock && (
-        <Text style={styles(progress, topicIndex, topics.length).topicText}>
-          {pagesData.Pages[0].preTextBlock.replace(/(<([^>]+)>)/gi, "")}
-        </Text>
-      )}
-      <WebView
-        onShouldStartLoadWithRequest={() => true}
-        source={{
-          uri: "https://fast.wistia.com/embed/medias/4px1bp0fpq",
+  const VideoPage: FC = () => {
+    const [videoLoading, setVideoLoading] = useState<boolean>(false);
+    return (
+      <View
+        style={{
+          flex: 1,
         }}
-        style={styles(progress, topicIndex, topics.length).video}
-      />
-      <View>
-        {pagesData?.Pages?.[0]?.body && (
-          <View>
-            <Text
-              style={styles(progress, topicIndex, topics.length).topicTitle}
-            >
-              Description
-            </Text>
-            <Text style={styles(progress, topicIndex, topics.length).topicText}>
-              {pagesData.Pages[0].body.replace(/(<([^>]+)>)/gi, "")}
-            </Text>
-          </View>
+      >
+        {pagesData?.Pages?.[0]?.title && (
+          <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
+            {pagesData.Pages[0].title}
+          </Text>
         )}
+        {pagesData?.Pages?.[0]?.preTextBlock && (
+          <Text style={styles(progress, topicIndex, topics.length).topicText}>
+            {pagesData.Pages[0].preTextBlock.replace(/(<([^>]+)>)/gi, "")}
+          </Text>
+        )}
+        <View style={styles(progress, topicIndex, topics.length).video}>
+          {videoLoading && <LoadingBanner />}
+          <WebView
+            onLoadStart={() => setVideoLoading(true)}
+            onLoad={() => setVideoLoading(false)}
+            javaScriptEnabled={true}
+            source={{
+              uri: `https://fast.wistia.com/embed/medias/${pagesData?.Pages?.[0]?.asset}`,
+            }}
+          />
+        </View>
+        <View>
+          {pagesData?.Pages?.[0]?.body && (
+            <View>
+              <Text
+                style={styles(progress, topicIndex, topics.length).topicTitle}
+              >
+                Description
+              </Text>
+              <Text
+                style={styles(progress, topicIndex, topics.length).topicText}
+              >
+                {pagesData.Pages[0].body.replace(/(<([^>]+)>)/gi, "")}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const PageNav: FC = () => (
     <TouchableOpacity
@@ -122,7 +134,13 @@ const ExploreCourse = () => {
         <View style={styles(progress, topicIndex, topics.length).progressBar} />
       </View>
       <View style={styles(progress, topicIndex, topics.length).topicPage}>
-        {pagesData?.Pages?.[0]?.type === "text" ? <TextPage /> : <VideoPage />}
+        {pagesData?.Pages?.[0]?.type === "text" ? (
+          <TextPage />
+        ) : pagesData?.Pages?.[0]?.type === "video" ? (
+          <VideoPage />
+        ) : (
+          <CourseQuiz quiz={pagesData?.Pages?.[0]} courseid={cid} />
+        )}
       </View>
     </View>
   );
@@ -188,9 +206,6 @@ const styles = (progress: number, topicIndex: number, topics: number) =>
       flex: 1,
     },
     courseContainer: {
-      flex: 1,
-    },
-    video: {
       flex: 1,
     },
     row: {
@@ -279,6 +294,7 @@ const styles = (progress: number, topicIndex: number, topics: number) =>
     },
     topicPage: {
       padding: 8,
+      flex: 1,
     },
     topicTitle: {
       color: "#1F2937",
@@ -306,6 +322,12 @@ const styles = (progress: number, topicIndex: number, topics: number) =>
       borderColor: topicIndex === topics - 1 ? "#3B1FA3" : "#FFFFFF",
       backgroundColor: topicIndex === topics - 1 ? "#3B1FA3" : "#FFFFFF",
       padding: 5,
+    },
+    videoPageContainer: {
+      flex: 1,
+    },
+    video: {
+      height: "40%",
     },
   });
 

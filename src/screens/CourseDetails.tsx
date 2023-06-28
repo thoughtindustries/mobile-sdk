@@ -1,5 +1,5 @@
 import React, { useState, FC } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Button, LoadingBanner, Hero } from "../components";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 30,
-    flex: 1,
   },
   buttonContainer: {
     flex: 1.5,
