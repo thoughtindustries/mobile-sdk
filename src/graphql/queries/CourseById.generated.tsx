@@ -18,6 +18,9 @@ export type CourseByIdQuery = {
       description?: string;
       authors?: Array<string>;
       asset?: string;
+      contentType?: {
+        label: string;
+      };
     };
     sections?: Array<{
       __typename?: "Section";
@@ -65,6 +68,9 @@ export const CourseByIdDocument = gql`
         description
         authors
         asset
+        contentType {
+          label
+        }
       }
       sections {
         id

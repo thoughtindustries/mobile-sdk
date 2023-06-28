@@ -512,6 +512,7 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     fontFamily: "Inter_400Regular",
     backgroundColor: "#DDD6FE",
+    marginBottom: 10,
   },
   Course: {
     backgroundColor: "#FDE68A",

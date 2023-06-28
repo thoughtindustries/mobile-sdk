@@ -34,13 +34,13 @@ const ContentDetails = () => {
   const { cid } = route.params;
   const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
     variables: {
-      id: cid || "",
+      id: cid,
     },
   });
   const { data: pagesCompletedData, loading: pagesCompletedDataLoading } =
     usePagesCompletedByCourseQuery({
       variables: {
-        courseId: cid || "",
+        courseId: cid,
       },
     });
   const [catalogCourse] = useState(
@@ -115,7 +115,9 @@ const ContentDetails = () => {
 
   const AboutCourse = () => (
     <View style={styles(courseData).aboutSection}>
-      <Text style={styles(courseData).courseSubTitle}>About this Course</Text>
+      <Text
+        style={styles(courseData).courseSubTitle}
+      >{`About this ${courseData?.CourseById?.courseGroup?.contentType?.label}`}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles(courseData).courseDesc}>
           {courseData?.CourseById.courseGroup?.description ||

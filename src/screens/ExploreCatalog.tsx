@@ -38,7 +38,6 @@ const ExploreCatalog = () => {
       values: filters.values,
     },
   });
-  const { contentData } = useDataContext();
 
   const filteredCourses = () => {
     const filteredCourses = data?.CatalogContent?.contentItems?.filter(
@@ -55,7 +54,7 @@ const ExploreCatalog = () => {
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: contentData?.length !== 0 ? item.displayCourse : item.id,
+            cid: item.displayCourse,
             from: "Explore",
           })
         }
