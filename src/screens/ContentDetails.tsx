@@ -7,6 +7,7 @@ import {
   Animated,
   ScrollView,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import { get, last } from "lodash";
 import { LoadingBanner } from "../components";
@@ -439,7 +440,6 @@ const styles = (data: any) =>
       fontSize: 20,
     },
     reportRow: {
-      flex: 1,
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
@@ -469,10 +469,10 @@ const styles = (data: any) =>
       fontFamily: "Inter_400Regular",
     },
     recentImage: {
-      width: 75,
-      height: 75,
+      width: (Dimensions.get("window").width / 440) * 80,
+      height: (Dimensions.get("window").width / 440) * 80,
       borderRadius: 8,
-      margin: 20,
+      margin: (Dimensions.get("window").width / 440) * 20,
       marginRight: 0,
     },
     aboutSection: {
