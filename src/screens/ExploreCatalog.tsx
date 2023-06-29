@@ -36,10 +36,8 @@ const ExploreCatalog = () => {
       page: 1,
       labels: filters.labels,
       values: filters.values,
-      contentTypes: "Course",
     },
   });
-  const { contentData } = useDataContext();
 
   const filteredCourses = () => {
     const filteredCourses = data?.CatalogContent?.contentItems?.filter(
@@ -56,7 +54,7 @@ const ExploreCatalog = () => {
       <Pressable
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid: contentData?.length !== 0 ? item.displayCourse : item.id,
+            cid: item.displayCourse,
             from: "Explore",
           })
         }
@@ -109,13 +107,13 @@ const ExploreCatalog = () => {
         data?.CatalogContent?.contentItems?.length > 0 && (
           <FlatList
             style={{
-              marginBottom:
-                ((data?.CatalogContent?.contentItems?.length *
-                  Dimensions.get("window").width) /
-                  440) *
-                32,
+              height:
+                Dimensions.get("window").height > 667
+                  ? (Dimensions.get("window").height / 440) * 280
+                  : (Dimensions.get("window").height / 440) * 238,
             }}
             data={filteredCourses()}
+            showsVerticalScrollIndicator={false}
             scrollEnabled={true}
             renderItem={({ item }) => <CourseItem item={item} />}
             onEndReachedThreshold={0.5}

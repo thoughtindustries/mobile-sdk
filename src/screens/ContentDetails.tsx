@@ -7,6 +7,7 @@ import {
   Animated,
   ScrollView,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import { get, last } from "lodash";
 import { LoadingBanner } from "../components";
@@ -33,13 +34,13 @@ const ContentDetails = () => {
   const { cid } = route.params;
   const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
     variables: {
-      id: cid || "",
+      id: cid,
     },
   });
   const { data: pagesCompletedData, loading: pagesCompletedDataLoading } =
     usePagesCompletedByCourseQuery({
       variables: {
-        courseId: cid || "",
+        courseId: cid,
       },
     });
   const [catalogCourse] = useState(
@@ -114,7 +115,9 @@ const ContentDetails = () => {
 
   const AboutCourse = () => (
     <View style={styles(courseData).aboutSection}>
-      <Text style={styles(courseData).courseSubTitle}>About this Course</Text>
+      <Text
+        style={styles(courseData).courseSubTitle}
+      >{`About this ${courseData?.CourseById?.courseGroup?.contentType?.label}`}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles(courseData).courseDesc}>
           {courseData?.CourseById.courseGroup?.description ||
@@ -439,7 +442,6 @@ const styles = (data: any) =>
       fontSize: 20,
     },
     reportRow: {
-      flex: 1,
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
@@ -469,10 +471,10 @@ const styles = (data: any) =>
       fontFamily: "Inter_400Regular",
     },
     recentImage: {
-      width: 75,
-      height: 75,
+      width: (Dimensions.get("window").width / 440) * 80,
+      height: (Dimensions.get("window").width / 440) * 80,
       borderRadius: 8,
-      margin: 20,
+      margin: (Dimensions.get("window").width / 440) * 20,
       marginRight: 0,
     },
     aboutSection: {

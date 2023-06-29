@@ -151,7 +151,6 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 30,
-    flex: 1,
   },
   buttonContainer: {
     flex: 1.5,
