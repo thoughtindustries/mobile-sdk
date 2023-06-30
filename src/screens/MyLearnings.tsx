@@ -286,7 +286,10 @@ const MyLearnings = () => {
           onEndReachedThreshold={0.5}
           showsVerticalScrollIndicator={false}
           style={{
-            height: (Dimensions.get("window").height / 440) * 200,
+            height:
+              Dimensions.get("window").height > 667
+                ? (Dimensions.get("window").height / 440) * 185
+                : (Dimensions.get("window").height / 440) * 125,
           }}
           ListEmptyComponent={
             <Text style={styles.noRecords}>
