@@ -63,7 +63,6 @@ const MyLearnings = () => {
       page: 1,
       labels: filters.labels,
       values: filters.values,
-      contentTypes: "Course",
     },
   });
 
@@ -125,6 +124,15 @@ const MyLearnings = () => {
   );
 
   const CourseItem = ({ data }: { data: courseListType }) => {
+    const contentLabelStyle =
+      data.contentTypeLabel === "Article"
+        ? styles.Article
+        : data.contentTypeLabel === "Course"
+        ? styles.Course
+        : data.contentTypeLabel === "Blog"
+        ? styles.Blog
+        : styles.Video;
+
     return (
       <TouchableOpacity
         style={styles.contentRow}
@@ -140,7 +148,14 @@ const MyLearnings = () => {
         <Image source={{ uri: data.asset }} style={styles.contentImage} />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
-            <Text style={styles.contentTag}>{data.contentTypeLabel}</Text>
+            <Text
+              style={{
+                ...styles.contentTag,
+                ...contentLabelStyle,
+              }}
+            >
+              {data.contentTypeLabel}
+            </Text>
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
         </View>
@@ -191,7 +206,7 @@ const MyLearnings = () => {
             >
               {data.contentTypeLabel}
             </Text>
-            {contentLabel === "Article" && (
+            {(contentLabel === "Article" || contentLabel === "Blog") && (
               <TouchableOpacity
                 onPress={() =>
                   data.id !== offlineContent?.[index]?.id
