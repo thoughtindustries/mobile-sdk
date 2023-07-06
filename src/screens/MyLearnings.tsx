@@ -95,7 +95,45 @@ const MyLearnings = () => {
 
   const filteredContent = () => {
     if (tab === "All") {
-      return contentItemData?.UserContentItems?.filter((item: courseListType) =>
+      const filteredContent: courseListType[] = [];
+
+      contentItemData?.UserContentItems?.forEach((item: courseListType) => {
+        if (
+          filters.labels.includes("Duration") &&
+          filters.labels.includes("Level of Difficulty")
+        ) {
+          item.customFields.duration.some((value: string) =>
+            filters.values.includes(value)
+          ) &&
+          item.customFields["level-of-difficulty"].some((value: string) =>
+            filters.values.includes(value)
+          )
+            ? filteredContent.push(item)
+            : null;
+        } else if (
+          filters.labels.includes("Duration") &&
+          !filters.labels.includes("Level of Difficulty")
+        ) {
+          item.customFields.duration.some((value: string) =>
+            filters.values.includes(value)
+          )
+            ? filteredContent.push(item)
+            : null;
+        } else if (
+          !filters.labels.includes("Duration") &&
+          filters.labels.includes("Level of Difficulty")
+        ) {
+          item.customFields["level-of-difficulty"].some((value: string) =>
+            filters.values.includes(value)
+          )
+            ? filteredContent.push(item)
+            : null;
+        } else {
+          filteredContent.push(item);
+        }
+      });
+
+      return filteredContent.filter((item: courseListType) =>
         item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
       );
     } else {

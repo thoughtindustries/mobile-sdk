@@ -53,16 +53,6 @@ const FilterControl = () => {
           selected: contextFilters?.values?.includes("Advanced"),
         },
       ],
-      tags: [
-        {
-          title: "QuickStart",
-          selected: contextFilters?.values?.includes("QuickStart"),
-        },
-        {
-          title: "Business",
-          selected: contextFilters?.values?.includes("Business"),
-        },
-      ],
       myLearningsEvent: [
         { title: "All", selected: false },
         { title: "Offline", selected: false },
@@ -106,14 +96,6 @@ const FilterControl = () => {
         difficultyLabel = "Level of Difficulty";
       }
 
-      // Tag Filter
-      let tags: string[] = [];
-      filters.tags.forEach((item) => {
-        if (item.selected) {
-          tags.push(item.title);
-        }
-      });
-
       if (difficulty.length > 0) {
         difficultyLabel = "Level of Difficulty";
       }
@@ -121,11 +103,7 @@ const FilterControl = () => {
       setContextFilters({
         ...contextFilters,
         sortDir: filters.sortDir,
-        values: [
-          ...new Set(durations),
-          ...new Set(difficulty),
-          ...new Set(tags),
-        ],
+        values: [...new Set(durations), ...new Set(difficulty)],
         labels: [durationLabel, difficultyLabel],
       });
       setShow(false);
@@ -211,29 +189,6 @@ const FilterControl = () => {
                           ? {
                               ...item,
                               selected: !filters.difficulty[idx].selected,
-                            }
-                          : item;
-                      }),
-                    })
-                  }
-                />
-              ))}
-            </View>
-            <View style={styles.filterBox}>
-              <Text style={styles.filterTitle}>Tags</Text>
-              {filters.tags.map((tag, idx) => (
-                <Checkbox
-                  key={idx}
-                  title={tag.title}
-                  selected={tag.selected}
-                  onPress={() =>
-                    setFilters({
-                      ...filters,
-                      tags: filters.tags.map((item) => {
-                        return tag.title === item.title
-                          ? {
-                              ...item,
-                              selected: !filters.tags[idx].selected,
                             }
                           : item;
                       }),

@@ -15,5 +15,6 @@ query UserContentItems(
     contentTypeLabel
     displayCourse
     title
+    customFields
   }
 }
