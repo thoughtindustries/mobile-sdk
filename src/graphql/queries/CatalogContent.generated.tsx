@@ -34,6 +34,10 @@ export type CatalogContentQuery = {
       description?: string;
       displayCourse?: string;
       contentTypeLabel?: string;
+      customFields?: {
+        duration: string[];
+        "level-of-difficulty": string[];
+      };
     }>;
   };
 };
@@ -69,6 +73,8 @@ export const CatalogContentDocument = gql`
         description
         displayCourse
         contentTypeLabel
+        customFields
+        kind
       }
     }
   }

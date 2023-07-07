@@ -19,6 +19,10 @@ export type UserContentItemsQuery = {
     contentTypeLabel?: string;
     displayCourse?: string;
     title?: string;
+    customFields?: {
+      duration: string[];
+      "level-of-difficulty": string[];
+    };
   }>;
 };
 
@@ -40,6 +44,8 @@ export const UserContentItemsDocument = gql`
       contentTypeLabel
       displayCourse
       title
+      customFields
+      kind
     }
   }
 `;

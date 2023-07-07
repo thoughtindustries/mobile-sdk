@@ -17,7 +17,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import {
-  useUserRecentContentQuery,
   useUserContentItemsQuery,
   useCatalogContentQuery,
   GlobalTypes,
@@ -25,6 +24,7 @@ import {
 } from "../graphql";
 import { FilterContext } from "../context";
 import { saveContent, getContent, removeContent } from "../db/db";
+import { ContentKind } from "../graphql/global-types";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -43,11 +43,6 @@ const MyLearnings = () => {
     values: [],
   });
 
-  const { data: recentContentData, loading: recentContentDataLoading } =
-    useUserRecentContentQuery({
-      variables: { limit: 5 },
-    });
-
   const { data: contentItemData, loading: contentItemDataLoading } =
     useUserContentItemsQuery({
       variables: {
@@ -61,9 +56,6 @@ const MyLearnings = () => {
       sortColumn: filters.sortBy,
       sortDirection: filters.sortDir,
       page: 1,
-      labels: filters.labels,
-      values: filters.values,
-      contentTypes: "Course",
     },
   });
 
@@ -94,26 +86,71 @@ const MyLearnings = () => {
     }
   };
 
+  const filteredItems = (items: courseListType[] | undefined) => {
+    const filteredItems: courseListType[] = [];
+
+    items?.forEach((item: courseListType) => {
+      if (
+        filters.labels.includes("Duration") &&
+        filters.labels.includes("Level of Difficulty")
+      ) {
+        item.customFields?.duration?.some((value: string) =>
+          filters.values.includes(value)
+        ) &&
+        item.customFields?.["level-of-difficulty"]?.some((value: string) =>
+          filters.values.includes(value)
+        )
+          ? filteredItems.push(item)
+          : null;
+      } else if (
+        filters.labels.includes("Duration") &&
+        !filters.labels.includes("Level of Difficulty")
+      ) {
+        item.customFields?.duration?.some((value: string) =>
+          filters.values.includes(value)
+        )
+          ? filteredItems.push(item)
+          : null;
+      } else if (
+        !filters.labels.includes("Duration") &&
+        filters.labels.includes("Level of Difficulty")
+      ) {
+        item.customFields?.["level-of-difficulty"]?.some((value: string) =>
+          filters.values.includes(value)
+        )
+          ? filteredItems.push(item)
+          : null;
+      } else {
+        filteredItems.push(item);
+      }
+    });
+
+    return filteredItems;
+  };
+
   const filteredContent = () => {
-    if (tab === "All") {
-      return contentItemData?.UserContentItems?.filter((item: courseListType) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-      );
-    } else {
-      return contentItemData?.UserContentItems?.filter(
-        (item: courseListType, idx: number) =>
-          item?.title
-            ?.toLocaleLowerCase()
-            .includes(search.toLocaleLowerCase()) &&
-          offlineContent?.some((content) => content.id === item.id)
-      );
-    }
+    const filteredContent = filteredItems(contentItemData?.UserContentItems);
+
+    return tab === "All"
+      ? filteredContent.filter((item: courseListType) =>
+          item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        )
+      : filteredContent.filter(
+          (item: courseListType) =>
+            item?.title
+              ?.toLocaleLowerCase()
+              .includes(search.toLocaleLowerCase()) &&
+            offlineContent?.some((content) => content.id === item.id)
+        );
   };
 
   const filteredCourses = () => {
-    return catalogData?.CatalogContent?.contentItems?.filter(
-      (item: courseListType) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+    const filteredCourses = filteredItems(
+      catalogData?.CatalogContent.contentItems
+    );
+
+    return filteredCourses?.filter((item: courseListType) =>
+      item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
     );
   };
 
@@ -125,47 +162,11 @@ const MyLearnings = () => {
   );
 
   const CourseItem = ({ data }: { data: courseListType }) => {
-    return (
-      <TouchableOpacity
-        style={styles.contentRow}
-        onPress={() => {
-          navigation.navigate("CourseDetails", {
-            cid: data.id,
-            title: data.title || "",
-            asset: data.asset || "",
-            contentTypeLabel: data.contentTypeLabel,
-          });
-        }}
-      >
-        <Image source={{ uri: data.asset }} style={styles.contentImage} />
-        <View style={styles.contentRightBox}>
-          <View style={styles.cTypeRow}>
-            <Text style={styles.contentTag}>{data.contentTypeLabel}</Text>
-          </View>
-          <Text style={styles.courseTitle}>{data.title}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const ContentItem = ({ data }: { data: courseListType }) => {
-    const index: number =
-      offlineContent?.findIndex((item) => item.id === data.id) || 0;
-    const contentLabel: string | undefined = data?.contentTypeLabel;
-    const { data: percentCompleteData } = useUserCourseProgressQuery({
-      variables: {
-        id: data.id,
-      },
-    });
-    const percentCompleted =
-      Number(percentCompleteData?.UserCourseProgress?.percentComplete) || 0;
     const contentLabelStyle =
-      contentLabel === "Article"
+      data.kind === ContentKind.Article
         ? styles.Article
-        : contentLabel === "Course"
+        : data.kind === ContentKind.CourseGroup
         ? styles.Course
-        : contentLabel === "Blog"
-        ? styles.Blog
         : styles.Video;
 
     return (
@@ -191,23 +192,73 @@ const MyLearnings = () => {
             >
               {data.contentTypeLabel}
             </Text>
-            <TouchableOpacity
-              onPress={() =>
-                data.id !== offlineContent?.[index]?.id
-                  ? downloadContent(data)
-                  : deleteContent(data)
-              }
+          </View>
+          <Text style={styles.courseTitle}>{data.title}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const ContentItem = ({ data }: { data: courseListType }) => {
+    const index: number =
+      offlineContent?.findIndex((item) => item.id === data.id) || 0;
+    const kind: string | undefined = data?.kind;
+    const { data: percentCompleteData } = useUserCourseProgressQuery({
+      variables: {
+        id: data.id,
+      },
+    });
+    const percentCompleted =
+      Number(percentCompleteData?.UserCourseProgress?.percentComplete) || 0;
+    const contentLabelStyle =
+      kind === ContentKind.Article
+        ? styles.Article
+        : kind === ContentKind.CourseGroup
+        ? styles.Course
+        : styles.Video;
+
+    return (
+      <TouchableOpacity
+        style={styles.contentRow}
+        onPress={() => {
+          navigation.navigate("CourseDetails", {
+            cid: data.id,
+            title: data.title || "",
+            asset: data.asset || "",
+            contentTypeLabel: data.contentTypeLabel,
+          });
+        }}
+      >
+        <Image source={{ uri: data.asset }} style={styles.contentImage} />
+        <View style={styles.contentRightBox}>
+          <View style={styles.cTypeRow}>
+            <Text
+              style={{
+                ...styles.contentTag,
+                ...contentLabelStyle,
+              }}
             >
-              <MaterialCommunityIcons
-                name={
+              {data.contentTypeLabel}
+            </Text>
+            {kind === ContentKind.Article && (
+              <TouchableOpacity
+                onPress={() =>
                   data.id !== offlineContent?.[index]?.id
-                    ? "download"
-                    : "close-circle-outline"
+                    ? downloadContent(data)
+                    : deleteContent(data)
                 }
-                size={22}
-                color="#232323"
-              />
-            </TouchableOpacity>
+              >
+                <MaterialCommunityIcons
+                  name={
+                    data.id !== offlineContent?.[index]?.id
+                      ? "download"
+                      : "close-circle-outline"
+                  }
+                  size={22}
+                  color="#232323"
+                />
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={styles.courseTitle}>{data.title}</Text>
           {data.contentTypeLabel === "Course" && (
@@ -269,7 +320,10 @@ const MyLearnings = () => {
           onEndReachedThreshold={0.5}
           showsVerticalScrollIndicator={false}
           style={{
-            height: (Dimensions.get("window").height / 440) * 200,
+            height:
+              Dimensions.get("window").height > 667
+                ? (Dimensions.get("window").height / 440) * 185
+                : (Dimensions.get("window").height / 440) * 125,
           }}
           ListEmptyComponent={
             <Text style={styles.noRecords}>
@@ -286,7 +340,10 @@ const MyLearnings = () => {
       data={filteredContent()}
       renderItem={({ item }) => <ContentItem data={item} />}
       style={{
-        height: (Dimensions.get("window").height / 440) * 175,
+        height:
+          Dimensions.get("window").height > 667
+            ? (Dimensions.get("window").height / 440) * 150
+            : (Dimensions.get("window").height / 440) * 215,
       }}
       showsVerticalScrollIndicator={false}
       scrollEnabled={true}
@@ -312,44 +369,47 @@ const MyLearnings = () => {
               <FilterControl />
             </FilterContext.Provider>
           </View>
-          {recentContentDataLoading || contentItemDataLoading ? (
+          {contentItemDataLoading ? (
             <LoadingBanner />
           ) : (
             <View>
-              {recentContentData?.UserRecentContent &&
-              recentContentData.UserRecentContent.length > 0 ? (
+              {contentItemData?.UserContentItems &&
+              contentItemData?.UserContentItems.length !== 0 ? (
                 <View>
-                  <View>
-                    <Text style={styles.latestTitle}>Latest Active</Text>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate("ContentDetails", {
-                          cid:
-                            recentContentData?.UserRecentContent[0]?.id || "",
-                          from: "My Learnings",
-                        })
-                      }
-                    >
-                      <View
-                        style={{
-                          ...styles.contentRow,
-                          backgroundColor: "#fff",
-                        }}
+                  {Dimensions.get("window").height > 667 && (
+                    <View>
+                      <Text style={styles.latestTitle}>Latest Active</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("ContentDetails", {
+                            cid:
+                              contentItemData?.UserContentItems?.[0]?.id || "",
+                            from: "My Learnings",
+                          })
+                        }
                       >
-                        <View style={styles.contentRightBox}>
-                          <Text style={styles.courseTitle}>
-                            {recentContentData?.UserRecentContent[0].title}
-                          </Text>
-                        </View>
-                        <Image
-                          source={{
-                            uri: recentContentData?.UserRecentContent[0].asset,
+                        <View
+                          style={{
+                            ...styles.recentContent,
+                            backgroundColor: "#fff",
                           }}
-                          style={styles.recentImage}
-                        />
-                      </View>
-                    </TouchableOpacity>
-                  </View>
+                        >
+                          <View style={styles.contentRightBox}>
+                            <Text style={styles.courseTitle}>
+                              {contentItemData?.UserContentItems?.[0].title}
+                            </Text>
+                          </View>
+                          <Image
+                            source={{
+                              uri: contentItemData?.UserContentItems?.[0].asset,
+                            }}
+                            style={styles.recentImage}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
                   <CategoryFilter />
                   <ContentList />
                 </View>
@@ -393,8 +453,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     height: 60,
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 20,
   },
   catBox: {
     borderRadius: 8,
@@ -464,6 +523,15 @@ const styles = StyleSheet.create({
     height: "90%",
     marginBottom: 170,
   },
+  recentContent: {
+    display: "flex",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#F5F5F7",
+    justifyContent: "space-between",
+  },
   contentRow: {
     display: "flex",
     flexDirection: "row",
@@ -496,6 +564,7 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     fontFamily: "Inter_400Regular",
     backgroundColor: "#DDD6FE",
+    marginBottom: 10,
   },
   Course: {
     backgroundColor: "#FDE68A",

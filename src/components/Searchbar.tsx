@@ -16,7 +16,7 @@ const Searchbar = ({ searchText, setSearch }: SearchBarProps) => {
         value={searchText}
         defaultValue={""}
         style={styles.searchbox}
-        placeholder="Search by Title, Instructor or Tag"
+        placeholder="Search by Title"
       />
       {isEmpty(searchText) && (
         <Pressable onPress={() => setSearch(searchText)} style={styles.magnify}>

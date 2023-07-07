@@ -33,11 +33,7 @@ const Banner = () => {
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("ContentDetails", {
-            cid:
-              recentContent?.[0]?.id ||
-              contentData?.[0]?.id ||
-              catalogData?.[0]?.id ||
-              "",
+            cid: contentData?.[0]?.displayCourse || catalogData?.[0]?.id || "",
             from: "Home",
           })
         }

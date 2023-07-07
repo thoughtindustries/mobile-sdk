@@ -6,6 +6,9 @@ query CourseById($id: ID!) {
       description
       authors
       asset
+      contentType {
+        label
+      }
     }
     sections {
       id
