@@ -17,7 +17,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import {
-  useUserRecentContentQuery,
   useUserContentItemsQuery,
   useCatalogContentQuery,
   GlobalTypes,
@@ -25,6 +24,7 @@ import {
 } from "../graphql";
 import { FilterContext } from "../context";
 import { saveContent, getContent, removeContent } from "../db/db";
+import { ContentKind } from "../graphql/global-types";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -43,11 +43,6 @@ const MyLearnings = () => {
     values: [],
   });
 
-  const { data: recentContentData, loading: recentContentDataLoading } =
-    useUserRecentContentQuery({
-      variables: { limit: 5 },
-    });
-
   const { data: contentItemData, loading: contentItemDataLoading } =
     useUserContentItemsQuery({
       variables: {
@@ -61,8 +56,6 @@ const MyLearnings = () => {
       sortColumn: filters.sortBy,
       sortDirection: filters.sortDir,
       page: 1,
-      labels: filters.labels,
-      values: filters.values,
     },
   });
 
@@ -101,10 +94,10 @@ const MyLearnings = () => {
         filters.labels.includes("Duration") &&
         filters.labels.includes("Level of Difficulty")
       ) {
-        item.customFields?.duration.some((value: string) =>
+        item.customFields?.duration?.some((value: string) =>
           filters.values.includes(value)
         ) &&
-        item.customFields["level-of-difficulty"].some((value: string) =>
+        item.customFields?.["level-of-difficulty"]?.some((value: string) =>
           filters.values.includes(value)
         )
           ? filteredItems.push(item)
@@ -113,7 +106,7 @@ const MyLearnings = () => {
         filters.labels.includes("Duration") &&
         !filters.labels.includes("Level of Difficulty")
       ) {
-        item.customFields?.duration.some((value: string) =>
+        item.customFields?.duration?.some((value: string) =>
           filters.values.includes(value)
         )
           ? filteredItems.push(item)
@@ -122,7 +115,7 @@ const MyLearnings = () => {
         !filters.labels.includes("Duration") &&
         filters.labels.includes("Level of Difficulty")
       ) {
-        item.customFields?.["level-of-difficulty"].some((value: string) =>
+        item.customFields?.["level-of-difficulty"]?.some((value: string) =>
           filters.values.includes(value)
         )
           ? filteredItems.push(item)
@@ -170,12 +163,10 @@ const MyLearnings = () => {
 
   const CourseItem = ({ data }: { data: courseListType }) => {
     const contentLabelStyle =
-      data.contentTypeLabel === "Article"
+      data.kind === ContentKind.Article
         ? styles.Article
-        : data.contentTypeLabel === "Course"
+        : data.kind === ContentKind.CourseGroup
         ? styles.Course
-        : data.contentTypeLabel === "Blog"
-        ? styles.Blog
         : styles.Video;
 
     return (
@@ -211,7 +202,7 @@ const MyLearnings = () => {
   const ContentItem = ({ data }: { data: courseListType }) => {
     const index: number =
       offlineContent?.findIndex((item) => item.id === data.id) || 0;
-    const contentLabel: string | undefined = data?.contentTypeLabel;
+    const kind: string | undefined = data?.kind;
     const { data: percentCompleteData } = useUserCourseProgressQuery({
       variables: {
         id: data.id,
@@ -220,12 +211,10 @@ const MyLearnings = () => {
     const percentCompleted =
       Number(percentCompleteData?.UserCourseProgress?.percentComplete) || 0;
     const contentLabelStyle =
-      contentLabel === "Article"
+      kind === ContentKind.Article
         ? styles.Article
-        : contentLabel === "Course"
+        : kind === ContentKind.CourseGroup
         ? styles.Course
-        : contentLabel === "Blog"
-        ? styles.Blog
         : styles.Video;
 
     return (
@@ -251,7 +240,7 @@ const MyLearnings = () => {
             >
               {data.contentTypeLabel}
             </Text>
-            {(contentLabel === "Article" || contentLabel === "Blog") && (
+            {kind === ContentKind.Article && (
               <TouchableOpacity
                 onPress={() =>
                   data.id !== offlineContent?.[index]?.id
@@ -380,7 +369,7 @@ const MyLearnings = () => {
               <FilterControl />
             </FilterContext.Provider>
           </View>
-          {recentContentDataLoading || contentItemDataLoading ? (
+          {contentItemDataLoading ? (
             <LoadingBanner />
           ) : (
             <View>

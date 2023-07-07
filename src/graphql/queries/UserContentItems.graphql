@@ -16,5 +16,6 @@ query UserContentItems(
     displayCourse
     title
     customFields
+    kind
   }
 }

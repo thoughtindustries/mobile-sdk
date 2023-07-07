@@ -45,6 +45,7 @@ export const UserContentItemsDocument = gql`
       displayCourse
       title
       customFields
+      kind
     }
   }
 `;
