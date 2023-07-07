@@ -29,6 +29,7 @@ query CatalogContent(
       displayCourse
       contentTypeLabel
       customFields
+      kind
     }
   }
 }
