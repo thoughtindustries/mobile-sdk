@@ -93,64 +93,71 @@ const MyLearnings = () => {
     }
   };
 
+  const filteredItems = (items: courseListType[] | undefined) => {
+    const filteredItems: courseListType[] = [];
+
+    items?.forEach((item: courseListType) => {
+      if (
+        filters.labels.includes("Duration") &&
+        filters.labels.includes("Level of Difficulty")
+      ) {
+        item.customFields?.duration.some((value: string) =>
+          filters.values.includes(value)
+        ) &&
+        item.customFields["level-of-difficulty"].some((value: string) =>
+          filters.values.includes(value)
+        )
+          ? filteredItems.push(item)
+          : null;
+      } else if (
+        filters.labels.includes("Duration") &&
+        !filters.labels.includes("Level of Difficulty")
+      ) {
+        item.customFields?.duration.some((value: string) =>
+          filters.values.includes(value)
+        )
+          ? filteredItems.push(item)
+          : null;
+      } else if (
+        !filters.labels.includes("Duration") &&
+        filters.labels.includes("Level of Difficulty")
+      ) {
+        item.customFields?.["level-of-difficulty"].some((value: string) =>
+          filters.values.includes(value)
+        )
+          ? filteredItems.push(item)
+          : null;
+      } else {
+        filteredItems.push(item);
+      }
+    });
+
+    return filteredItems;
+  };
+
   const filteredContent = () => {
-    if (tab === "All") {
-      const filteredContent: courseListType[] = [];
+    const filteredContent = filteredItems(contentItemData?.UserContentItems);
 
-      contentItemData?.UserContentItems?.forEach((item: courseListType) => {
-        if (
-          filters.labels.includes("Duration") &&
-          filters.labels.includes("Level of Difficulty")
-        ) {
-          item.customFields.duration.some((value: string) =>
-            filters.values.includes(value)
-          ) &&
-          item.customFields["level-of-difficulty"].some((value: string) =>
-            filters.values.includes(value)
-          )
-            ? filteredContent.push(item)
-            : null;
-        } else if (
-          filters.labels.includes("Duration") &&
-          !filters.labels.includes("Level of Difficulty")
-        ) {
-          item.customFields.duration.some((value: string) =>
-            filters.values.includes(value)
-          )
-            ? filteredContent.push(item)
-            : null;
-        } else if (
-          !filters.labels.includes("Duration") &&
-          filters.labels.includes("Level of Difficulty")
-        ) {
-          item.customFields["level-of-difficulty"].some((value: string) =>
-            filters.values.includes(value)
-          )
-            ? filteredContent.push(item)
-            : null;
-        } else {
-          filteredContent.push(item);
-        }
-      });
-
-      return filteredContent.filter((item: courseListType) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-      );
-    } else {
-      return contentItemData?.UserContentItems?.filter(
-        (item: courseListType, idx: number) =>
-          item?.title
-            ?.toLocaleLowerCase()
-            .includes(search.toLocaleLowerCase()) &&
-          offlineContent?.some((content) => content.id === item.id)
-      );
-    }
+    return tab === "All"
+      ? filteredContent.filter((item: courseListType) =>
+          item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        )
+      : filteredContent.filter(
+          (item: courseListType) =>
+            item?.title
+              ?.toLocaleLowerCase()
+              .includes(search.toLocaleLowerCase()) &&
+            offlineContent?.some((content) => content.id === item.id)
+        );
   };
 
   const filteredCourses = () => {
-    return catalogData?.CatalogContent?.contentItems?.filter(
-      (item: courseListType) =>
-        item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+    const filteredCourses = filteredItems(
+      catalogData?.CatalogContent.contentItems
+    );
+
+    return filteredCourses?.filter((item: courseListType) =>
+      item?.title?.toLocaleLowerCase().includes(search.toLocaleLowerCase())
     );
   };
 

@@ -52,7 +52,7 @@ export type courseListType = {
   contentTypeLabel?: string;
   progress?: Float;
   description?: string;
-  customFields: {
+  customFields?: {
     duration: string[];
     "level-of-difficulty": string[];
   };
