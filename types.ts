@@ -52,6 +52,10 @@ export type courseListType = {
   contentTypeLabel?: string;
   progress?: Float;
   description?: string;
+  customFields?: {
+    duration: string[];
+    "level-of-difficulty": string[];
+  };
 };
 
 export type topicType = {

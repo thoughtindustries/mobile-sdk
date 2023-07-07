@@ -28,6 +28,7 @@ query CatalogContent(
       description
       displayCourse
       contentTypeLabel
+      customFields
     }
   }
 }
