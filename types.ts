@@ -56,6 +56,7 @@ export type courseListType = {
     duration: string[];
     "level-of-difficulty": string[];
   };
+  kind?: string;
 };
 
 export type topicType = {

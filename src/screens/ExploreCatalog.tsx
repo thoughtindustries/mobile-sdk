@@ -16,6 +16,7 @@ import { RootStackParamList } from "../../types";
 import { GlobalTypes } from "../graphql";
 import { FilterContext, useDataContext } from "../context";
 import { useCatalogContentQuery } from "../graphql";
+import { placeHolderimage } from "../helpers";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
@@ -66,9 +67,10 @@ const ExploreCatalog = () => {
               By {item.authors?.join(", ") || "Anonymous"}
             </Text>
           </View>
-          {item.asset !== "na" && (
-            <Image source={{ uri: item.asset }} style={styles.courseImage} />
-          )}
+          <Image
+            source={item.asset ? { uri: item.asset } : placeHolderimage}
+            style={styles.courseImage}
+          />
         </View>
       </Pressable>
     );
