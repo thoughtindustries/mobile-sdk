@@ -182,7 +182,10 @@ const MyLearnings = () => {
           });
         }}
       >
-        <Image source={{ uri: data.asset }} style={styles.contentImage} />
+        <Image
+          source={data.asset ? { uri: data.asset } : placeHolderimage}
+          style={styles.contentImage}
+        />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
