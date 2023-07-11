@@ -25,6 +25,7 @@ import {
 import { FilterContext } from "../context";
 import { saveContent, getContent, removeContent } from "../db/db";
 import { ContentKind } from "../graphql/global-types";
+import { placeHolderimage } from "../helpers";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -181,7 +182,10 @@ const MyLearnings = () => {
           });
         }}
       >
-        <Image source={{ uri: data.asset }} style={styles.contentImage} />
+        <Image
+          source={data.asset ? { uri: data.asset } : placeHolderimage}
+          style={styles.contentImage}
+        />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
@@ -229,7 +233,16 @@ const MyLearnings = () => {
           });
         }}
       >
-        <Image source={{ uri: data.asset }} style={styles.contentImage} />
+        <Image
+          source={
+            data.asset
+              ? {
+                  uri: data.asset,
+                }
+              : placeHolderimage
+          }
+          style={styles.contentImage}
+        />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
             <Text
@@ -387,25 +400,22 @@ const MyLearnings = () => {
                             from: "My Learnings",
                           })
                         }
+                        style={styles.recentContent}
                       >
-                        <View
-                          style={{
-                            ...styles.recentContent,
-                            backgroundColor: "#fff",
-                          }}
-                        >
-                          <View style={styles.contentRightBox}>
-                            <Text style={styles.courseTitle}>
-                              {contentItemData?.UserContentItems?.[0].title}
-                            </Text>
-                          </View>
-                          <Image
-                            source={{
-                              uri: contentItemData?.UserContentItems?.[0].asset,
-                            }}
-                            style={styles.recentImage}
-                          />
-                        </View>
+                        <Text style={styles.courseTitle}>
+                          {contentItemData?.UserContentItems?.[0].title}
+                        </Text>
+                        <Image
+                          source={
+                            contentItemData?.UserContentItems?.[0].asset
+                              ? {
+                                  uri: contentItemData?.UserContentItems?.[0]
+                                    .asset,
+                                }
+                              : placeHolderimage
+                          }
+                          style={styles.recentImage}
+                        />
                       </TouchableOpacity>
                     </View>
                   )}
@@ -500,7 +510,7 @@ const styles = StyleSheet.create({
   },
   courseTitle: {
     fontSize: 16,
-    maxWidth: "80%",
+    maxWidth: "60%",
     lineHeight: 24,
     textAlign: "left",
     color: "#1F2937",
@@ -529,8 +539,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     borderColor: "#E5E7EB",
-    backgroundColor: "#F5F5F7",
+    backgroundColor: "#FFFFFF",
     justifyContent: "space-between",
+    padding: 20,
   },
   contentRow: {
     display: "flex",
@@ -547,7 +558,6 @@ const styles = StyleSheet.create({
     minHeight: 100,
     margin: 20,
     marginRight: 20,
-    maxWidth: "70%",
   },
   cTypeRow: {
     display: "flex",
@@ -588,9 +598,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 8,
   },
   recentImage: {
-    width: 70,
+    width: (Dimensions.get("window").width / 440) * 100,
     borderRadius: 8,
-    margin: 20,
+    height: (Dimensions.get("window").width / 440) * 120,
   },
   searching: {
     backgroundColor: "#3B1FA3",
