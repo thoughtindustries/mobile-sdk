@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC } from "react";
 import {
   View,
   Text,
@@ -90,7 +90,7 @@ const ContentDetails = () => {
     );
   }, [content]);
 
-  const CustomReport = () => (
+  const CustomReport: FC = () => (
     <View style={styles(courseData).reportRow}>
       <View style={styles(courseData).reportRightBox}>
         <Text style={styles(courseData).courseTitle}>
@@ -113,7 +113,7 @@ const ContentDetails = () => {
     </View>
   );
 
-  const AboutCourse = () => (
+  const AboutCourse: FC = () => (
     <View style={styles(courseData).aboutSection}>
       <Text
         style={styles(courseData).courseSubTitle}
@@ -135,7 +135,7 @@ const ContentDetails = () => {
     }
   };
 
-  const SectionProgress = ({ percent }: { percent: number }) => (
+  const SectionProgress: FC<{ percent: number }> = ({ percent }) => (
     <View style={styles(courseData).sectionProgress}>
       <Animated.View
         style={{
@@ -147,19 +147,13 @@ const ContentDetails = () => {
     </View>
   );
 
-  const LessonView = ({
-    idx,
-    lesson,
-    lessonsRead,
-    section,
-    secProgress,
-  }: {
+  const LessonView: FC<{
     idx: number;
     lesson: { topics: []; title: string };
     lessonsRead: string[];
     section: string;
     secProgress: number;
-  }) => {
+  }> = ({ idx, lesson, lessonsRead, section, secProgress }) => {
     const lessonRead = lesson.topics.some((topic: any) =>
       lessonsRead.includes(topic.id)
     );
@@ -193,14 +187,10 @@ const ContentDetails = () => {
     );
   };
 
-  const SectionView = ({
+  const SectionView: FC<{ id: string; title: string; lessons: [] }> = ({
     id,
     title,
     lessons,
-  }: {
-    id: string;
-    title: string;
-    lessons: [];
   }) => {
     const lessonsRead = getSectionProgress(lessons);
     const sectionProgress = (lessonsRead.length / lessons.length) * 100;
@@ -256,7 +246,7 @@ const ContentDetails = () => {
     );
   };
 
-  const SectionList = () => (
+  const SectionList: FC = () => (
     <View style={styles(courseData).sectionList}>
       {courseData?.CourseById && (
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -273,7 +263,7 @@ const ContentDetails = () => {
     </View>
   );
 
-  const FloatingContainer = () => {
+  const FloatingContainer: FC = () => {
     const sectionId = getLastViewedSection();
     let section: any = courseData?.CourseById.sections?.[0];
     if (sectionId != "") {
@@ -305,7 +295,7 @@ const ContentDetails = () => {
     );
   };
 
-  const Nav = () => (
+  const Nav: FC = () => (
     <TouchableOpacity style={styles(courseData).row}>
       <View
         style={{

@@ -29,7 +29,7 @@ const CourseDetails = () => {
   );
 
   const CourseDetailsBanner: FC = () => (
-    <Hero asset={courseData?.CourseById.courseGroup?.asset || asset}>
+    <Hero asset={asset}>
       <View style={styles.bannerArea}>
         <View style={styles.buttons}>
           <MaterialCommunityIcons
