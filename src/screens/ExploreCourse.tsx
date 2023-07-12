@@ -1,5 +1,5 @@
-import React, { useState, FC, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState, FC } from "react";
+import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
 import { get } from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
@@ -9,6 +9,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { WebView } from "react-native-webview";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { usePagesQuery } from "../graphql";
+import RenderHtml from "react-native-render-html";
 
 type ExploreCourseProps = StackNavigationProp<
   RootStackParamList,
@@ -29,20 +30,23 @@ const ExploreCourse = () => {
     },
   });
 
-  const TextPage: FC = () => (
-    <View
-      style={styles(progress, topicIndex, topics.length).videoPageContainer}
-    >
-      <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
-        {pagesData?.Pages?.[0]?.title}
-      </Text>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles(progress, topicIndex, topics.length).topicText}>
-          {pagesData?.Pages?.[0]?.body?.replace(/(<([^>]+)>)/gi, "")}
+  const TextPage: FC = () => {
+    const { width } = useWindowDimensions();
+    const html = pagesData?.Pages?.[0].body;
+
+    return (
+      <View
+        style={styles(progress, topicIndex, topics.length).videoPageContainer}
+      >
+        <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
+          {pagesData?.Pages?.[0]?.title}
         </Text>
-      </ScrollView>
-    </View>
-  );
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <RenderHtml source={{ html }} contentWidth={width} />
+        </ScrollView>
+      </View>
+    );
+  };
 
   const VideoPage: FC = () => {
     const [videoLoading, setVideoLoading] = useState<boolean>(false);
