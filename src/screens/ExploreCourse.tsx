@@ -157,7 +157,8 @@ const ExploreCourse = () => {
       useUpdateTopicAndCourseProgressMutation({});
 
     const handleNext = () => {
-      if (get(route, "params.topics.length", 1) - 1 > topicIndex) {
+      console.log(topics.length - 1, topicIndex);
+      if (topics.length > 1 && topics.length - 1 > topicIndex) {
         setTopicIndex(topicIndex + 1);
         if (pagesData?.Pages?.[0]?.type === "text") {
           updateTopicAndCourseProgressMutation({
@@ -167,30 +168,36 @@ const ExploreCourse = () => {
             },
           });
         }
+      } else if (topics.length === 1) {
+        if (pagesData?.Pages?.[0]?.type === "text") {
+          updateTopicAndCourseProgressMutation({
+            variables: {
+              topicId: topics[topicIndex].id,
+              progress: 100,
+            },
+          });
+        }
+        navigation.goBack();
       }
     };
 
     const handlePrevious = () => {
-      if (topicIndex > 0) {
-        setTopicIndex(topicIndex - 1);
-      }
+      topicIndex > 0 ? setTopicIndex(topicIndex - 1) : navigation.goBack();
     };
 
     return (
       <View style={styles(progress, topicIndex, topics.length).courseNav}>
         <TouchableOpacity
-          disabled={topicIndex === 0}
           style={styles(progress, topicIndex, topics.length).topicBackButton}
           onPress={() => handlePrevious()}
         >
           <MaterialCommunityIcons
             name="chevron-left"
             size={36}
-            color={topicIndex === 0 ? "#3B1FA3" : "#FFFFFF"}
+            color={"#FFFFFF"}
           />
         </TouchableOpacity>
         <TouchableOpacity
-          disabled={topicIndex === topics.length - 1}
           style={styles(progress, topicIndex, topics.length).topicForwardButton}
           onPress={() => handleNext()}
         >
@@ -219,7 +226,7 @@ const ExploreCourse = () => {
           <CourseDetails />
         </View>
       )}
-      {topics.length > 1 && <CourseNav />}
+      <CourseNav />
     </View>
   );
 };
@@ -336,15 +343,15 @@ const styles = (progress: number, topicIndex: number, topics: number) =>
     topicBackButton: {
       borderRadius: 5,
       borderWidth: 1,
-      borderColor: topicIndex === 0 ? "#3B1FA3" : "#FFFFFF",
+      borderColor: "#FFFFFF",
       backgroundColor: "#3B1FA3",
       padding: 5,
     },
     topicForwardButton: {
       borderRadius: 5,
       borderWidth: 1,
-      borderColor: topicIndex === topics - 1 ? "#3B1FA3" : "#FFFFFF",
-      backgroundColor: topicIndex === topics - 1 ? "#3B1FA3" : "#FFFFFF",
+      borderColor: "#FFFFFF",
+      backgroundColor: "#FFFFFF",
       padding: 5,
     },
     videoPageContainer: {

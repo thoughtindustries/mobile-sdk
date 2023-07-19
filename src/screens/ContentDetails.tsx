@@ -264,22 +264,29 @@ const ContentDetails = () => {
   );
 
   const FloatingContainer: FC = () => {
-    const sectionId = getLastViewedSection();
-    let section: any = courseData?.CourseById.sections?.[0];
-    if (sectionId != "") {
-      section = courseData?.CourseById?.sections?.find(
-        (s: { id: string }) => s.id === sectionId
-      );
-    }
+    const [courseComplete, setCourseComplete] = useState<boolean>(false);
+    let nextSection: any = courseData?.CourseById.sections?.[0];
+    courseData?.CourseById.sections?.some((section: any) => {
+      const lessonsRead = getSectionProgress(section.lessons);
+      const sectionProgress =
+        (lessonsRead.length / section.lessons.length) * 100;
+
+      if (sectionProgress >= 0 && sectionProgress < 100) {
+        nextSection = section;
+        return true;
+      }
+    });
     return (
       <View>
         {courseData && (
           <View style={styles(courseData).floatingFooter}>
             <View style={styles(courseData).FlotingText}>
               <Text style={styles(courseData).ftextItem}>UP NEXT</Text>
-              <Text style={styles(courseData).fsection}>{section?.title}</Text>
+              <Text style={styles(courseData).fsection}>
+                {nextSection?.title}
+              </Text>
               <Text style={styles(courseData).ftopic}>
-                {section?.lessons?.[0]?.title}
+                {nextSection?.lessons?.[0]?.title}
               </Text>
             </View>
             <TouchableOpacity
@@ -532,13 +539,13 @@ const styles = (data: any) =>
     },
     ftextItem: {
       color: "#D4D4D8",
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 12,
       fontFamily: "Inter_700Bold",
     },
     fsection: {
-      fontSize: 10,
-      lineHeight: 12,
+      fontSize: 12,
+      lineHeight: 16,
       fontFamily: "Inter_700Bold",
       color: "#ffffff",
     },
