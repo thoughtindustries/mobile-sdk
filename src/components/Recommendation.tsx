@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useDataContext } from "../context";
+import { placeHolderimage } from "../helpers";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -37,7 +38,7 @@ const Recommendation = () => {
           <View style={styles.recContentBox}>
             <ImageBackground
               key={idx}
-              source={{ uri: course.asset }}
+              source={course.asset ? { uri: course.asset } : placeHolderimage}
               resizeMode="cover"
               style={styles.imageBackground}
               imageStyle={styles.image}
@@ -73,7 +74,9 @@ const Recommendation = () => {
             <View style={styles.recContentBox}>
               <ImageBackground
                 key={idx}
-                source={{ uri: content.asset }}
+                source={
+                  content.asset ? { uri: content.asset } : placeHolderimage
+                }
                 resizeMode="cover"
                 style={styles.imageBackground}
                 imageStyle={styles.image}

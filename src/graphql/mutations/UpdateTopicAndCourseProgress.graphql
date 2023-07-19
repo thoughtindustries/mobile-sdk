@@ -1,0 +1,3 @@
+mutation UpdateTopicAndCourseProgress($progress: Int!, $topicId: ID!) {
+  UpdateTopicAndCourseProgress(progress: $progress, topicId: $topicId)
+}

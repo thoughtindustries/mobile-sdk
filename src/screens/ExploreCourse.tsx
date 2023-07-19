@@ -8,7 +8,10 @@ import { RootStackParamList } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { WebView } from "react-native-webview";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import { usePagesQuery } from "../graphql";
+import {
+  usePagesQuery,
+  useUpdateTopicAndCourseProgressMutation,
+} from "../graphql";
 import RenderHtml from "react-native-render-html";
 
 type ExploreCourseProps = StackNavigationProp<
@@ -149,40 +152,57 @@ const ExploreCourse = () => {
     </View>
   );
 
-  const CourseNav: FC = () => (
-    <View style={styles(progress, topicIndex, topics.length).courseNav}>
-      <TouchableOpacity
-        disabled={topicIndex === 0}
-        style={styles(progress, topicIndex, topics.length).topicBackButton}
-        onPress={() => {
-          if (topicIndex > 0) {
-            setTopicIndex(topicIndex - 1);
-          }
-        }}
-      >
-        <MaterialCommunityIcons
-          name="chevron-left"
-          size={36}
-          color={topicIndex === 0 ? "#3B1FA3" : "#FFFFFF"}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity
-        disabled={topicIndex === topics.length - 1}
-        style={styles(progress, topicIndex, topics.length).topicForwardButton}
-        onPress={() => {
-          if (get(route, "params.topics.length", 1) - 1 > topicIndex) {
-            setTopicIndex(topicIndex + 1);
-          }
-        }}
-      >
-        <MaterialCommunityIcons
-          name="chevron-right"
-          size={36}
-          color={"#3B1FA3"}
-        />
-      </TouchableOpacity>
-    </View>
-  );
+  const CourseNav: FC = () => {
+    const [updateTopicAndCourseProgressMutation] =
+      useUpdateTopicAndCourseProgressMutation({});
+
+    const handleNext = () => {
+      if (get(route, "params.topics.length", 1) - 1 > topicIndex) {
+        setTopicIndex(topicIndex + 1);
+        if (pagesData?.Pages?.[0]?.type === "text") {
+          updateTopicAndCourseProgressMutation({
+            variables: {
+              topicId: topics[topicIndex].id,
+              progress: 100,
+            },
+          });
+        }
+      }
+    };
+
+    const handlePrevious = () => {
+      if (topicIndex > 0) {
+        setTopicIndex(topicIndex - 1);
+      }
+    };
+
+    return (
+      <View style={styles(progress, topicIndex, topics.length).courseNav}>
+        <TouchableOpacity
+          disabled={topicIndex === 0}
+          style={styles(progress, topicIndex, topics.length).topicBackButton}
+          onPress={() => handlePrevious()}
+        >
+          <MaterialCommunityIcons
+            name="chevron-left"
+            size={36}
+            color={topicIndex === 0 ? "#3B1FA3" : "#FFFFFF"}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={topicIndex === topics.length - 1}
+          style={styles(progress, topicIndex, topics.length).topicForwardButton}
+          onPress={() => handleNext()}
+        >
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={36}
+            color={"#3B1FA3"}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles(progress, topicIndex, topics.length).container}>
