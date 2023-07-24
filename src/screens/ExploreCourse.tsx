@@ -1,6 +1,5 @@
 import React, { useState, FC } from "react";
 import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
-import { get } from "lodash";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { CourseQuiz, LoadingBanner } from "../components";
@@ -157,7 +156,6 @@ const ExploreCourse = () => {
       useUpdateTopicAndCourseProgressMutation({});
 
     const handleNext = () => {
-      console.log(topics.length - 1, topicIndex);
       if (topics.length > 1 && topics.length - 1 > topicIndex) {
         setTopicIndex(topicIndex + 1);
         if (pagesData?.Pages?.[0]?.type === "text") {
@@ -177,7 +175,10 @@ const ExploreCourse = () => {
             },
           });
         }
-        navigation.goBack();
+        navigation.navigate("ContentDetails", {
+          cid: cid,
+          from: "ExploreCourse",
+        });
       }
     };
 

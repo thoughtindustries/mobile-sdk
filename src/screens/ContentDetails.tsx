@@ -11,7 +11,11 @@ import {
 } from "react-native";
 import { get, last } from "lodash";
 import { LoadingBanner } from "../components";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useIsFocused,
+} from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, contentListType } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -31,21 +35,30 @@ type ContentDetailsScreenProps = StackNavigationProp<
 const ContentDetails = () => {
   const route = useRoute();
   const { catalogData } = useDataContext();
+  const isFocused = useIsFocused();
   const { cid } = route.params;
-  const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
+  const {
+    data: courseData,
+    loading: courseDataLoading,
+    refetch: refetchCourseData,
+  } = useCourseByIdQuery({
     variables: {
       id: cid,
     },
   });
-  const { data: pagesCompletedData, loading: pagesCompletedDataLoading } =
-    usePagesCompletedByCourseQuery({
-      variables: {
-        courseId: cid,
-      },
-    });
+  const {
+    data: pagesCompletedData,
+    loading: pagesCompletedDataLoading,
+    refetch: refetchPagesCompleted,
+  } = usePagesCompletedByCourseQuery({
+    variables: {
+      courseId: cid,
+    },
+  });
   const [catalogCourse] = useState(
     catalogData?.find((course) => course.id === cid)
   );
+  const [loading, setLoading] = useState<boolean>(false);
 
   let backToRoute = get(route, "params.from", "Home");
   const navigation = useNavigation<ContentDetailsScreenProps>();
@@ -54,6 +67,22 @@ const ContentDetails = () => {
     progress: [],
   });
   const [activeSection, setActiveSection] = useState<string>("");
+
+  useEffect(() => {
+    (async () => {
+      if (isFocused) {
+        try {
+          setLoading(true);
+          await refetchCourseData();
+          await refetchPagesCompleted();
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          console.log("ERROR: ", error);
+        }
+      }
+    })();
+  }, [isFocused]);
 
   const getLastViewedSection = () => {
     let secreads = get(content, "course.sections", []).filter(
@@ -263,45 +292,6 @@ const ContentDetails = () => {
     </View>
   );
 
-  const FloatingContainer: FC = () => {
-    const [courseComplete, setCourseComplete] = useState<boolean>(false);
-    let nextSection: any = courseData?.CourseById.sections?.[0];
-    courseData?.CourseById.sections?.some((section: any) => {
-      const lessonsRead = getSectionProgress(section.lessons);
-      const sectionProgress =
-        (lessonsRead.length / section.lessons.length) * 100;
-
-      if (sectionProgress >= 0 && sectionProgress < 100) {
-        nextSection = section;
-        return true;
-      }
-    });
-    return (
-      <View>
-        {courseData && (
-          <View style={styles(courseData).floatingFooter}>
-            <View style={styles(courseData).FlotingText}>
-              <Text style={styles(courseData).ftextItem}>UP NEXT</Text>
-              <Text style={styles(courseData).fsection}>
-                {nextSection?.title}
-              </Text>
-              <Text style={styles(courseData).ftopic}>
-                {nextSection?.lessons?.[0]?.title}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles(courseData).button}
-              onPress={() => alert("This will go to section")}
-              activeOpacity={0.7}
-            >
-              <Text style={styles(courseData).buttonText}>GO</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-    );
-  };
-
   const Nav: FC = () => (
     <TouchableOpacity style={styles(courseData).row}>
       <View
@@ -332,7 +322,7 @@ const ContentDetails = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      {courseDataLoading || pagesCompletedDataLoading ? (
+      {courseDataLoading || pagesCompletedDataLoading || loading ? (
         <View style={styles(courseData).loader}>
           <LoadingBanner />
         </View>
@@ -342,7 +332,6 @@ const ContentDetails = () => {
           <CustomReport />
           <AboutCourse />
           <SectionList />
-          <FloatingContainer />
         </View>
       )}
     </View>
