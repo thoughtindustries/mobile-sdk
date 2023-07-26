@@ -36,7 +36,7 @@ const ContentDetails = () => {
   const route = useRoute();
   const { catalogData } = useDataContext();
   const isFocused = useIsFocused();
-  const { cid } = route.params;
+  const { cid, from } = route.params;
   const {
     data: courseData,
     loading: courseDataLoading,
@@ -70,7 +70,7 @@ const ContentDetails = () => {
 
   useEffect(() => {
     (async () => {
-      if (isFocused) {
+      if (isFocused && from === "ExploreCourse") {
         try {
           setLoading(true);
           await refetchCourseData();

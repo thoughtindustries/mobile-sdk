@@ -11,23 +11,17 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { useDataContext } from "../context";
+import { placeHolderimage } from "../helpers";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
-  const { recentContent } = useDataContext();
-
-  const showDescription = (description: string | undefined, length: number) => {
-    const words = description?.split(" ");
-    const truncatedWords = words?.splice(0, length);
-    const summary = truncatedWords?.join(" ");
-    return summary;
-  };
+  const { contentData } = useDataContext();
 
   return (
     <View>
-      {recentContent?.length !== 0 && (
+      {contentData?.length !== 0 && (
         <View>
           <View style={styles.courseBox}>
             <Text style={styles.heading}>Recently Launched Courses</Text>
@@ -37,7 +31,7 @@ const RecentCourses = () => {
             style={styles.courseContainer}
             showsHorizontalScrollIndicator={false}
           >
-            {recentContent?.map((course, idx) => (
+            {contentData?.map((course, idx) => (
               <Pressable
                 key={idx}
                 onPress={() =>
@@ -51,18 +45,15 @@ const RecentCourses = () => {
                   <View style={styles.courseThumbnail}>
                     <Image
                       key={idx}
-                      source={{ uri: course.asset }}
+                      source={
+                        course.asset ? { uri: course.asset } : placeHolderimage
+                      }
                       style={styles.image}
                     />
                   </View>
                   <View style={styles.contentArea}>
                     <Text style={styles.recCourseTitle}>{course.title}</Text>
-                    <Text style={styles.courseDes}>
-                      {`${showDescription(
-                        course.description ? course.description : "",
-                        12
-                      )}...`}
-                    </Text>
+                    <Text style={styles.courseDes}>{course.description}</Text>
                   </View>
                 </View>
               </Pressable>

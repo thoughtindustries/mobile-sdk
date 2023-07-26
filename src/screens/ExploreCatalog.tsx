@@ -3,7 +3,7 @@ import {
   View,
   Text,
   Image,
-  Pressable,
+  TouchableOpacity,
   StyleSheet,
   FlatList,
   Dimensions,
@@ -52,7 +52,7 @@ const ExploreCatalog = () => {
 
   const CourseItem = ({ item }: { item: GlobalTypes.Content }) => {
     return (
-      <Pressable
+      <TouchableOpacity
         onPress={() =>
           navigation.navigate("ContentDetails", {
             cid: item.displayCourse,
@@ -72,7 +72,7 @@ const ExploreCatalog = () => {
             style={styles.courseImage}
           />
         </View>
-      </Pressable>
+      </TouchableOpacity>
     );
   };
 
