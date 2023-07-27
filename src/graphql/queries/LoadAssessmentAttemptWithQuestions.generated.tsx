@@ -1,39 +1,53 @@
-import * as Types from '../global-types';
+import * as Types from "../global-types";
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 const defaultOptions = {} as const;
 export type LoadAssessmentAttemptWithQuestionsQueryVariables = Types.Exact<{
-  assessmentAttemptId?: Types.InputMaybe<Types.Scalars['ID']>;
-  courseId?: Types.InputMaybe<Types.Scalars['ID']>;
-  id: Types.Scalars['ID'];
-  instructorAssessmentUserId?: Types.InputMaybe<Types.Scalars['ID']>;
-  linkedWorkbookId?: Types.InputMaybe<Types.Scalars['ID']>;
-  shouldShuffleAndSubset?: Types.InputMaybe<Types.Scalars['Boolean']>;
+  assessmentAttemptId?: Types.InputMaybe<Types.Scalars["ID"]>;
+  courseId?: Types.InputMaybe<Types.Scalars["ID"]>;
+  id: Types.Scalars["ID"];
+  instructorAssessmentUserId?: Types.InputMaybe<Types.Scalars["ID"]>;
+  linkedWorkbookId?: Types.InputMaybe<Types.Scalars["ID"]>;
+  shouldShuffleAndSubset?: Types.InputMaybe<Types.Scalars["Boolean"]>;
   topicType: Types.AssessmentTopicType;
 }>;
 
-
-export type LoadAssessmentAttemptWithQuestionsQuery = { __typename?: 'Query', LoadAssessmentAttemptWithQuestions: { __typename?: 'AssessmentAttempt', id: string, status: Types.AssessmentAttemptStatus, grade?: number } };
-
+export type LoadAssessmentAttemptWithQuestionsQuery = {
+  __typename?: "Query";
+  LoadAssessmentAttemptWithQuestions: {
+    __typename?: "AssessmentAttempt";
+    id: string;
+    status: Types.AssessmentAttemptStatus;
+    grade?: number;
+  };
+};
 
 export const LoadAssessmentAttemptWithQuestionsDocument = gql`
-    query LoadAssessmentAttemptWithQuestions($assessmentAttemptId: ID, $courseId: ID, $id: ID!, $instructorAssessmentUserId: ID, $linkedWorkbookId: ID, $shouldShuffleAndSubset: Boolean, $topicType: AssessmentTopicType!) {
-  LoadAssessmentAttemptWithQuestions(
-    assessmentAttemptId: $assessmentAttemptId
-    courseId: $courseId
-    id: $id
-    instructorAssessmentUserId: $instructorAssessmentUserId
-    linkedWorkbookId: $linkedWorkbookId
-    shouldShuffleAndSubset: $shouldShuffleAndSubset
-    topicType: $topicType
+  query LoadAssessmentAttemptWithQuestions(
+    $assessmentAttemptId: ID
+    $courseId: ID
+    $id: ID!
+    $instructorAssessmentUserId: ID
+    $linkedWorkbookId: ID
+    $shouldShuffleAndSubset: Boolean
+    $topicType: AssessmentTopicType!
   ) {
-    id
-    status
-    grade
+    LoadAssessmentAttemptWithQuestions(
+      assessmentAttemptId: $assessmentAttemptId
+      courseId: $courseId
+      id: $id
+      instructorAssessmentUserId: $instructorAssessmentUserId
+      linkedWorkbookId: $linkedWorkbookId
+      shouldShuffleAndSubset: $shouldShuffleAndSubset
+      topicType: $topicType
+    ) {
+      id
+      status
+      grade
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useLoadAssessmentAttemptWithQuestionsQuery__
@@ -57,14 +71,37 @@ export const LoadAssessmentAttemptWithQuestionsDocument = gql`
  *   },
  * });
  */
-export function useLoadAssessmentAttemptWithQuestionsQuery(baseOptions: Apollo.QueryHookOptions<LoadAssessmentAttemptWithQuestionsQuery, LoadAssessmentAttemptWithQuestionsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LoadAssessmentAttemptWithQuestionsQuery, LoadAssessmentAttemptWithQuestionsQueryVariables>(LoadAssessmentAttemptWithQuestionsDocument, options);
-      }
-export function useLoadAssessmentAttemptWithQuestionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LoadAssessmentAttemptWithQuestionsQuery, LoadAssessmentAttemptWithQuestionsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LoadAssessmentAttemptWithQuestionsQuery, LoadAssessmentAttemptWithQuestionsQueryVariables>(LoadAssessmentAttemptWithQuestionsDocument, options);
-        }
-export type LoadAssessmentAttemptWithQuestionsQueryHookResult = ReturnType<typeof useLoadAssessmentAttemptWithQuestionsQuery>;
-export type LoadAssessmentAttemptWithQuestionsLazyQueryHookResult = ReturnType<typeof useLoadAssessmentAttemptWithQuestionsLazyQuery>;
-export type LoadAssessmentAttemptWithQuestionsQueryResult = Apollo.QueryResult<LoadAssessmentAttemptWithQuestionsQuery, LoadAssessmentAttemptWithQuestionsQueryVariables>;
+export function useLoadAssessmentAttemptWithQuestionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    LoadAssessmentAttemptWithQuestionsQuery,
+    LoadAssessmentAttemptWithQuestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    LoadAssessmentAttemptWithQuestionsQuery,
+    LoadAssessmentAttemptWithQuestionsQueryVariables
+  >(LoadAssessmentAttemptWithQuestionsDocument, options);
+}
+export function useLoadAssessmentAttemptWithQuestionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LoadAssessmentAttemptWithQuestionsQuery,
+    LoadAssessmentAttemptWithQuestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    LoadAssessmentAttemptWithQuestionsQuery,
+    LoadAssessmentAttemptWithQuestionsQueryVariables
+  >(LoadAssessmentAttemptWithQuestionsDocument, options);
+}
+export type LoadAssessmentAttemptWithQuestionsQueryHookResult = ReturnType<
+  typeof useLoadAssessmentAttemptWithQuestionsQuery
+>;
+export type LoadAssessmentAttemptWithQuestionsLazyQueryHookResult = ReturnType<
+  typeof useLoadAssessmentAttemptWithQuestionsLazyQuery
+>;
+export type LoadAssessmentAttemptWithQuestionsQueryResult = Apollo.QueryResult<
+  LoadAssessmentAttemptWithQuestionsQuery,
+  LoadAssessmentAttemptWithQuestionsQueryVariables
+>;

@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
+import { placeHolderimage } from "../helpers";
 
 interface HeroProps {
   asset: string;
@@ -9,7 +10,7 @@ interface HeroProps {
 const Hero: FC<HeroProps> = ({ asset, children }) => {
   return (
     <ImageBackground
-      source={{ uri: asset }}
+      source={asset ? { uri: asset } : placeHolderimage}
       resizeMode="cover"
       style={styles.hero}
     >

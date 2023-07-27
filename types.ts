@@ -30,7 +30,7 @@ export type RootStackParamList = {
     section: string;
     lesson: string;
     progress: number;
-    topics?: [];
+    topics: topicType[];
     from: string;
   };
 };
@@ -60,6 +60,7 @@ export type courseListType = {
 };
 
 export type topicType = {
+  id: string;
   language?: null | string;
   label: string;
   title?: string;

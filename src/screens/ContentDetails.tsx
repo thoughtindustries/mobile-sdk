@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,11 @@ import {
 } from "react-native";
 import { get, last } from "lodash";
 import { LoadingBanner } from "../components";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useIsFocused,
+} from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, contentListType } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -31,21 +35,30 @@ type ContentDetailsScreenProps = StackNavigationProp<
 const ContentDetails = () => {
   const route = useRoute();
   const { catalogData } = useDataContext();
-  const { cid } = route.params;
-  const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
+  const isFocused = useIsFocused();
+  const { cid, from } = route.params;
+  const {
+    data: courseData,
+    loading: courseDataLoading,
+    refetch: refetchCourseData,
+  } = useCourseByIdQuery({
     variables: {
       id: cid,
     },
   });
-  const { data: pagesCompletedData, loading: pagesCompletedDataLoading } =
-    usePagesCompletedByCourseQuery({
-      variables: {
-        courseId: cid,
-      },
-    });
+  const {
+    data: pagesCompletedData,
+    loading: pagesCompletedDataLoading,
+    refetch: refetchPagesCompleted,
+  } = usePagesCompletedByCourseQuery({
+    variables: {
+      courseId: cid,
+    },
+  });
   const [catalogCourse] = useState(
-    catalogData?.find((course) => course.id === cid)
+    catalogData?.find((course) => course.displayCourse === cid)
   );
+  const [loading, setLoading] = useState<boolean>(false);
 
   let backToRoute = get(route, "params.from", "Home");
   const navigation = useNavigation<ContentDetailsScreenProps>();
@@ -54,6 +67,22 @@ const ContentDetails = () => {
     progress: [],
   });
   const [activeSection, setActiveSection] = useState<string>("");
+
+  useEffect(() => {
+    (async () => {
+      if (isFocused && from === "ExploreCourse") {
+        try {
+          setLoading(true);
+          await refetchCourseData();
+          await refetchPagesCompleted();
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+          console.log("ERROR: ", error);
+        }
+      }
+    })();
+  }, [isFocused]);
 
   const getLastViewedSection = () => {
     let secreads = get(content, "course.sections", []).filter(
@@ -83,6 +112,13 @@ const ContentDetails = () => {
     return lessonsRead;
   };
 
+  const getCourseKind = (kind: string | undefined) => {
+    if (typeof kind !== "string" || kind.length === 0) {
+      return kind;
+    }
+    return kind.charAt(0).toUpperCase() + kind.slice(1);
+  };
+
   useEffect(() => {
     const lastId = getLastViewedSection();
     setActiveSection(
@@ -90,7 +126,7 @@ const ContentDetails = () => {
     );
   }, [content]);
 
-  const CustomReport = () => (
+  const CustomReport: FC = () => (
     <View style={styles(courseData).reportRow}>
       <View style={styles(courseData).reportRightBox}>
         <Text style={styles(courseData).courseTitle}>
@@ -113,11 +149,12 @@ const ContentDetails = () => {
     </View>
   );
 
-  const AboutCourse = () => (
+  const AboutCourse: FC = () => (
     <View style={styles(courseData).aboutSection}>
-      <Text
-        style={styles(courseData).courseSubTitle}
-      >{`About this ${courseData?.CourseById?.courseGroup?.contentType?.label}`}</Text>
+      <Text style={styles(courseData).courseSubTitle}>{`About this ${
+        courseData?.CourseById?.courseGroup?.contentType?.label ||
+        getCourseKind(catalogCourse?.kind)
+      }`}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles(courseData).courseDesc}>
           {courseData?.CourseById.courseGroup?.description ||
@@ -135,7 +172,7 @@ const ContentDetails = () => {
     }
   };
 
-  const SectionProgress = ({ percent }: { percent: number }) => (
+  const SectionProgress: FC<{ percent: number }> = ({ percent }) => (
     <View style={styles(courseData).sectionProgress}>
       <Animated.View
         style={{
@@ -147,19 +184,13 @@ const ContentDetails = () => {
     </View>
   );
 
-  const LessonView = ({
-    idx,
-    lesson,
-    lessonsRead,
-    section,
-    secProgress,
-  }: {
+  const LessonView: FC<{
     idx: number;
     lesson: { topics: []; title: string };
     lessonsRead: string[];
     section: string;
     secProgress: number;
-  }) => {
+  }> = ({ idx, lesson, lessonsRead, section, secProgress }) => {
     const lessonRead = lesson.topics.some((topic: any) =>
       lessonsRead.includes(topic.id)
     );
@@ -193,14 +224,10 @@ const ContentDetails = () => {
     );
   };
 
-  const SectionView = ({
+  const SectionView: FC<{ id: string; title: string; lessons: [] }> = ({
     id,
     title,
     lessons,
-  }: {
-    id: string;
-    title: string;
-    lessons: [];
   }) => {
     const lessonsRead = getSectionProgress(lessons);
     const sectionProgress = (lessonsRead.length / lessons.length) * 100;
@@ -256,7 +283,7 @@ const ContentDetails = () => {
     );
   };
 
-  const SectionList = () => (
+  const SectionList: FC = () => (
     <View style={styles(courseData).sectionList}>
       {courseData?.CourseById && (
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -273,39 +300,7 @@ const ContentDetails = () => {
     </View>
   );
 
-  const FloatingContainer = () => {
-    const sectionId = getLastViewedSection();
-    let section: any = courseData?.CourseById.sections?.[0];
-    if (sectionId != "") {
-      section = courseData?.CourseById?.sections?.find(
-        (s: { id: string }) => s.id === sectionId
-      );
-    }
-    return (
-      <View>
-        {courseData && (
-          <View style={styles(courseData).floatingFooter}>
-            <View style={styles(courseData).FlotingText}>
-              <Text style={styles(courseData).ftextItem}>UP NEXT</Text>
-              <Text style={styles(courseData).fsection}>{section?.title}</Text>
-              <Text style={styles(courseData).ftopic}>
-                {section?.lessons?.[0]?.title}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles(courseData).button}
-              onPress={() => alert("This will go to section")}
-              activeOpacity={0.7}
-            >
-              <Text style={styles(courseData).buttonText}>GO</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-    );
-  };
-
-  const Nav = () => (
+  const Nav: FC = () => (
     <TouchableOpacity style={styles(courseData).row}>
       <View
         style={{
@@ -335,7 +330,7 @@ const ContentDetails = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      {courseDataLoading || pagesCompletedDataLoading ? (
+      {courseDataLoading || pagesCompletedDataLoading || loading ? (
         <View style={styles(courseData).loader}>
           <LoadingBanner />
         </View>
@@ -345,7 +340,6 @@ const ContentDetails = () => {
           <CustomReport />
           <AboutCourse />
           <SectionList />
-          <FloatingContainer />
         </View>
       )}
     </View>
@@ -542,13 +536,13 @@ const styles = (data: any) =>
     },
     ftextItem: {
       color: "#D4D4D8",
-      fontSize: 10,
+      fontSize: 12,
       lineHeight: 12,
       fontFamily: "Inter_700Bold",
     },
     fsection: {
-      fontSize: 10,
-      lineHeight: 12,
+      fontSize: 12,
+      lineHeight: 16,
       fontFamily: "Inter_700Bold",
       color: "#ffffff",
     },

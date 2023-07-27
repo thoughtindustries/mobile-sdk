@@ -16,6 +16,7 @@ import ResourceControl from "./ResourceControl";
 import CourseQuiz from "./CourseQuiz";
 import LoadingBanner from "./LoadingBanner";
 import Hero from "./Hero";
+import QuizQuestion from "./QuizQuestion";
 
 export {
   Button,
@@ -36,4 +37,5 @@ export {
   CourseQuiz,
   LoadingBanner,
   Hero,
+  QuizQuestion,
 };

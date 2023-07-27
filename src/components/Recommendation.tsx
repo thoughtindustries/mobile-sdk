@@ -11,25 +11,32 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useDataContext } from "../context";
+import { placeHolderimage } from "../helpers";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
 const Recommendation = () => {
   const { catalogData, contentData } = useDataContext();
   const navigation = useNavigation<HomeScreenProps>();
+  const recommendations = catalogData?.filter(
+    (catalogItem) =>
+      !contentData?.some(
+        (contentItem) => contentItem.id === catalogItem.displayCourse
+      )
+  );
 
-  const CourseList = () => (
+  const CatalogList = () => (
     <ScrollView
       horizontal={true}
       style={styles.courseContainer}
       showsHorizontalScrollIndicator={false}
     >
-      {catalogData?.map((course, idx) => (
+      {recommendations?.map((course, idx) => (
         <TouchableOpacity
           key={idx}
           onPress={() =>
             navigation.navigate("ContentDetails", {
-              cid: course?.id || "",
+              cid: course?.displayCourse || "",
               from: "Home",
             })
           }
@@ -37,7 +44,7 @@ const Recommendation = () => {
           <View style={styles.recContentBox}>
             <ImageBackground
               key={idx}
-              source={{ uri: course.asset }}
+              source={course.asset ? { uri: course.asset } : placeHolderimage}
               resizeMode="cover"
               style={styles.imageBackground}
               imageStyle={styles.image}
@@ -52,48 +59,12 @@ const Recommendation = () => {
     </ScrollView>
   );
 
-  const ContentList = () => (
-    <ScrollView
-      horizontal={true}
-      style={styles.courseContainer}
-      showsHorizontalScrollIndicator={false}
-    >
-      {contentData
-        ?.filter((item) => item.contentTypeLabel === "Course")
-        .map((content, idx) => (
-          <TouchableOpacity
-            key={idx}
-            onPress={() =>
-              navigation.navigate("ContentDetails", {
-                cid: content.displayCourse || "",
-                from: "Home",
-              })
-            }
-          >
-            <View style={styles.recContentBox}>
-              <ImageBackground
-                key={idx}
-                source={{ uri: content.asset }}
-                resizeMode="cover"
-                style={styles.imageBackground}
-                imageStyle={styles.image}
-              >
-                <View style={styles.bannerArea}>
-                  <Text style={styles.courseTitle}>{content.title}</Text>
-                </View>
-              </ImageBackground>
-            </View>
-          </TouchableOpacity>
-        ))}
-    </ScrollView>
-  );
-
   return (
     <View>
       <View style={styles.courseBox}>
         <Text style={styles.heading}>Recommendations</Text>
       </View>
-      {contentData?.length !== 0 ? <ContentList /> : <CourseList />}
+      <CatalogList />
     </View>
   );
 };

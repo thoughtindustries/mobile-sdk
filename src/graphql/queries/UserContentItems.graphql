@@ -17,5 +17,6 @@ query UserContentItems(
     title
     customFields
     kind
+    description
   }
 }

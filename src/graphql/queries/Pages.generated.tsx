@@ -52,7 +52,7 @@ export type PagesQuery = {
     | { __typename?: "SurveyPage" }
     | { __typename?: "TallyPage" }
     | { __typename?: "TestPage" }
-    | { __typename?: "TextPage" }
+    | { __typename?: "TextPage"; title?: string }
     | { __typename?: "VideoPage" }
     | { __typename?: "WorkbookPage" }
   >;
@@ -82,6 +82,122 @@ export const PagesDocument = gql`
           pdfAssetTitleSecondary
           pdfAssetUrl
         }
+      }
+      ... on TextPage {
+        title
+        body
+        type
+      }
+      ... on VideoPage {
+        title
+        asset
+        body
+        preTextBlock
+        type
+      }
+      ... on QuizPage {
+        accessibilityAudioAsset
+        accessibilityAudioAssetTitle
+        accessibilityAudioAssetUrl
+        allowToResume
+        completionTimeSeconds
+        contentDescription
+        contentEstimate
+        contentTime
+        continueAfterTimerExpires
+        displayAllHints
+        displayAttemptNumbers
+        editableByChildren
+        failMessage
+        hintControlEnabled
+        id
+        indentationLevel
+        instructorAssessment
+        isGraded
+        maxAttempts
+        minPassingPercent
+        navigationDisabled
+        questions {
+          additionalContent
+          body
+          choices {
+            altText
+            asset
+            choiceId
+            correct
+            points
+            response
+            value
+          }
+          fileSubmissionAsset
+          gradedAsCorrect
+          hasChoices
+          isBooleanChoice
+          isEssay
+          isFileSubmission
+          isImageComparison
+          isLikert
+          isMultipleChoice
+          isOpenEnded
+          isSelectBoxes
+          isTable
+          mustSelectAllCorrectChoices
+          openEndedResponse
+          parentQuestion
+          placeholder
+          postText
+          postText2
+          preText
+          preText2
+          preselectedChoices {
+            choiceId
+          }
+          questionId
+          questionCategoryId
+          questionType
+          required
+          response
+          selectedChoice {
+            choiceId
+          }
+          shouldCheckAnswers
+          shouldDisplayOnResults
+          table {
+            headers {
+              locked
+              value
+              weight
+            }
+            rows {
+              locked
+              value
+              weight
+            }
+          }
+          tableResponse {
+            headers {
+              locked
+              value
+              weight
+            }
+            rows {
+              locked
+              value
+              weight
+            }
+          }
+          type
+        }
+        passMessage
+        preventProgression
+        questionSkipEnabled
+        showAnswerAfterPass
+        startMessage
+        timeLimitInSeconds
+        timePerQuestionInSeconds
+        timerEnabled
+        title
+        type
       }
     }
   }

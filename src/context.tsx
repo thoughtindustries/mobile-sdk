@@ -53,7 +53,6 @@ export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
         page: 1,
         labels: [],
         values: [],
-        contentTypes: "Course",
       },
     });
 

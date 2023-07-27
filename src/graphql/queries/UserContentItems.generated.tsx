@@ -46,6 +46,7 @@ export const UserContentItemsDocument = gql`
       title
       customFields
       kind
+      description
     }
   }
 `;
