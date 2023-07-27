@@ -56,7 +56,7 @@ const ContentDetails = () => {
     },
   });
   const [catalogCourse] = useState(
-    catalogData?.find((course) => course.id === cid)
+    catalogData?.find((course) => course.displayCourse === cid)
   );
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -112,6 +112,13 @@ const ContentDetails = () => {
     return lessonsRead;
   };
 
+  const getCourseKind = (kind: string | undefined) => {
+    if (typeof kind !== "string" || kind.length === 0) {
+      return kind;
+    }
+    return kind.charAt(0).toUpperCase() + kind.slice(1);
+  };
+
   useEffect(() => {
     const lastId = getLastViewedSection();
     setActiveSection(
@@ -144,9 +151,10 @@ const ContentDetails = () => {
 
   const AboutCourse: FC = () => (
     <View style={styles(courseData).aboutSection}>
-      <Text
-        style={styles(courseData).courseSubTitle}
-      >{`About this ${courseData?.CourseById?.courseGroup?.contentType?.label}`}</Text>
+      <Text style={styles(courseData).courseSubTitle}>{`About this ${
+        courseData?.CourseById?.courseGroup?.contentType?.label ||
+        getCourseKind(catalogCourse?.kind)
+      }`}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles(courseData).courseDesc}>
           {courseData?.CourseById.courseGroup?.description ||

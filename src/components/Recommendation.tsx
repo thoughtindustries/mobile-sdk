@@ -36,7 +36,7 @@ const Recommendation = () => {
           key={idx}
           onPress={() =>
             navigation.navigate("ContentDetails", {
-              cid: course?.id || "",
+              cid: course?.displayCourse || "",
               from: "Home",
             })
           }
