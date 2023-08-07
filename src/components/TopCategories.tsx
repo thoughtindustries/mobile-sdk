@@ -21,10 +21,10 @@ const TopCategories = () => {
     <View>
       <View style={styles.topCatBox}>
         <Text style={styles.heading}>Top Categories</Text>
-        <Link
+{/*         <Link
           title="See All"
           onPress={() => navigation.navigate("TopCategories")}
-        />
+        /> */}
       </View>
       <ScrollView
         horizontal={true}
