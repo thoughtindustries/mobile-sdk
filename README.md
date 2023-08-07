@@ -1,8 +1,15 @@
 # React Native Mobile SDK
 
+📚 [Thought Industries Developer Site](https://developer.thoughtindustries.com/build/developer-guide/) | 🗣 [Discord](https://discord.gg/cTJBX4muVn) | 📝 [GraphQL Docs](https://thoughtindustries.github.io/helium-graphql/) | 
+
 ## About
 
 This repository contains code for the Thought Industries Mobile SDK. You can use this SDK as a starting point for creating a mobile app powered by the Thought Industries' APIs.
+
+## Features
+The mobile SDK is fully native and utilizes no iframes. It allows users to sign up, access a course, watch videos, and read articles. It also allows users to download articles so they can be read later when the user doesn’t have internet access. Users can also see which courses they currently have access to and view the course catalog.
+
+The Mobile SDK is meant to serve as a reference/starting point for building your own application and is not meant to include every Ti capability. As an SDK, you are free to build and customize your application to meet your specific business needs utilizing all of the Ti platforms API/GraphQL capabilities along with native features on the mobile device’s operating system.
 
 ## Getting Started
 
