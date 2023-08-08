@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
   page: {
     marginHorizontal: 30,
     height: Dimensions.get("window").height - 220,
-    Width:"100%"
   },
 });
 

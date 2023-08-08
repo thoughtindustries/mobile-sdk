@@ -6,7 +6,6 @@ import {
   ImageBackground,
   TouchableOpacity,
   Dimensions,
-  useWindowDimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -19,7 +18,6 @@ type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 const Banner = () => {
   const { recentContent, contentData, catalogData } = useDataContext();
   const navigation = useNavigation<HomeScreenProps>();
-  const {height, width} = useWindowDimensions();
   const content = recentContent?.[0]?.id
     ? recentContent
     : contentData?.[0]?.id
@@ -45,14 +43,12 @@ const Banner = () => {
                   }
                 : placeHolderimage
             }
-            resizeMode="contain"
+            resizeMode="cover"
             imageStyle={styles.image}
           >
             <View style={styles.bannerArea}>
-              <View style={styles.bannerBlock}>
-                <Text style={styles.bannerTitle}>{content?.[0].title}</Text>
-                <Text style={styles.bannerText}>{content?.[0].description}</Text>
-              </View>
+              <Text style={styles.bannerTitle}>{content?.[0].title}</Text>
+              <Text style={styles.bannerText}>{content?.[0].description}</Text>
             </View>
           </ImageBackground>
         </View>
@@ -64,45 +60,30 @@ const Banner = () => {
 const styles = StyleSheet.create({
   bannerContainer: {
     borderRadius: 10,
-    
   },
   bannerArea: {
     paddingTop:
       Dimensions.get("window").height < 667
         ? (Dimensions.get("window").height / 440) * 50
         : (Dimensions.get("window").height / 440) * 100,
+    padding: 32,
     justifyContent: "flex-end",
     fontFamily: "Poppins_400Regular",
-  },
-  bannerBlock:{
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    marginTop: -80,
-    padding:15,
-
   },
   bannerTitle: {
     fontSize: (Dimensions.get("window").width / 440) * 24,
     lineHeight: 36,
     fontFamily: "Poppins_700Bold",
     color: "#fff",
-    
   },
   bannerText: {
     fontSize: (Dimensions.get("window").width / 440) * 16,
     lineHeight: 24,
     fontFamily: "Poppins_400Regular",
-    color:"#ffffff",
-    
+    color: "#ccc",
   },
   image: {
     borderRadius: 8,
-    justifyContent: 'center',
-    flex:1,
-    alignItems: 'center',
-    width: "100%",
-    height:"auto",
-    resizeMode:"contain"
-    
   },
 });
 

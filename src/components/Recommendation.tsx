@@ -45,7 +45,7 @@ const Recommendation = () => {
             <ImageBackground
               key={idx}
               source={course.asset ? { uri: course.asset } : placeHolderimage}
-              resizeMode="contain"
+              resizeMode="cover"
               style={styles.imageBackground}
               imageStyle={styles.image}
             >
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
   },
   bannerArea: {
     height: 282,
+    padding: 32,
     justifyContent: "flex-end",
     fontFamily: "Poppins_400Regular",
   },
@@ -106,9 +107,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
     justifyContent: "flex-start",
-    lineHeight: 30,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    padding:15,
+    lineHeight: 50,
   },
   image: {
     borderRadius: 8,
