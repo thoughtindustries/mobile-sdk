@@ -21,7 +21,7 @@ import {
 } from "lodash";
 import striptags from "striptags";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { questionChoice } from "../../types";
+import { QuestionChoice } from "../../types";
 import tiGql from "../helpers/TIGraphQL";
 import { VictoryPie } from "victory-native";
 import { useLoadAssessmentAttemptWithQuestionsQuery } from "../graphql";
@@ -41,7 +41,6 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
   });
 
   const [startQuiz, setStartQuiz] = useState<boolean>(false);
-
   const [loading, setLoading] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
@@ -246,13 +245,13 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
   };
 
   const renderChoice = (
-    choices: questionChoice[],
+    choices: QuestionChoice[],
     isMulti: boolean,
     type: string
   ) => {
     return (
       <>
-        {choices.map((choice: questionChoice, idx: number) => (
+        {choices.map((choice: QuestionChoice, idx: number) => (
           <Pressable onPress={() => saveAttempt(choice.value, isMulti)}>
             <View
               key={choice.choiceId}
@@ -339,58 +338,6 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
       </View>
     </View>
   );
-
-  const QuizQuestions: FC = () => {
-    const [index, setIndex] = useState<number>(0);
-    const question = quiz?.questions[index];
-
-    return (
-      <View>
-        {question.preText && <Text>{striptags(question.preText)}</Text>}
-        <Text style={styles.questionTitle}>{striptags(question.body)}</Text>
-        {question.postText && (
-          <Text style={styles.questionText}>
-            {striptags(question.postText)}
-          </Text>
-        )}
-      </View>
-    );
-
-    return (
-      // <View>
-      //   <View style={styles.questionBox}>
-      //     {qIndex < quiz?.questions.length && (
-      //       <View
-      //         style={
-      //           quiz?.questionSkipEnabled && get(attempts, qIndex, []).length > 0
-      //             ? styles.row
-      //             : {}
-      //         }
-      //       >
-      //         {quiz?.questionSkipEnabled && (
-      //           <Button
-      //             title="Skip Question"
-      //             mode={2}
-      //             onPress={() => setQIndex(qIndex + 1)}
-      //           />
-      //         )}
-
-      //         {get(attempts, qIndex, []).length > 0 && (
-      //           <Button title="Next Question" onPress={goNextQuestion} />
-      //         )}
-      //       </View>
-      //     )}
-
-      //     {postText()}
-
-      //     {qIndex >= quiz?.questions.length && (
-      //       <Button title="See Results" onPress={goNextQuestion} />
-      //     )}
-      //   </View>
-      // </View>
-      null
-    );
-  };
 
   const getFormattedTime = (t: number) => {
     let suffix: string = "seconds";

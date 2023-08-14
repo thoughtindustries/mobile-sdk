@@ -96,7 +96,7 @@ export type userRecentContentType = {
   description: string;
 };
 
-export type questionChoice = {
+export type QuestionChoice = {
   altText?: string;
   asset?: string;
   choiceId?: string;
