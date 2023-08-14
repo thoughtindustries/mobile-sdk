@@ -75,7 +75,9 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
                 style={styles.image}
               />
             )}
-            <Text>{choice.value}</Text>
+            <Text style={{ marginLeft: -4 }}>{`${idx + 1}. ${
+              choice.value
+            }`}</Text>
             {answer.correct !== undefined &&
               answer.idx === idx &&
               choice.response && (
@@ -83,7 +85,7 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
                   style={{
                     color: "#737373",
                     opacity: 0.5,
-                    marginBottom: -14,
+                    marginBottom: -16,
                   }}
                 >
                   <RenderHtml
