@@ -20,10 +20,9 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
     correct: boolean | undefined;
     idx: number;
   }>({ correct: undefined, idx: 0 });
-
+  const { width } = useWindowDimensions();
   const question = quiz?.questions[index];
   const questionType = question?.questionType;
-  let component;
 
   const handleAnswer = (idx: number) => {
     setAnswer({ correct: question.choices[idx].correct, idx: idx });
@@ -37,109 +36,6 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
 
   const handleSubmission = () => {};
 
-  switch (questionType) {
-    case "imageComparison":
-      component = (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ marginBottom: showButton ? 80 : 15 }}
-        >
-          {question?.choices.map((choice: QuestionChoice, idx: number) => (
-            <TouchableOpacity
-              key={choice.choiceId}
-              onPress={() => handleAnswer(idx)}
-              disabled={answer.correct !== undefined}
-              style={{
-                ...styles.imageComparison,
-                backgroundColor:
-                  answer.correct === true && answer.idx === idx
-                    ? "#DCE5DF"
-                    : answer.correct === false && answer.idx === idx
-                    ? "#F7DADD"
-                    : '"#FCFCFF"',
-                borderColor:
-                  answer.correct === true && answer.idx === idx
-                    ? "#326D3C"
-                    : answer.correct === false && answer.idx === idx
-                    ? "#DC2626"
-                    : "#E5E7EB",
-              }}
-            >
-              <ImageBackground
-                source={{ uri: choice.asset }}
-                resizeMode="cover"
-                style={styles.image}
-              />
-              <Text style={{ marginBottom: 10 }}>{choice.value}</Text>
-              {answer.correct !== undefined && answer.idx === idx && (
-                <Text style={{ color: "#737373" }}>
-                  {answer.correct
-                    ? "Correct!"
-                    : "Oops! This is not the correct answer."}
-                </Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      );
-      break;
-    case "multipleChoice":
-      const { width } = useWindowDimensions();
-      component = (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ marginBottom: showButton ? 80 : 15 }}
-        >
-          {question?.choices.map((choice: QuestionChoice, idx: number) => (
-            <TouchableOpacity
-              key={choice.choiceId}
-              onPress={() => handleAnswer(idx)}
-              disabled={answer.correct !== undefined}
-              style={{
-                ...styles.imageComparison,
-                backgroundColor:
-                  answer.correct === true && answer.idx === idx
-                    ? "#DCE5DF"
-                    : answer.correct === false && answer.idx === idx
-                    ? "#F7DADD"
-                    : '"#FCFCFF"',
-                borderColor:
-                  answer.correct === true && answer.idx === idx
-                    ? "#326D3C"
-                    : answer.correct === false && answer.idx === idx
-                    ? "#DC2626"
-                    : "#E5E7EB",
-              }}
-            >
-              <Text key={choice.choiceId}>{choice.value}</Text>
-              {answer.correct !== undefined &&
-                answer.idx === idx &&
-                choice.response && (
-                  <Text
-                    style={{
-                      color: "#737373",
-                      opacity: 0.5,
-                      marginBottom: -14,
-                    }}
-                  >
-                    <RenderHtml
-                      source={{
-                        html: choice.response,
-                      }}
-                      contentWidth={width}
-                    />
-                  </Text>
-                )}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      );
-      break;
-    default:
-      component = <View />;
-      break;
-  }
-
   return (
     <View style={styles.container}>
       {question?.preText && <Text>{striptags(question?.preText)}</Text>}
@@ -147,7 +43,60 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
       {question?.postText && (
         <Text style={styles.questionText}>{striptags(question?.postText)}</Text>
       )}
-      {component}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ marginBottom: showButton ? 80 : 15 }}
+      >
+        {question?.choices.map((choice: QuestionChoice, idx: number) => (
+          <TouchableOpacity
+            key={choice.choiceId}
+            onPress={() => handleAnswer(idx)}
+            disabled={answer.correct !== undefined}
+            style={{
+              ...styles.imageComparison,
+              backgroundColor:
+                answer.correct === true && answer.idx === idx
+                  ? "#DCE5DF"
+                  : answer.correct === false && answer.idx === idx
+                  ? "#F7DADD"
+                  : '"#FCFCFF"',
+              borderColor:
+                answer.correct === true && answer.idx === idx
+                  ? "#326D3C"
+                  : answer.correct === false && answer.idx === idx
+                  ? "#DC2626"
+                  : "#E5E7EB",
+            }}
+          >
+            {questionType === "imageComparison" && (
+              <ImageBackground
+                source={{ uri: choice.asset }}
+                resizeMode="cover"
+                style={styles.image}
+              />
+            )}
+            <Text>{choice.value}</Text>
+            {answer.correct !== undefined &&
+              answer.idx === idx &&
+              choice.response && (
+                <Text
+                  style={{
+                    color: "#737373",
+                    opacity: 0.5,
+                    marginBottom: -14,
+                  }}
+                >
+                  <RenderHtml
+                    source={{
+                      html: choice.response,
+                    }}
+                    contentWidth={width}
+                  />
+                </Text>
+              )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
       {showButton && (
         <View style={{ position: "absolute", bottom: 50, width: "100%" }}>
           <Button
