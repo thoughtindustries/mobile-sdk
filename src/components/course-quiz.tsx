@@ -515,11 +515,6 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
           </View>
         </View>
       )}
-      {quiz?.questions?.length !== 0 && index === 0 && (
-        <Button title="Start Quiz" onPress={() => setIndex(1)} />
-      )}
-
-      {!loading && index > 0 && !showResult && renderQuestion()}
 
       {loading && (
         <View style={styles.searching}>

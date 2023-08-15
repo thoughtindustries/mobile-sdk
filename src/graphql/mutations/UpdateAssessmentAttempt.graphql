@@ -1,0 +1,8 @@
+mutation UpdateAssessmentAttempt($assessmentAttempt: AssessmentAttemptInput) {
+  UpdateAssessmentAttempt(assessmentAttempt: $assessmentAttempt) {
+    id
+    grade
+    answeredQuestionsCount
+    correctQuestionsCount
+  }
+}

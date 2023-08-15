@@ -31,6 +31,7 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
 
   const handleNextQuestion = () => {
     setIndex(index + 1);
+    setAnswer({ correct: undefined, idx: index });
     setShowButton(false);
   };
 
