@@ -14,7 +14,7 @@ import { Logo, Button, Link, Message } from "../components";
 import AppStyle from "../../AppStyle";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
-import Success from "./Success";
+import Success from "./success";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";

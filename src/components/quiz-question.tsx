@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import striptags from "striptags";
 import { QuestionChoice } from "../../types";
-import Button from "./Button";
+import Button from "./button";
 import RenderHtml from "react-native-render-html";
 
 const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {

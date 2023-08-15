@@ -7,7 +7,7 @@ import {
   TextInput,
   ImageBackground,
 } from "react-native";
-import { Button, Loader, QuizQuestion } from "../components";
+import { Button, Loader, QuizQuestion } from ".";
 import {
   get,
   filter,

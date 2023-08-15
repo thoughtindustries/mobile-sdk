@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Checkbox from "./Checkbox";
+import Checkbox from "./checkbox";
 import { FilterContext } from "../context";
 import { GlobalTypes } from "../graphql";
 

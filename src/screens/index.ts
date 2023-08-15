@@ -1,18 +1,18 @@
-import Onboarding from "./Onboarding";
-import Login from "./Login";
-import Registration from "./Registration";
-import Success from "./Success";
-import Offline from "./Offline";
-import Home from "./Home";
-import MyLearnings from "./MyLearnings";
-import Account from "./Account";
-import ProfileEdit from "./ProfileEdit";
-import SplashScreen from "./SplashScreen";
-import ExploreCatalog from "./ExploreCatalog";
-import CourseDetails from "./CourseDetails";
-import ContentDetails from "./ContentDetails";
-import TopCategories from "./TopCategories";
-import ExploreCourse from "./ExploreCourse";
+import Onboarding from "./onboarding";
+import Login from "./login";
+import Registration from "./registration";
+import Success from "./success";
+import Offline from "./offline";
+import Home from "./home";
+import MyLearnings from "./my-learnings";
+import Account from "./account";
+import ProfileEdit from "./profile-edit";
+import SplashScreen from "./splash-screen";
+import ExploreCatalog from "./explore-catalog";
+import CourseDetails from "./course-details";
+import ContentDetails from "./content-details";
+import TopCategories from "./top-categories";
+import ExploreCourse from "./explore-course";
 
 export {
   Onboarding,

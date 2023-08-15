@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Logo, Button, Message } from "../components";
-import Success from "./Success";
+import Success from "./success";
 import AppStyle from "../../AppStyle";
 import tiApiObj from "../helpers/TIApi";
 import { TI_INSTANCE_NAME } from "@env";
