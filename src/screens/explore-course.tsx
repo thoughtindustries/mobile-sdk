@@ -12,6 +12,7 @@ import {
   useUpdateTopicAndCourseProgressMutation,
 } from "../graphql";
 import RenderHtml from "react-native-render-html";
+import { QuizProvider } from "../test";
 
 type ExploreCourseProps = StackNavigationProp<
   RootStackParamList,
@@ -145,7 +146,9 @@ const ExploreCourse = () => {
         ) : pagesData?.Pages?.[0]?.type === "video" ? (
           <VideoPage />
         ) : (
-          <CourseQuiz quiz={pagesData?.Pages?.[0]} courseid={cid} />
+          <QuizProvider>
+            <CourseQuiz quiz={pagesData?.Pages?.[0]} courseid={cid} />
+          </QuizProvider>
         )}
       </View>
     </View>

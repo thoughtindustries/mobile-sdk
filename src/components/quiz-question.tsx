@@ -13,6 +13,7 @@ import { QuestionChoice } from "../../types";
 import Button from "./button";
 import RenderHtml from "react-native-render-html";
 import { useUpdateAssessmentAttemptMutation } from "../graphql";
+import { useQuizContext } from "../test";
 
 interface Answer {
   value: string | undefined;
@@ -22,10 +23,10 @@ interface Answer {
 
 interface Quiz {
   quiz: any;
-  attemptId: string | undefined;
 }
 
-const QuizQuestion = ({ quiz, attemptId }: Quiz) => {
+const QuizQuestion = ({ quiz }: Quiz) => {
+  const { attemptId, setResult } = useQuizContext();
   const [index, setIndex] = useState<number>(0);
   const [showButton, setShowButton] = useState<boolean>(false);
   const [attempt, setAttempt] = useState<Answer>({
@@ -85,13 +86,18 @@ const QuizQuestion = ({ quiz, attemptId }: Quiz) => {
   const handleSubmission = async () => {
     try {
       setLoading(true);
-      await updateAssessmentAttemptMutation({
+      const { data } = await updateAssessmentAttemptMutation({
         variables: {
           assessmentAttempt: {
             id: attemptId,
             status: "finished",
           },
         },
+      });
+      setResult({
+        grade: data?.UpdateAssessmentAttempt.grade,
+        answered: data?.UpdateAssessmentAttempt.answeredQuestionsCount,
+        correct: data?.UpdateAssessmentAttempt.correctQuestionsCount,
       });
       setLoading(false);
     } catch (error) {

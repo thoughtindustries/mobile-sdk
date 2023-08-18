@@ -14,9 +14,8 @@ export type UpdateAssessmentAttemptMutation = {
     __typename?: "AssessmentAttempt";
     id: string;
     grade?: number;
-    answers: {
-      answer: string;
-    };
+    answeredQuestionsCount?: number;
+    correctQuestionsCount?: number;
   };
 };
 
@@ -31,9 +30,8 @@ export const UpdateAssessmentAttemptDocument = gql`
     ) {
       id
       grade
-      answers {
-        answer
-      }
+      answeredQuestionsCount
+      correctQuestionsCount
     }
   }
 `;
