@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -12,30 +12,93 @@ import striptags from "striptags";
 import { QuestionChoice } from "../../types";
 import Button from "./button";
 import RenderHtml from "react-native-render-html";
+import { useUpdateAssessmentAttemptMutation } from "../graphql";
 
-const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
+interface Answer {
+  value: string | undefined;
+  correct: boolean | undefined;
+  idx: number | undefined;
+}
+
+interface Quiz {
+  quiz: any;
+  attemptId: string | undefined;
+}
+
+const QuizQuestion = ({ quiz, attemptId }: Quiz) => {
   const [index, setIndex] = useState<number>(0);
   const [showButton, setShowButton] = useState<boolean>(false);
-  const [answer, setAnswer] = useState<{
-    correct: boolean | undefined;
-    idx: number;
-  }>({ correct: undefined, idx: 0 });
+  const [attempt, setAttempt] = useState<Answer>({
+    value: undefined,
+    correct: undefined,
+    idx: 0,
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [answers, setAnswers] = useState<Answer[]>([]);
   const { width } = useWindowDimensions();
   const question = quiz?.questions[index];
   const questionType = question?.questionType;
 
-  const handleAnswer = (idx: number) => {
-    setAnswer({ correct: question.choices[idx].correct, idx: idx });
+  const [updateAssessmentAttemptMutation] =
+    useUpdateAssessmentAttemptMutation();
+
+  const handleAttempt = (value: string, idx: number) => {
+    const answer: Answer = {
+      correct: question.choices[idx].correct,
+      idx: idx,
+      value: value,
+    };
+    setAttempt(answer);
+    setAnswers([...answers, answer]);
     setShowButton(true);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+    try {
+      setLoading(true);
+      await updateAssessmentAttemptMutation({
+        variables: {
+          assessmentAttempt: {
+            id: attemptId,
+            status: "started",
+          },
+          activeQuestion: {
+            body: question.body,
+            mustSelectAllCorrectChoices: question.mustSelectAllCorrectChoices,
+            selectedChoice: {
+              value: attempt.value,
+              correct: attempt.correct,
+            },
+          },
+        },
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log("Attempt submission error: ", error);
+    }
     setIndex(index + 1);
-    setAnswer({ correct: undefined, idx: index });
+    setAttempt({ correct: undefined, idx: index, value: undefined });
     setShowButton(false);
   };
 
-  const handleSubmission = () => {};
+  const handleSubmission = async () => {
+    try {
+      setLoading(true);
+      await updateAssessmentAttemptMutation({
+        variables: {
+          assessmentAttempt: {
+            id: attemptId,
+            status: "finished",
+          },
+        },
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log("Quiz submission error: ", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -51,20 +114,20 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
         {question?.choices.map((choice: QuestionChoice, idx: number) => (
           <TouchableOpacity
             key={choice.choiceId}
-            onPress={() => handleAnswer(idx)}
-            disabled={answer.correct !== undefined}
+            onPress={() => handleAttempt(choice.value, idx)}
+            disabled={attempt.correct !== undefined}
             style={{
               ...styles.imageComparison,
               backgroundColor:
-                answer.correct === true && answer.idx === idx
+                attempt.correct === true && attempt.idx === idx
                   ? "#DCE5DF"
-                  : answer.correct === false && answer.idx === idx
+                  : attempt.correct === false && attempt.idx === idx
                   ? "#F7DADD"
-                  : '"#FCFCFF"',
+                  : "#FCFCFF",
               borderColor:
-                answer.correct === true && answer.idx === idx
+                attempt.correct === true && attempt.idx === idx
                   ? "#326D3C"
-                  : answer.correct === false && answer.idx === idx
+                  : attempt.correct === false && attempt.idx === idx
                   ? "#DC2626"
                   : "#E5E7EB",
             }}
@@ -79,8 +142,8 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
             <Text style={{ marginLeft: -4 }}>{`${idx + 1}. ${
               choice.value
             }`}</Text>
-            {answer.correct !== undefined &&
-              answer.idx === idx &&
+            {attempt.correct !== undefined &&
+              attempt.idx === idx &&
               choice.response && (
                 <Text
                   style={{
@@ -105,7 +168,11 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
           <Button
             title={`${
               index < quiz?.questions.length - 1
-                ? "Next Question"
+                ? loading
+                  ? "Loading..."
+                  : "Next Question"
+                : loading
+                ? "Loading..."
                 : "See Results"
             }`}
             onPress={
@@ -113,6 +180,7 @@ const QuizQuestion: FC<{ quiz: any }> = ({ quiz }) => {
                 ? handleNextQuestion
                 : handleSubmission
             }
+            disabled={loading}
           />
         </View>
       )}

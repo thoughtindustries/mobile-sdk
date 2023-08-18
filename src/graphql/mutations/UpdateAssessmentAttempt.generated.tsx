@@ -4,6 +4,7 @@ import { gql } from "@apollo/client";
 import * as Apollo from "@apollo/client";
 const defaultOptions = {} as const;
 export type UpdateAssessmentAttemptMutationVariables = Types.Exact<{
+  activeQuestion?: Types.InputMaybe<Types.QuestionInput>;
   assessmentAttempt?: Types.InputMaybe<Types.AssessmentAttemptInput>;
 }>;
 
@@ -13,18 +14,26 @@ export type UpdateAssessmentAttemptMutation = {
     __typename?: "AssessmentAttempt";
     id: string;
     grade?: number;
-    answeredQuestionsCount?: number;
-    correctQuestionsCount?: number;
+    answers: {
+      answer: string;
+    };
   };
 };
 
 export const UpdateAssessmentAttemptDocument = gql`
-  mutation UpdateAssessmentAttempt($assessmentAttempt: AssessmentAttemptInput) {
-    UpdateAssessmentAttempt(assessmentAttempt: $assessmentAttempt) {
+  mutation UpdateAssessmentAttempt(
+    $activeQuestion: QuestionInput
+    $assessmentAttempt: AssessmentAttemptInput
+  ) {
+    UpdateAssessmentAttempt(
+      activeQuestion: $activeQuestion
+      assessmentAttempt: $assessmentAttempt
+    ) {
       id
       grade
-      answeredQuestionsCount
-      correctQuestionsCount
+      answers {
+        answer
+      }
     }
   }
 `;
@@ -46,6 +55,7 @@ export type UpdateAssessmentAttemptMutationFn = Apollo.MutationFunction<
  * @example
  * const [updateAssessmentAttemptMutation, { data, loading, error }] = useUpdateAssessmentAttemptMutation({
  *   variables: {
+ *      activeQuestion: // value for 'activeQuestion'
  *      assessmentAttempt: // value for 'assessmentAttempt'
  *   },
  * });

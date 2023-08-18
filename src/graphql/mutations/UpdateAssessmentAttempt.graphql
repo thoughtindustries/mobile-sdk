@@ -1,8 +1,12 @@
-mutation UpdateAssessmentAttempt($assessmentAttempt: AssessmentAttemptInput) {
-  UpdateAssessmentAttempt(assessmentAttempt: $assessmentAttempt) {
+mutation UpdateAssessmentAttempt(
+  $activeQuestion: QuestionInput
+  $assessmentAttempt: AssessmentAttemptInput
+) {
+  UpdateAssessmentAttempt(
+    activeQuestion: $activeQuestion
+    assessmentAttempt: $assessmentAttempt
+  ) {
     id
     grade
-    answeredQuestionsCount
-    correctQuestionsCount
   }
 }

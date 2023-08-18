@@ -32,25 +32,31 @@ interface CourseQuizProps {
 }
 
 const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
-  const { data } = useLoadAssessmentAttemptWithQuestionsQuery({
-    variables: {
-      courseId: courseid,
-      id: quiz?.id,
-      topicType: "quiz",
-    },
-  });
+  const { data, loading: assessmentLoading } =
+    useLoadAssessmentAttemptWithQuestionsQuery({
+      variables: {
+        courseId: courseid,
+        id: quiz?.id,
+        topicType: "quiz",
+      },
+    });
 
-  const [startQuiz, setStartQuiz] = useState<boolean>(false);
+  const [initQuiz, setInitQuiz] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<string[]>([]);
-  const [attemptId, setAttemptId] = useState<string>("");
+  const [attemptId, setAttemptId] = useState<string | undefined>();
   const [result, setResult] = useState<{
     grade: number;
     answered: number;
     correct: number;
   }>({ grade: 0, answered: 0, correct: 0 });
+
+  const startQuiz = () => {
+    setInitQuiz(true);
+    setAttemptId(data?.LoadAssessmentAttemptWithQuestions.id);
+  };
 
   const saveAttempt = (answer: string, isMulti: boolean) => {
     let temp = [...attempts];
@@ -306,7 +312,11 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
         </Text>
       )}
       <View style={{ position: "absolute", bottom: 10, width: "100%" }}>
-        <Button title="Start Quiz" onPress={() => setStartQuiz(true)} />
+        <Button
+          title={`${assessmentLoading ? "Loading..." : "Start Quiz"}`}
+          onPress={() => startQuiz()}
+          disabled={assessmentLoading}
+        />
       </View>
     </View>
   );
@@ -486,10 +496,10 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
 
   return (
     <View>
-      {startQuiz ? (
+      {initQuiz ? (
         <View>
           <QuizInfo />
-          <QuizQuestion quiz={quiz} />
+          <QuizQuestion quiz={quiz} attemptId={attemptId} />
         </View>
       ) : (
         <QuizHeader />
