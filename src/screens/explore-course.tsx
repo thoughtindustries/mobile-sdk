@@ -44,9 +44,11 @@ const ExploreCourse = () => {
         <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
           {pagesData?.Pages?.[0]?.title}
         </Text>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <RenderHtml source={{ html }} contentWidth={width} />
-        </ScrollView>
+        {html && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <RenderHtml source={{ html }} contentWidth={width} />
+          </ScrollView>
+        )}
       </View>
     );
   };
