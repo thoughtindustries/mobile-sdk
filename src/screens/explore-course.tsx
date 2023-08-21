@@ -12,7 +12,7 @@ import {
   useUpdateTopicAndCourseProgressMutation,
 } from "../graphql";
 import RenderHtml from "react-native-render-html";
-import { QuizProvider } from "../test";
+import { QuizProvider } from "../context";
 
 type ExploreCourseProps = StackNavigationProp<
   RootStackParamList,
@@ -159,7 +159,7 @@ const ExploreCourse = () => {
       useUpdateTopicAndCourseProgressMutation({});
 
     const handleNext = () => {
-      if (topics.length > 1 && topics.length - 1 > topicIndex) {
+      if (topics.length - 1 > topicIndex) {
         setTopicIndex(topicIndex + 1);
         if (pagesData?.Pages?.[0]?.type === "text") {
           updateTopicAndCourseProgressMutation({
@@ -169,7 +169,7 @@ const ExploreCourse = () => {
             },
           });
         }
-      } else if (topics.length === 1) {
+      } else {
         if (pagesData?.Pages?.[0]?.type === "text") {
           updateTopicAndCourseProgressMutation({
             variables: {

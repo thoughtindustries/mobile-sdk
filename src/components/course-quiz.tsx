@@ -1,8 +1,11 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Button, QuizQuestion, QuizResults } from ".";
-import { useLoadAssessmentAttemptWithQuestionsQuery } from "../graphql";
-import { useQuizContext } from "../test";
+import { Button, LoadingBanner, QuizQuestion, QuizResults } from ".";
+import {
+  useLoadAssessmentAttemptWithQuestionsQuery,
+  useLoadAssessmentAttemptsByTopicOrCourseQuery,
+} from "../graphql";
+import { useQuizContext } from "../context";
 
 interface CourseQuizProps {
   courseid: string;
@@ -10,16 +13,56 @@ interface CourseQuizProps {
 }
 
 const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
-  const { initQuiz, setInitQuiz, setAttemptId, result, setQuiz } =
+  const [query, setQuery] = useState<boolean>(false);
+  const { initQuiz, setInitQuiz, setAttemptId, result, setQuiz, setResult } =
     useQuizContext();
+
   const { data, loading: assessmentLoading } =
     useLoadAssessmentAttemptWithQuestionsQuery({
+      skip: !query,
       variables: {
         courseId: courseid,
         id: quiz?.id,
         topicType: "quiz",
       },
     });
+
+  const {
+    loading: assessmentDataLoading,
+    data: assessmentData,
+    error: assessmentDataError,
+    refetch,
+  } = useLoadAssessmentAttemptsByTopicOrCourseQuery({
+    variables: {
+      courseId: courseid,
+      topicId: quiz.id,
+    },
+  });
+
+  useEffect(() => {
+    refetch();
+    if (
+      !assessmentDataLoading &&
+      !assessmentDataError &&
+      assessmentData &&
+      assessmentData.LoadAssessmentAttemptsByTopicOrCourse.length > 0
+    ) {
+      assessmentData.LoadAssessmentAttemptsByTopicOrCourse.every((item) => {
+        if (item.status === "finished") {
+          setResult({
+            grade: item.grade,
+            answered: item.answeredQuestionsCount,
+            correct: item.correctQuestionsCount,
+          });
+          return false;
+        }
+
+        return true;
+      });
+    } else {
+      setQuery(true);
+    }
+  }, [assessmentDataLoading, assessmentDataError, assessmentData, refetch]);
 
   const startQuiz = () => {
     setInitQuiz(true);
@@ -56,6 +99,8 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
         <View>
           <QuizQuestion quiz={quiz} />
         </View>
+      ) : assessmentDataLoading ? (
+        <LoadingBanner />
       ) : (
         <QuizHeader />
       )}

@@ -13,7 +13,7 @@ import { QuestionChoice } from "../../types";
 import Button from "./button";
 import RenderHtml from "react-native-render-html";
 import { useUpdateAssessmentAttemptMutation } from "../graphql";
-import { useQuizContext } from "../test";
+import { useQuizContext } from "../context";
 
 interface Answer {
   value: string | undefined;
@@ -92,8 +92,17 @@ const QuizQuestion = ({ quiz }: Quiz) => {
             id: attemptId,
             status: "finished",
           },
+          activeQuestion: {
+            body: question.body,
+            mustSelectAllCorrectChoices: question.mustSelectAllCorrectChoices,
+            selectedChoice: {
+              value: attempt.value,
+              correct: attempt.correct,
+            },
+          },
         },
       });
+
       setResult({
         grade: data?.UpdateAssessmentAttempt.grade,
         answered: data?.UpdateAssessmentAttempt.answeredQuestionsCount,
@@ -170,7 +179,7 @@ const QuizQuestion = ({ quiz }: Quiz) => {
         ))}
       </ScrollView>
       {showButton && (
-        <View style={{ position: "absolute", bottom: 50, width: "100%" }}>
+        <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
           <Button
             title={`${
               index < quiz?.questions.length - 1
@@ -202,7 +211,7 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     justifyContent: "space-between",
-    height: "88%",
+    height: "100%",
   },
   imageComparison: {
     paddingVertical: 10,

@@ -1,0 +1,12 @@
+query LoadAssessmentAttemptsByTopicOrCourse($courseId: ID, $topicId: ID) {
+  LoadAssessmentAttemptsByTopicOrCourse(
+    courseId: $courseId
+    topicId: $topicId
+  ) {
+    id
+    status
+    grade
+    answeredQuestionsCount
+    correctQuestionsCount
+  }
+}

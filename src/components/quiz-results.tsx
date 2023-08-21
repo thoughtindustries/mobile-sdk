@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { VictoryPie } from "victory-native";
-import { useQuizContext } from "../test";
+import { useQuizContext } from "../context";
 
 const QuizResults = () => {
   const { result, quiz } = useQuizContext();
@@ -38,13 +38,18 @@ const QuizResults = () => {
             },
           }}
         />
-        <View style={{ position: "absolute", top: "33%", left: "39%" }}>
+        <View
+          style={{
+            position: "absolute",
+            width: "100%",
+            top: "33%",
+            alignItems: "center",
+          }}
+        >
           <Text style={styles.midTextTitle}>{result.grade}%</Text>
-          <View>
-            <Text style={styles.midTextNote}>
-              {result.correct}/{quiz?.questions?.length} Correct
-            </Text>
-          </View>
+          <Text style={styles.midTextNote}>
+            {result.correct}/{quiz?.questions?.length} Correct
+          </Text>
         </View>
 
         <View
@@ -83,12 +88,12 @@ const styles = StyleSheet.create({
   },
   chartBox: {
     alignItems: "center",
+    justifyContent: "center",
     borderRadius: 10,
     borderColor: "#ccc",
     borderWidth: 1,
   },
   midTextTitle: {
-    marginLeft: 20,
     fontFamily: "Poppins_700Bold",
     fontSize: 24,
     color: "#1F2937",
