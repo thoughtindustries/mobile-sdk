@@ -161,25 +161,16 @@ const ExploreCourse = () => {
       useUpdateTopicAndCourseProgressMutation({});
 
     const handleNext = () => {
+      updateTopicAndCourseProgressMutation({
+        variables: {
+          topicId: topics[topicIndex].id,
+          progress: 100,
+        },
+      });
+
       if (topics.length - 1 > topicIndex) {
         setTopicIndex(topicIndex + 1);
-        if (pagesData?.Pages?.[0]?.type === "text") {
-          updateTopicAndCourseProgressMutation({
-            variables: {
-              topicId: topics[topicIndex].id,
-              progress: 100,
-            },
-          });
-        }
       } else {
-        if (pagesData?.Pages?.[0]?.type === "text") {
-          updateTopicAndCourseProgressMutation({
-            variables: {
-              topicId: topics[topicIndex].id,
-              progress: 100,
-            },
-          });
-        }
         navigation.navigate("ContentDetails", {
           cid: cid,
           from: "ExploreCourse",
