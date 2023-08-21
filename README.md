@@ -57,3 +57,6 @@ You will be prompted for your learning instance URL, learning instance API key (
 Once the Metro Bundler has started, you will have to the options to scan the QR code to run the application on your mobile device, run the application on an iOS simulator, or run the application on an Android Emulator.
 
 To select a specific iOS device press `Shift + i` and to select a specific Android Emulator press `Shift + a`
+
+### Report Bugs and Issues
+If you notice any bugs or issues with the Mobile SDK, please report them in our [Developer Discord](https://discord.gg/cTJBX4muVn) or open up a pull request / issue.
