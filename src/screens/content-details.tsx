@@ -73,7 +73,7 @@ const ContentDetails = () => {
       if (isFocused && from === "ExploreCourse") {
         try {
           setLoading(true);
-          await refetchCourseData();
+
           await refetchPagesCompleted();
           setLoading(false);
         } catch (error) {
@@ -81,6 +81,7 @@ const ContentDetails = () => {
           console.log("ERROR: ", error);
         }
       }
+      await refetchCourseData();
     })();
   }, [isFocused]);
 
@@ -230,7 +231,12 @@ const ContentDetails = () => {
     lessons,
   }) => {
     const lessonsRead = getSectionProgress(lessons);
-    const sectionProgress = (lessonsRead.length / lessons.length) * 100;
+    const sectionProgress =
+      ((lessonsRead.length < lessons.length
+        ? lessonsRead.length
+        : lessons.length) /
+        lessons.length) *
+      100;
 
     return (
       <Collapse
@@ -246,7 +252,10 @@ const ContentDetails = () => {
                 <View>
                   {lessonsRead.length > 0 && (
                     <Text style={styles(courseData).sectionCount}>
-                      {lessonsRead.length}/{lessons.length} Lessons started
+                      {lessonsRead.length < lessons.length
+                        ? lessonsRead.length
+                        : lessons.length}
+                      /{lessons.length} Lessons started
                     </Text>
                   )}
                   {lessonsRead.length === 0 && (
