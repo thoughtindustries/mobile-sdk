@@ -117,86 +117,98 @@ const QuizQuestion = ({ quiz }: Quiz) => {
 
   return (
     <View style={styles.container}>
-      {question?.preText && <Text>{striptags(question?.preText)}</Text>}
-      <Text style={styles.questionTitle}>{striptags(question?.body)}</Text>
-      {question?.postText && (
-        <Text style={styles.questionText}>{striptags(question?.postText)}</Text>
-      )}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{ marginBottom: showButton ? 80 : 15 }}
-      >
-        {question?.choices.map((choice: QuestionChoice, idx: number) => (
-          <TouchableOpacity
-            key={choice.choiceId}
-            onPress={() => handleAttempt(choice.value, idx)}
-            disabled={attempt.correct !== undefined}
-            style={{
-              ...styles.imageComparison,
-              backgroundColor:
-                attempt.correct === true && attempt.idx === idx
-                  ? "#DCE5DF"
-                  : attempt.correct === false && attempt.idx === idx
-                  ? "#F7DADD"
-                  : "#FCFCFF",
-              borderColor:
-                attempt.correct === true && attempt.idx === idx
-                  ? "#326D3C"
-                  : attempt.correct === false && attempt.idx === idx
-                  ? "#DC2626"
-                  : "#E5E7EB",
-            }}
+      {questionType === "imageComparison" ||
+      questionType === "multipleChoice" ||
+      questionType === "booleanChoice" ? (
+        <View>
+          {question?.preText && <Text>{striptags(question?.preText)}</Text>}
+          <Text style={styles.questionTitle}>{striptags(question?.body)}</Text>
+          {question?.postText && (
+            <Text style={styles.questionText}>
+              {striptags(question?.postText)}
+            </Text>
+          )}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{ marginBottom: showButton ? 80 : 15 }}
           >
-            {questionType === "imageComparison" && (
-              <ImageBackground
-                source={{ uri: choice.asset }}
-                resizeMode="cover"
-                style={styles.image}
-              />
-            )}
-            <Text style={{ marginLeft: -4 }}>{`${idx + 1}. ${
-              choice.value
-            }`}</Text>
-            {attempt.correct !== undefined &&
-              attempt.idx === idx &&
-              choice.response && (
-                <Text
-                  style={{
-                    color: "#737373",
-                    opacity: 0.5,
-                    marginBottom: -16,
-                  }}
-                >
-                  <RenderHtml
-                    source={{
-                      html: choice.response,
-                    }}
-                    contentWidth={width}
+            {question?.choices.map((choice: QuestionChoice, idx: number) => (
+              <TouchableOpacity
+                key={choice.choiceId}
+                onPress={() => handleAttempt(choice.value, idx)}
+                disabled={attempt.correct !== undefined}
+                style={{
+                  ...styles.imageComparison,
+                  backgroundColor:
+                    attempt.correct === true && attempt.idx === idx
+                      ? "#DCE5DF"
+                      : attempt.correct === false && attempt.idx === idx
+                      ? "#F7DADD"
+                      : "#FCFCFF",
+                  borderColor:
+                    attempt.correct === true && attempt.idx === idx
+                      ? "#326D3C"
+                      : attempt.correct === false && attempt.idx === idx
+                      ? "#DC2626"
+                      : "#E5E7EB",
+                }}
+              >
+                {questionType === "imageComparison" && (
+                  <ImageBackground
+                    source={{ uri: choice.asset }}
+                    resizeMode="cover"
+                    style={styles.image}
                   />
-                </Text>
-              )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      {showButton && (
-        <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
-          <Button
-            title={`${
-              index < quiz?.questions.length - 1
-                ? loading
-                  ? "Loading..."
-                  : "Next Question"
-                : loading
-                ? "Loading..."
-                : "See Results"
-            }`}
-            onPress={
-              index < quiz?.questions.length - 1
-                ? handleNextQuestion
-                : handleSubmission
-            }
-            disabled={loading}
-          />
+                )}
+                <Text style={{ marginLeft: -4 }}>{`${idx + 1}. ${
+                  choice.value
+                }`}</Text>
+                {attempt.correct !== undefined &&
+                  attempt.idx === idx &&
+                  choice.response && (
+                    <Text
+                      style={{
+                        color: "#737373",
+                        opacity: 0.5,
+                        marginBottom: -16,
+                      }}
+                    >
+                      <RenderHtml
+                        source={{
+                          html: choice.response,
+                        }}
+                        contentWidth={width}
+                      />
+                    </Text>
+                  )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          {showButton && (
+            <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
+              <Button
+                title={`${
+                  index < quiz?.questions.length - 1
+                    ? loading
+                      ? "Loading..."
+                      : "Next Question"
+                    : loading
+                    ? "Loading..."
+                    : "See Results"
+                }`}
+                onPress={
+                  index < quiz?.questions.length - 1
+                    ? handleNextQuestion
+                    : handleSubmission
+                }
+                disabled={loading}
+              />
+            </View>
+          )}
+        </View>
+      ) : (
+        <View>
+          <Text>{`The ${questionType} quiz type is currently not supported.`}</Text>
         </View>
       )}
     </View>
