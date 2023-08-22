@@ -48,7 +48,10 @@ const UserHeader = () => {
   return (
     <View style={styles.container}>
       {userInfo.asset === null || userInfo.asset === "" ? (
-        <Image source={require("../../assets/user.png")} />
+        <Image
+          source={require("../../assets/profile.png")}
+          style={{ height: 40, width: 40 }}
+        />
       ) : (
         <Image source={{ uri: userInfo.asset }} style={styles.profilePic} />
       )}

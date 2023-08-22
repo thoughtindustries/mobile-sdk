@@ -1,10 +1,15 @@
-import React, { useEffect } from "react";
-import { StyleSheet, View, ImageBackground } from "react-native";
+import { useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  ImageBackground,
+  useWindowDimensions,
+} from "react-native";
 import { Loader } from "../components";
-import AppStyle from "../../AppStyle";
 import * as SecureStore from "expo-secure-store";
 
 const SplashScreen = ({ navigation }: any) => {
+  const { height } = useWindowDimensions();
   useEffect(() => {
     (async () => {
       const user = await SecureStore.getItemAsync("userInfo");
@@ -19,9 +24,9 @@ const SplashScreen = ({ navigation }: any) => {
   }, []);
 
   return (
-    <View style={{ ...AppStyle.container, backgroundColor: "#3B1FA3" }}>
+    <View style={[styles.container, { height }]}>
       <ImageBackground
-        source={require("../../assets/start-screen.png")}
+        source={require("../../assets/splash.png")}
         resizeMode="cover"
         style={styles.image}
       >
@@ -34,12 +39,14 @@ const SplashScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#3B1FA3",
+  },
   image: {
     flex: 1,
     justifyContent: "center",
   },
   loader: {
-    lineHeight: 4,
     textAlign: "center",
     justifyContent: "flex-start",
     alignItems: "center",
