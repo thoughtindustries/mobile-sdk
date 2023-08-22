@@ -1,16 +1,14 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Button } from "../components";
 import AppStyle from "../../AppStyle";
+import { WifiOff } from "lucide-react-native";
 
 const Offline = () => {
   return (
     <View style={AppStyle.container}>
       <View style={styles.prompt}>
-        <Image
-          source={require("../../assets/wifix.png")}
-          style={styles.networkOff}
-        />
+        <WifiOff size={96} color="#6B7280" />
         <Text style={styles.title}>You are currently offline</Text>
         <Text style={styles.subtitle}>Get all your offline files here.</Text>
       </View>
@@ -29,12 +27,10 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
-
   offlineButton: {
     width: "100%",
     marginBottom: "45%",
   },
-
   title: {
     fontFamily: "Poppins_700Bold",
     fontSize: 24,
@@ -43,7 +39,6 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     marginBottom: 10,
   },
-
   subtitle: {
     fontSize: 16,
     lineHeight: 24,
@@ -51,7 +46,6 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     fontFamily: "Poppins_400Regular",
   },
-
   networkOff: {
     textAlign: "center",
     fontWeight: "700",
