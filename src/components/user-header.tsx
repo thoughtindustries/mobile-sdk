@@ -50,7 +50,7 @@ const UserHeader = () => {
       {userInfo.asset === null || userInfo.asset === "" ? (
         <Image
           source={require("../../assets/profile.png")}
-          style={{ height: 40, width: 40 }}
+          style={styles.profilePic}
         />
       ) : (
         <Image source={{ uri: userInfo.asset }} style={styles.profilePic} />
@@ -67,11 +67,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     backgroundColor: "#F3F4F6",
-    paddingTop: 60,
     paddingBottom: 20,
     marginHorizontal: 30,
   },
-
   name: {
     margin: 5,
     fontFamily: "Poppins_700Bold",
@@ -79,8 +77,8 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   profilePic: {
-    width: (Dimensions.get("window").width / 440) * 40,
-    height: (Dimensions.get("window").width / 440) * 40,
+    width: (Dimensions.get("window").width / 440) * 50,
+    height: (Dimensions.get("window").width / 440) * 50,
     marginRight: (Dimensions.get("window").width / 440) * 10,
     borderRadius: 9999,
   },

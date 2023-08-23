@@ -12,7 +12,6 @@ import Banner from "./banner";
 import TopCategories from "./top-categories";
 import Recommendation from "./recommendation";
 import RecentCourses from "./recent-courses";
-import ResourceControl from "./resource-control";
 import CourseQuiz from "./course-quiz";
 import LoadingBanner from "./loading-banner";
 import Hero from "./hero";
@@ -34,7 +33,6 @@ export {
   TopCategories,
   Recommendation,
   RecentCourses,
-  ResourceControl,
   CourseQuiz,
   LoadingBanner,
   Hero,

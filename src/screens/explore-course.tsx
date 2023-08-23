@@ -56,11 +56,7 @@ const ExploreCourse = () => {
   const VideoPage: FC = () => {
     const [videoLoading, setVideoLoading] = useState<boolean>(false);
     return (
-      <View
-        style={{
-          flex: 1,
-        }}
-      >
+      <View style={styles(progress, topicIndex, topics.length).container}>
         {pagesData?.Pages?.[0]?.title && (
           <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
             {pagesData.Pages[0].title}

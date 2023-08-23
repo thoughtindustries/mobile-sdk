@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, Dimensions } from "react-native";
+import { StyleSheet, ScrollView, Dimensions, SafeAreaView } from "react-native";
 import {
   UserHeader,
   Banner,
@@ -10,7 +10,7 @@ import {
 
 const Home = () => {
   return (
-    <View>
+    <SafeAreaView>
       <UserHeader />
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <Banner />
@@ -18,7 +18,7 @@ const Home = () => {
         <Recommendation />
         <RecentCourses />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

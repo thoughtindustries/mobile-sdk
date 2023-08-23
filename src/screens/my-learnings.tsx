@@ -158,7 +158,7 @@ const MyLearnings = () => {
   const ProgressBar = ({ percent }: { percent: Float }) => (
     <View>
       <View style={styles.progressBar}></View>
-      <View style={{ ...styles.progressStrip, width: `${percent}%` }} />
+      <View style={[styles.progressStrip, { width: `${percent}%` }]} />
     </View>
   );
 
@@ -188,12 +188,7 @@ const MyLearnings = () => {
         />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
-            <Text
-              style={{
-                ...styles.contentTag,
-                ...contentLabelStyle,
-              }}
-            >
+            <Text style={[styles.contentTag, { ...contentLabelStyle }]}>
               {data.contentTypeLabel}
             </Text>
           </View>
@@ -245,12 +240,7 @@ const MyLearnings = () => {
         />
         <View style={styles.contentRightBox}>
           <View style={styles.cTypeRow}>
-            <Text
-              style={{
-                ...styles.contentTag,
-                ...contentLabelStyle,
-              }}
-            >
+            <Text style={[styles.contentTag, { ...contentLabelStyle }]}>
               {data.contentTypeLabel}
             </Text>
             {kind === ContentKind.Article && (
@@ -296,18 +286,24 @@ const MyLearnings = () => {
         {events.map((item, idx) => (
           <TouchableOpacity key={idx} onPress={() => setTab(item)}>
             <View
-              style={{
-                ...styles.catBox,
-                ...(tab === item ? styles.catBoxSelected : styles.catBoxNormal),
-              }}
+              style={[
+                styles.catBox,
+                {
+                  ...(tab === item
+                    ? styles.catBoxSelected
+                    : styles.catBoxNormal),
+                },
+              ]}
             >
               <Text
-                style={{
-                  ...styles.catTitle,
-                  ...(tab === item
-                    ? styles.catTitleSelected
-                    : styles.catTitleNormal),
-                }}
+                style={[
+                  styles.catTitle,
+                  {
+                    ...(tab === item
+                      ? styles.catTitleSelected
+                      : styles.catTitleNormal),
+                  },
+                ]}
               >
                 {item}
               </Text>
@@ -321,7 +317,7 @@ const MyLearnings = () => {
   const RecommendedList = () => {
     return (
       <View>
-        <Text style={{ ...styles.note, paddingTop: 30 }}>
+        <Text style={styles.emptyRecList}>
           It's looking a bit empty right now, we know. But this is where you'll
           find your most recent activity, Events, Completed Courses,
           Certifications and Offline Downloaded Courses.{" "}
@@ -332,12 +328,7 @@ const MyLearnings = () => {
           renderItem={({ item }) => <CourseItem data={item} />}
           onEndReachedThreshold={0.5}
           showsVerticalScrollIndicator={false}
-          style={{
-            height:
-              Dimensions.get("window").height > 667
-                ? (Dimensions.get("window").height / 440) * 185
-                : (Dimensions.get("window").height / 440) * 125,
-          }}
+          style={styles.recList}
           ListEmptyComponent={
             <Text style={styles.noRecords}>
               No records found, try using other filters.
@@ -352,12 +343,7 @@ const MyLearnings = () => {
     <FlatList
       data={filteredContent()}
       renderItem={({ item }) => <ContentItem data={item} />}
-      style={{
-        height:
-          Dimensions.get("window").height > 667
-            ? (Dimensions.get("window").height / 440) * 150
-            : (Dimensions.get("window").height / 440) * 215,
-      }}
+      style={styles.contentList}
       showsVerticalScrollIndicator={false}
       scrollEnabled={true}
       ListEmptyComponent={
@@ -375,7 +361,7 @@ const MyLearnings = () => {
       {Utils.isOffline() !== true && (
         <View>
           <View style={styles.searchboxContainer}>
-            <View style={{ flexGrow: 1, marginRight: 3 }}>
+            <View style={styles.searchBar}>
               <Searchbar searchText={search} setSearch={setSearch} />
             </View>
             <FilterContext.Provider value={{ filters, setFilters }}>
@@ -647,6 +633,31 @@ const styles = StyleSheet.create({
     height: 20,
     backgroundColor: "#3B1FA3",
     borderRadius: 10,
+  },
+  emptyRecList: {
+    padding: 15,
+    paddingBottom: 0,
+    lineHeight: 24,
+    color: "#6B7280",
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    paddingTop: 30,
+  },
+  recList: {
+    height:
+      Dimensions.get("window").height > 667
+        ? (Dimensions.get("window").height / 440) * 185
+        : (Dimensions.get("window").height / 440) * 125,
+  },
+  contentList: {
+    height:
+      Dimensions.get("window").height > 667
+        ? (Dimensions.get("window").height / 440) * 150
+        : (Dimensions.get("window").height / 440) * 215,
+  },
+  searchBar: {
+    flexGrow: 1,
+    marginRight: 3,
   },
 });
 

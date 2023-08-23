@@ -74,14 +74,14 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
   }, [quiz]);
 
   const QuizHeader: FC = () => (
-    <View style={{ height: "100%" }}>
+    <View style={styles.quizHeader}>
       <Text style={styles.heading}>{quiz?.title}</Text>
       {quiz?.startMessage && (
         <Text style={styles.startMessage}>
           {quiz?.startMessage.replace(/(<([^>]+)>)/gi, "")}
         </Text>
       )}
-      <View style={{ position: "absolute", bottom: 10, width: "100%" }}>
+      <View style={styles.quizButton}>
         <Button
           title={`${assessmentLoading ? "Loading..." : "Start Quiz"}`}
           onPress={() => startQuiz()}
@@ -144,6 +144,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#F3F4F6",
     marginRight: 5,
+  },
+  quizHeader: {
+    height: "100%",
+  },
+  quizButton: {
+    position: "absolute",
+    bottom: 10,
+    width: "100%",
   },
   prenote: {
     fontFamily: "Poppins_400Regular",

@@ -38,39 +38,24 @@ const QuizResults = () => {
             },
           }}
         />
-        <View
-          style={{
-            position: "absolute",
-            width: "100%",
-            top: "33%",
-            alignItems: "center",
-          }}
-        >
+        <View style={styles.grade}>
           <Text style={styles.midTextTitle}>{result.grade}%</Text>
           <Text style={styles.midTextNote}>
             {result.correct}/{quiz?.questions?.length} Correct
           </Text>
         </View>
 
-        <View
-          style={{
-            ...styles.row,
-            width: "100%",
-            justifyContent: "space-between",
-            padding: 10,
-            paddingBottom: 20,
-          }}
-        >
+        <View style={styles.legend}>
           <View style={styles.row}>
-            <View style={{ ...styles.dot, backgroundColor: "#326D3C" }} />
+            <View style={[styles.dot, { backgroundColor: "#326D3C" }]} />
             <Text>Correct</Text>
           </View>
           <View style={styles.row}>
-            <View style={{ ...styles.dot, backgroundColor: "#DC2626" }} />
+            <View style={[styles.dot, { backgroundColor: "#DC2626" }]} />
             <Text>Incorrect</Text>
           </View>
           <View style={styles.row}>
-            <View style={{ ...styles.dot, backgroundColor: "#D1D5DB" }} />
+            <View style={[styles.dot, { backgroundColor: "#D1D5DB" }]} />
             <Text>Unanswered</Text>
           </View>
         </View>
@@ -135,6 +120,21 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: 14,
     color: "#1F2937",
+  },
+  grade: {
+    position: "absolute",
+    width: "100%",
+    top: "33%",
+    alignItems: "center",
+  },
+  legend: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    padding: 10,
+    paddingBottom: 20,
   },
 });
 

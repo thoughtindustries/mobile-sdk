@@ -273,7 +273,7 @@ const Login = () => {
                 />
                 <Pressable
                   onPress={() => setShowpPassword(!showPassword)}
-                  style={{ justifyContent: "center" }}
+                  style={styles(loading).showPassword}
                 >
                   <MaterialCommunityIcons
                     name={!showPassword ? "eye-off" : "eye"}
@@ -325,6 +325,9 @@ const styles = (loading: boolean) =>
       margin: 0,
       padding: 0,
       width: "93%",
+    },
+    showPassword: {
+      justifyContent: "center",
     },
   });
 

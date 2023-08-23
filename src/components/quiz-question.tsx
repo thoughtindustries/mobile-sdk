@@ -120,7 +120,7 @@ const QuizQuestion = ({ quiz }: Quiz) => {
       {questionType === "imageComparison" ||
       questionType === "multipleChoice" ||
       questionType === "booleanChoice" ? (
-        <View>
+        <>
           {question?.preText && <Text>{striptags(question?.preText)}</Text>}
           <Text style={styles.questionTitle}>{striptags(question?.body)}</Text>
           {question?.postText && (
@@ -128,30 +128,29 @@ const QuizQuestion = ({ quiz }: Quiz) => {
               {striptags(question?.postText)}
             </Text>
           )}
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ marginBottom: showButton ? 80 : 15 }}
-          >
+          <ScrollView showsVerticalScrollIndicator={false}>
             {question?.choices.map((choice: QuestionChoice, idx: number) => (
               <TouchableOpacity
                 key={choice.choiceId}
                 onPress={() => handleAttempt(choice.value, idx)}
                 disabled={attempt.correct !== undefined}
-                style={{
-                  ...styles.imageComparison,
-                  backgroundColor:
-                    attempt.correct === true && attempt.idx === idx
-                      ? "#DCE5DF"
-                      : attempt.correct === false && attempt.idx === idx
-                      ? "#F7DADD"
-                      : "#FCFCFF",
-                  borderColor:
-                    attempt.correct === true && attempt.idx === idx
-                      ? "#326D3C"
-                      : attempt.correct === false && attempt.idx === idx
-                      ? "#DC2626"
-                      : "#E5E7EB",
-                }}
+                style={[
+                  styles.choice,
+                  {
+                    backgroundColor:
+                      attempt.correct === true && attempt.idx === idx
+                        ? "#DCE5DF"
+                        : attempt.correct === false && attempt.idx === idx
+                        ? "#F7DADD"
+                        : "#FCFCFF",
+                    borderColor:
+                      attempt.correct === true && attempt.idx === idx
+                        ? "#326D3C"
+                        : attempt.correct === false && attempt.idx === idx
+                        ? "#DC2626"
+                        : "#E5E7EB",
+                  },
+                ]}
               >
                 {questionType === "imageComparison" && (
                   <ImageBackground
@@ -160,19 +159,13 @@ const QuizQuestion = ({ quiz }: Quiz) => {
                     style={styles.image}
                   />
                 )}
-                <Text style={{ marginLeft: -4 }}>{`${idx + 1}. ${
+                <Text style={styles.choiceValue}>{`${idx + 1}. ${
                   choice.value
                 }`}</Text>
                 {attempt.correct !== undefined &&
                   attempt.idx === idx &&
                   choice.response && (
-                    <Text
-                      style={{
-                        color: "#737373",
-                        opacity: 0.5,
-                        marginBottom: -16,
-                      }}
-                    >
+                    <Text style={styles.rejoinder}>
                       <RenderHtml
                         source={{
                           html: choice.response,
@@ -185,7 +178,7 @@ const QuizQuestion = ({ quiz }: Quiz) => {
             ))}
           </ScrollView>
           {showButton && (
-            <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
+            <View style={styles.questionButton}>
               <Button
                 title={`${
                   index < quiz?.questions.length - 1
@@ -205,7 +198,7 @@ const QuizQuestion = ({ quiz }: Quiz) => {
               />
             </View>
           )}
-        </View>
+        </>
       ) : (
         <View>
           <Text>{`The ${questionType} quiz type is currently not supported.`}</Text>
@@ -225,13 +218,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     height: "100%",
   },
-  imageComparison: {
-    paddingVertical: 10,
+  choice: {
+    paddingVertical: 20,
     paddingHorizontal: 20,
     marginBottom: 20,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#E5E7EB",
+  },
+  choiceValue: {
+    margin: -4,
+  },
+  rejoinder: {
+    color: "#737373",
+    opacity: 0.5,
+    marginBottom: -16,
   },
   image: {
     height: 100,
@@ -248,6 +249,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#1F2937",
     marginBottom: 30,
+  },
+  questionButton: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
   },
 });
 

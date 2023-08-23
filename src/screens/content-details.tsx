@@ -176,11 +176,7 @@ const ContentDetails = () => {
   const SectionProgress: FC<{ percent: number }> = ({ percent }) => (
     <View style={styles(courseData).sectionProgress}>
       <Animated.View
-        style={{
-          backgroundColor: "#3B1FA3",
-          width: `${percent}%`,
-          borderRadius: 16,
-        }}
+        style={[styles(courseData).progressBar, { width: `${percent}%` }]}
       />
     </View>
   );
@@ -246,7 +242,7 @@ const ContentDetails = () => {
       >
         <CollapseHeader>
           <View style={styles(courseData).sectionContainer}>
-            <View style={{ width: "85%" }}>
+            <View style={styles(courseData).sectionHeader}>
               <Text style={styles(courseData).sectionTitle}>{title}</Text>
               {lessons.length > 0 && (
                 <View>
@@ -311,16 +307,7 @@ const ContentDetails = () => {
 
   const Nav: FC = () => (
     <TouchableOpacity style={styles(courseData).row}>
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#374151",
-          borderRadius: 8,
-          width: 36,
-          height: 36,
-        }}
-      >
+      <View style={styles(courseData).backButton}>
         <MaterialCommunityIcons
           name="chevron-left"
           size={32}
@@ -338,13 +325,13 @@ const ContentDetails = () => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles(courseData).container}>
       {courseDataLoading || pagesCompletedDataLoading || loading ? (
         <View style={styles(courseData).loader}>
           <LoadingBanner />
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={styles(courseData).container}>
           <Nav />
           <CustomReport />
           <AboutCourse />
@@ -359,6 +346,9 @@ const styles = (data: any) =>
   StyleSheet.create({
     sectionList: {
       flex: data ? 4 : 0,
+    },
+    container: {
+      flex: 1,
     },
     loader: {
       marginHorizontal: 30,
@@ -580,6 +570,21 @@ const styles = (data: any) =>
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
+    },
+    progressBar: {
+      backgroundColor: "#3B1FA3",
+      borderRadius: 16,
+    },
+    sectionHeader: {
+      width: "85%",
+    },
+    backButton: {
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#374151",
+      borderRadius: 8,
+      width: 36,
+      height: 36,
     },
   });
 

@@ -80,7 +80,7 @@ const ExploreCatalog = () => {
     <View>
       <Text style={styles.title}>Explore The Catalog</Text>
       <View style={styles.searchboxContainer}>
-        <View style={{ flexGrow: 1, marginRight: 3 }}>
+        <View style={styles.searchBar}>
           <Searchbar searchText={search} setSearch={setSearch} />
         </View>
         <FilterContext.Provider value={{ filters, setFilters }}>
@@ -93,14 +93,7 @@ const ExploreCatalog = () => {
         </View>
       )}
       {!loading && (
-        <Text
-          style={{
-            ...styles.courseTitle,
-            marginTop: 15,
-            marginLeft: 30,
-            paddingBottom: 10,
-          }}
-        >
+        <Text style={styles.results}>
           {`Results (${filteredCourses().length})`}
         </Text>
       )}
@@ -108,12 +101,7 @@ const ExploreCatalog = () => {
         data?.CatalogContent?.contentItems &&
         data?.CatalogContent?.contentItems?.length > 0 && (
           <FlatList
-            style={{
-              height:
-                Dimensions.get("window").height > 667
-                  ? (Dimensions.get("window").height / 440) * 280
-                  : (Dimensions.get("window").height / 440) * 238,
-            }}
+            style={styles.contentList}
             data={filteredCourses()}
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
@@ -150,7 +138,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginHorizontal: 30,
   },
-
   courseRow: {
     display: "flex",
     flexDirection: "row",
@@ -160,11 +147,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomColor: "#ccc",
   },
-
   courseLeftBox: {
     flexGrow: 1,
   },
-
   courseTitle: {
     fontSize: 16,
     maxWidth: "80%",
@@ -173,19 +158,16 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     fontFamily: "Poppins_700Bold",
   },
-
   courseAuthor: {
     fontSize: 12,
     fontFamily: "Inter_400Regular",
     color: "#6B7280",
   },
-
   courseImage: {
     width: (Dimensions.get("window").width / 400) * 75,
     height: (Dimensions.get("window").width / 400) * 75,
     borderRadius: 15,
   },
-
   searching: {
     marginTop: 20,
     marginHorizontal: 20,
@@ -197,7 +179,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   searchingText: {
     fontSize: 16,
     lineHeight: 24,
@@ -206,7 +187,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     padding: 20,
   },
-
   noRecords: {
     paddingTop: 40,
     textAlign: "center",
@@ -214,6 +194,27 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: "#6B7280",
     fontFamily: "Poppins_700Bold",
+  },
+  searchBar: {
+    flexGrow: 1,
+    marginRight: 3,
+  },
+  results: {
+    fontSize: 16,
+    maxWidth: "80%",
+    lineHeight: 24,
+    textAlign: "left",
+    color: "#1F2937",
+    fontFamily: "Poppins_700Bold",
+    marginTop: 15,
+    marginLeft: 30,
+    paddingBottom: 10,
+  },
+  contentList: {
+    height:
+      Dimensions.get("window").height > 667
+        ? (Dimensions.get("window").height / 440) * 280
+        : (Dimensions.get("window").height / 440) * 238,
   },
 });
 

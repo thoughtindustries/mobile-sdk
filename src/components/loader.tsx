@@ -20,30 +20,37 @@ const Loader = ({ size }: LoaderProps) => {
     })();
   }, []);
 
-  const style = StyleSheet.create({
-    container: {
-      width: size,
-      height: size,
-      backgroundColor: "#cccccc55",
-      borderRadius: size,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-  });
-
   return (
-    <View style={style.container}>
+    <View
+      style={[
+        style.container,
+        { height: size, width: size, borderRadius: size },
+      ]}
+    >
       <Animated.View
-        style={{
-          height: init,
-          width: init,
-          borderRadius: size,
-          backgroundColor: "#cccccc33",
-        }}
+        style={[
+          style.loader,
+          {
+            height: init,
+            width: init,
+            borderRadius: size,
+          },
+        ]}
       />
     </View>
   );
 };
+
+const style = StyleSheet.create({
+  container: {
+    backgroundColor: "#cccccc55",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loader: {
+    backgroundColor: "#cccccc33",
+  },
+});
 
 export default Loader;
