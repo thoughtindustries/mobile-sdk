@@ -110,3 +110,8 @@ export type ErrorMessageType = {
   title: string;
   message: string;
 };
+
+export enum Screens {
+  ContentDetails = "ContentDetails",
+  Home = "Home",
+}

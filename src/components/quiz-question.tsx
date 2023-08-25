@@ -14,6 +14,8 @@ import Button from "./button";
 import RenderHtml from "react-native-render-html";
 import { useUpdateAssessmentAttemptMutation } from "../graphql";
 import { useQuizContext } from "../context";
+import { AssessmentAttemptStatus } from "../graphql/global-types";
+import { fonts, scaleDimension, theme } from "../utils";
 
 interface Answer {
   value: string | undefined;
@@ -61,7 +63,7 @@ const QuizQuestion = ({ quiz }: Quiz) => {
         variables: {
           assessmentAttempt: {
             id: attemptId,
-            status: "started",
+            status: AssessmentAttemptStatus.started,
           },
           activeQuestion: {
             body: question.body,
@@ -90,7 +92,7 @@ const QuizQuestion = ({ quiz }: Quiz) => {
         variables: {
           assessmentAttempt: {
             id: attemptId,
-            status: "finished",
+            status: AssessmentAttemptStatus.finished,
           },
           activeQuestion: {
             body: question.body,
@@ -139,16 +141,16 @@ const QuizQuestion = ({ quiz }: Quiz) => {
                   {
                     backgroundColor:
                       attempt.correct === true && attempt.idx === idx
-                        ? "#DCE5DF"
+                        ? theme.surface["surface-success"]
                         : attempt.correct === false && attempt.idx === idx
-                        ? "#F7DADD"
-                        : "#FCFCFF",
+                        ? theme.surface["surface-error"]
+                        : theme.surface["surface-200"],
                     borderColor:
                       attempt.correct === true && attempt.idx === idx
-                        ? "#326D3C"
+                        ? theme.border["border-success"]
                         : attempt.correct === false && attempt.idx === idx
-                        ? "#DC2626"
-                        : "#E5E7EB",
+                        ? theme.border["border-error"]
+                        : theme.border["border-100"],
                   },
                 ]}
               >
@@ -210,8 +212,8 @@ const QuizQuestion = ({ quiz }: Quiz) => {
 
 const styles = StyleSheet.create({
   answerText: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 14,
+    fontFamily: fonts.inter.regular,
+    fontSize: scaleDimension(14, true),
   },
   container: {
     display: "flex",
@@ -219,36 +221,36 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   choice: {
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 8,
+    paddingVertical: scaleDimension(20, true),
+    paddingHorizontal: scaleDimension(20, true),
+    marginBottom: scaleDimension(20, true),
+    borderRadius: scaleDimension(8, true),
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: theme.border["border-100"],
   },
   choiceValue: {
-    margin: -4,
+    margin: scaleDimension(-4, true),
   },
   rejoinder: {
-    color: "#737373",
+    color: theme.text["text-primary"],
     opacity: 0.5,
-    marginBottom: -16,
+    marginBottom: scaleDimension(-16, true),
   },
   image: {
-    height: 100,
+    height: scaleDimension(50, false),
     width: "100%",
-    marginBottom: 10,
+    marginBottom: scaleDimension(10, true),
   },
   questionText: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 16,
-    color: "#6B7280",
+    fontFamily: fonts.poppins.regular,
+    fontSize: scaleDimension(16, true),
+    color: theme.text["text-secondary"],
   },
   questionTitle: {
-    fontFamily: "Inter_700Bold",
-    fontSize: 20,
-    color: "#1F2937",
-    marginBottom: 30,
+    fontFamily: fonts.inter.bold,
+    fontSize: scaleDimension(20, true),
+    color: theme.text["text-primary"],
+    marginBottom: scaleDimension(15, false),
   },
   questionButton: {
     position: "absolute",

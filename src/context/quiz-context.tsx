@@ -9,8 +9,8 @@ interface QuizResult {
 interface QuizProps {
   setInitQuiz: (initQuiz: boolean) => void;
   initQuiz: boolean;
-  setAttemptId: (attemptId: string | undefined) => void;
-  attemptId: string | undefined;
+  setAttemptId: (attemptId: string) => void;
+  attemptId: string;
   setResult: (result: QuizResult) => void;
   result: QuizResult | undefined;
   setQuiz: (quiz: any) => void;
@@ -40,7 +40,7 @@ export const useQuizContext = () => useContext(QuizContext);
 
 export const QuizProvider = ({ children }: QuizProviderProps) => {
   const [initQuiz, setInitQuiz] = useState<boolean>(false);
-  const [attemptId, setAttemptId] = useState<string | undefined>("");
+  const [attemptId, setAttemptId] = useState<string>("");
   const [result, setResult] = useState<QuizResult>();
   const [quiz, setQuiz] = useState<any>({});
 

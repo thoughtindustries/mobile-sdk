@@ -1,7 +1,8 @@
 import React from "react";
 import { View, TextInput, StyleSheet, Pressable } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Search, XCircle } from "lucide-react-native";
 import { isEmpty } from "lodash";
+import { scaleDimension, theme } from "../utils";
 
 interface SearchBarProps {
   searchText: string;
@@ -20,16 +21,12 @@ const Searchbar = ({ searchText, setSearch }: SearchBarProps) => {
       />
       {isEmpty(searchText) && (
         <Pressable onPress={() => setSearch(searchText)} style={styles.magnify}>
-          <MaterialCommunityIcons name="magnify" size={22} color="#232323" />
+          <Search color={theme.text["text-secondary"]} size={20} />
         </Pressable>
       )}
       {!isEmpty(searchText) && (
         <Pressable onPress={() => setSearch("")} style={styles.magnify}>
-          <MaterialCommunityIcons
-            name="close-circle-outline"
-            size={22}
-            color="#232323"
-          />
+          <XCircle size={20} color={theme.text["text-secondary"]} />
         </Pressable>
       )}
     </View>
@@ -38,22 +35,22 @@ const Searchbar = ({ searchText, setSearch }: SearchBarProps) => {
 
 const styles = StyleSheet.create({
   searchboxContainer: {
-    height: 50,
+    height: scaleDimension(26, false),
     display: "flex",
     flexDirection: "row",
   },
   searchbox: {
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#E5E7EB",
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#F9FAFB",
+    borderColor: theme.border["border-100"],
+    padding: scaleDimension(10, true),
+    borderRadius: scaleDimension(10, true),
+    backgroundColor: theme.interface["ui-quaternary"],
     flexGrow: 1,
   },
   magnify: {
-    right: 10,
-    top: 15,
+    right: scaleDimension(10, true),
+    top: scaleDimension(8, false),
     position: "absolute",
   },
 });

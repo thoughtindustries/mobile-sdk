@@ -1,16 +1,16 @@
 import React, { FC, ReactNode } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
-import { placeHolderimage } from "../helpers";
+import { placeHolderImage } from "../utils";
 
 interface HeroProps {
   asset: string;
   children: ReactNode;
 }
 
-const Hero: FC<HeroProps> = ({ asset, children }) => {
+const Hero = ({ asset, children }: HeroProps) => {
   return (
     <ImageBackground
-      source={asset ? { uri: asset } : placeHolderimage}
+      source={asset ? { uri: asset } : placeHolderImage}
       resizeMode="cover"
       style={styles.hero}
     >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Animated } from "react-native";
+import { theme } from "../utils";
 
 interface LoaderProps {
   size: number;
@@ -43,13 +44,13 @@ const Loader = ({ size }: LoaderProps) => {
 
 const style = StyleSheet.create({
   container: {
-    backgroundColor: "#cccccc55",
+    backgroundColor: theme.surface["surface-300"],
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   loader: {
-    backgroundColor: "#cccccc33",
+    backgroundColor: theme.surface["surface-400"],
   },
 });
 

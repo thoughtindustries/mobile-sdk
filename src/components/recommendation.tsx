@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useDataContext } from "../context";
-import { placeHolderimage } from "../helpers";
+import { placeHolderImage, scaleDimension, fonts, theme } from "../utils";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -25,6 +25,13 @@ const Recommendation = () => {
       )
   );
 
+  const handleNav = (courseId: string) => {
+    navigation.navigate("ContentDetails", {
+      cid: courseId,
+      from: "Home",
+    });
+  };
+
   const CatalogList = () => (
     <ScrollView
       horizontal={true}
@@ -33,20 +40,15 @@ const Recommendation = () => {
     >
       {recommendations?.map((course, idx) => (
         <TouchableOpacity
+          style={styles.recContentBox}
           key={idx}
-          onPress={() =>
-            navigation.navigate("ContentDetails", {
-              cid: course?.displayCourse,
-              from: "Home",
-            })
-          }
+          onPress={() => handleNav(course.displayCourse || "")}
         >
-          <View style={styles.recContentBox}>
+          <View>
             <ImageBackground
               key={idx}
-              source={course.asset ? { uri: course.asset } : placeHolderimage}
+              source={course.asset ? { uri: course.asset } : placeHolderImage}
               resizeMode="cover"
-              style={styles.imageBackground}
               imageStyle={styles.image}
             >
               <View style={styles.bannerArea}>
@@ -61,7 +63,7 @@ const Recommendation = () => {
 
   return (
     <View>
-      <View style={styles.courseBox}>
+      <View style={styles.sectionName}>
         <Text style={styles.heading}>Recommendations</Text>
       </View>
       <CatalogList />
@@ -70,50 +72,47 @@ const Recommendation = () => {
 };
 
 const styles = StyleSheet.create({
-  courseBox: {
-    marginTop: 5,
+  sectionName: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   heading: {
-    marginTop: 15,
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: "Poppins_700Bold",
-    color: "#000",
+    marginTop: scaleDimension(16, true),
+    fontSize: scaleDimension(8, false),
+    lineHeight: scaleDimension(14, false),
+    fontFamily: fonts.poppins.bold,
+    color: theme.text["text-primary"],
   },
   courseContainer: {
     display: "flex",
     flexDirection: "row",
-    padding: 5,
-    marginHorizontal: -12,
+    padding: scaleDimension(5, true),
+    marginLeft: scaleDimension(-12, true),
   },
   recContentBox: {
-    backgroundColor: "#FAFAFA",
     borderStyle: "solid",
-    borderColor: "#E5E7EB",
-    width: 260,
-    margin: 12,
+    borderColor: theme.border["border-100"],
+    margin: scaleDimension(12, true),
+    height: scaleDimension(150, false),
+    width: scaleDimension(300, true),
   },
   bannerArea: {
-    height: 282,
-    padding: 32,
+    height: "100%",
+    padding: scaleDimension(32, true),
     justifyContent: "flex-end",
-    fontFamily: "Poppins_400Regular",
+    fontFamily: fonts.poppins.regular,
   },
   courseTitle: {
-    color: "#D4D4D8",
-    fontWeight: "700",
-    fontSize: 16,
-    justifyContent: "flex-start",
-    lineHeight: 50,
+    color: theme.text["text-inverse"],
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(8, false),
+    paddingBottom: scaleDimension(5, false),
   },
   image: {
-    borderRadius: 8,
-  },
-  imageBackground: {
-    borderRadius: 10,
+    borderRadius: scaleDimension(6, true),
+    height: "100%",
+    width: "100%",
   },
 });
 

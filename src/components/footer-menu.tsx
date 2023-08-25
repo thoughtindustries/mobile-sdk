@@ -1,8 +1,14 @@
 import React from "react";
-import { Dimensions, PixelRatio } from "react-native";
+import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  Home as HomeIcon,
+  Search,
+  GraduationCap,
+  User,
+} from "lucide-react-native";
 import { Home, ExploreCatalog, MyLearnings, Account } from "../screens";
+import { scaleDimension, theme } from "../utils";
 
 const FooterMenu = ({ route }: { route: { name: string } }) => {
   const Tab = createBottomTabNavigator();
@@ -12,25 +18,12 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
       initialRouteName={route.name}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          height:
-            Dimensions.get("window").height < 700
-              ? (Dimensions.get("window").height / 440) * 55
-              : (Dimensions.get("window").height / 440) * 50,
-          justifyContent: "center",
-          alignItems: "center",
-        },
-        tabBarItemStyle: {
-          borderRadius: 6,
-          margin: (Dimensions.get("window").width / 440) * 10,
-        },
-        tabBarLabelStyle: {
-          marginBottom: (Dimensions.get("window").width / 440) * 10,
-          marginTop: (Dimensions.get("window").width / 440) * -8,
-        },
-        tabBarActiveTintColor: "#ffffff",
-        tabBarInactiveTintColor: "#6B7280",
-        tabBarActiveBackgroundColor: "#3B1FA3",
+        tabBarStyle: styles.tabBarStyle,
+        tabBarItemStyle: styles.tabBarItemStyle,
+        tabBarLabelStyle: styles.tabBarLabelStyle,
+        tabBarActiveTintColor: theme.text["text-inverse"],
+        tabBarInactiveTintColor: theme.text["text-secondary"],
+        tabBarActiveBackgroundColor: theme.brand["brand-primary"],
       }}
     >
       <Tab.Screen
@@ -38,11 +31,7 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={Home}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="home"
-              color={color}
-              size={(Dimensions.get("window").width / 440) * size}
-            />
+            <HomeIcon color={color} size={scaleDimension(size, true)} />
           ),
         }}
       />
@@ -51,11 +40,7 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={ExploreCatalog}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="magnify"
-              color={color}
-              size={(Dimensions.get("window").width / 440) * size}
-            />
+            <Search color={color} size={scaleDimension(size, true)} />
           ),
         }}
       />
@@ -64,11 +49,7 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={MyLearnings}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="school"
-              color={color}
-              size={(Dimensions.get("window").width / 440) * size}
-            />
+            <GraduationCap color={color} size={scaleDimension(size, true)} />
           ),
         }}
       />
@@ -77,16 +58,28 @@ const FooterMenu = ({ route }: { route: { name: string } }) => {
         component={Account}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="account"
-              color={color}
-              size={(Dimensions.get("window").width / 440) * size}
-            />
+            <User color={color} size={scaleDimension(size, true)} />
           ),
         }}
       />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  tabBarStyle: {
+    height: scaleDimension(55, false),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tabBarItemStyle: {
+    borderRadius: scaleDimension(6, true),
+    margin: scaleDimension(10, true),
+  },
+  tabBarLabelStyle: {
+    marginBottom: scaleDimension(10, true),
+    marginTop: scaleDimension(-8, true),
+  },
+});
 
 export default FooterMenu;

@@ -5,13 +5,18 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
-  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
+import { RootStackParamList, Screens } from "../../types";
 import { useDataContext } from "../context";
-import { placeHolderimage } from "../helpers";
+import {
+  truncateString,
+  placeHolderImage,
+  scaleDimension,
+  theme,
+  fonts,
+} from "../utils";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -24,24 +29,14 @@ const Banner = () => {
     ? contentData
     : catalogData;
 
-  const truncateString = (description: string, max: number) => {
-    if (description.length <= max) {
-      return description;
-    } else {
-      return description?.slice(0, max) + "...";
-    }
+  const handleBannerPress = () => {
+    const cid = content?.[0]?.id || "";
+    navigation.navigate(Screens.ContentDetails, { cid, from: Screens.Home });
   };
 
   return (
     <View>
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("ContentDetails", {
-            cid: content?.[0]?.id || "",
-            from: "Home",
-          })
-        }
-      >
+      <TouchableOpacity onPress={() => handleBannerPress()}>
         <View style={styles.bannerContainer}>
           <ImageBackground
             source={
@@ -49,7 +44,7 @@ const Banner = () => {
                 ? {
                     uri: content?.[0].asset,
                   }
-                : placeHolderimage
+                : placeHolderImage
             }
             resizeMode="cover"
             imageStyle={styles.image}
@@ -58,7 +53,7 @@ const Banner = () => {
               <Text style={styles.bannerTitle}>{content?.[0].title}</Text>
               {content?.[0].description && (
                 <Text style={styles.bannerText}>
-                  {truncateString(content[0].description, 65)}
+                  {truncateString(content[0].description, 30)}
                 </Text>
               )}
             </View>
@@ -71,31 +66,28 @@ const Banner = () => {
 
 const styles = StyleSheet.create({
   bannerContainer: {
-    borderRadius: 10,
+    borderRadius: scaleDimension(10, false),
   },
   bannerArea: {
-    paddingTop:
-      Dimensions.get("window").height < 667
-        ? (Dimensions.get("window").height / 440) * 50
-        : (Dimensions.get("window").height / 440) * 100,
-    padding: 32,
+    paddingTop: scaleDimension(100, false),
+    padding: scaleDimension(20, false),
     justifyContent: "flex-end",
-    fontFamily: "Poppins_400Regular",
+    fontFamily: fonts.poppins.regular,
   },
   bannerTitle: {
-    fontSize: (Dimensions.get("window").width / 440) * 24,
-    lineHeight: 36,
-    fontFamily: "Poppins_700Bold",
-    color: "#fff",
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(24, false),
+    fontFamily: fonts.poppins.bold,
+    color: theme.text["text-inverse"],
   },
   bannerText: {
-    fontSize: (Dimensions.get("window").width / 440) * 16,
-    lineHeight: 24,
-    fontFamily: "Poppins_400Regular",
-    color: "#ccc",
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    fontFamily: fonts.poppins.regular,
+    color: theme.text["text-inverse"],
   },
   image: {
-    borderRadius: 8,
+    borderRadius: scaleDimension(8, true),
   },
 });
 

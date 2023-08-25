@@ -1,37 +1,35 @@
-import React, { FC } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Loader from "./loader";
+import { fonts, scaleDimension, theme } from "../utils";
 
-interface LoadingBannerProps {}
-
-const LoadingBanner: FC<LoadingBannerProps> = () => {
+const LoadingBanner = () => {
   return (
-    <View style={styles.searching}>
-      <Text style={styles.searchingText}>Loading Data</Text>
+    <View style={styles.banner}>
+      <Text style={styles.prompt}>Loading Data</Text>
       <Loader size={50} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  searching: {
-    marginVertical: 30,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 10,
-    paddingBottom: 20,
+  banner: {
+    marginVertical: scaleDimension(30, true),
+    backgroundColor: theme.brand["brand-primary"],
+    borderRadius: scaleDimension(10, true),
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
+    padding: scaleDimension(24, true),
   },
-
-  searchingText: {
-    fontSize: 16,
-    lineHeight: 24,
+  prompt: {
+    fontSize: scaleDimension(20, true),
+    lineHeight: scaleDimension(12, false),
     textAlign: "center",
-    color: "#ffffff",
-    fontFamily: "Poppins_700Bold",
-    padding: 20,
+    color: theme.text["text-inverse"],
+    fontFamily: fonts.poppins.bold,
+    marginBottom: scaleDimension(24, true),
   },
 });
 

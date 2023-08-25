@@ -183,10 +183,10 @@ export type CourseByIdQuery = {
   };
 };
 
-enum AssessmentAttemptStatus {
-  started,
-  finished,
-  pending,
+export enum AssessmentAttemptStatus {
+  started = "started",
+  finished = "finished",
+  pending = "pending",
 }
 
 enum AssessmentTopicType {
@@ -223,65 +223,65 @@ export type QuestionCategoryInput = Exact<{
 }>;
 
 export type QuestionChoiceInput = Exact<{
-  choiceId: Scalars["String"];
-  value: Scalars["String"];
-  correct: Scalars["Boolean"];
-  valueArray: Array<Scalars["String"]>;
-  asset: Scalars["String"];
-  response: Scalars["String"];
-  points: Scalars["Int"];
-  altText: Scalars["String"];
+  choiceId?: Scalars["String"];
+  value?: Scalars["String"];
+  correct?: Scalars["Boolean"];
+  valueArray?: Array<Scalars["String"]>;
+  asset?: Scalars["String"];
+  response?: Scalars["String"];
+  points?: Scalars["Int"];
+  altText?: Scalars["String"];
 }>;
 
 export type QuestionInput = Exact<{
-  parentQuestion: Scalars["ID"];
-  body: Scalars["String"];
-  questionId: Scalars["ID"];
-  additionalContent: Scalars["String"];
-  openEndedResponse: Scalars["String"];
-  response: Scalars["String"];
-  fileSubmissionAsset: Scalars["String"];
-  selectedChoice: QuestionChoiceInput;
-  type: Scalars["String"];
-  mustSelectAllCorrectChoices: Scalars["Boolean"];
-  choices: Array<QuestionChoiceInput>;
-  deleted: Scalars["Boolean"];
-  questionCategoryId: Scalars["ID"];
-  questionCategory: QuestionCategoryInput;
-  displayOption: QuestionDisplayOption;
-  preText: Scalars["String"];
-  preTextDisplayOption: QuestionDisplayOption;
-  postText: Scalars["String"];
-  postTextDisplayOption: QuestionDisplayOption;
-  preText2: Scalars["String"];
-  preTextDisplayOption2: QuestionDisplayOption;
-  postText2: Scalars["String"];
-  postTextDisplayOption2: QuestionDisplayOption;
-  placeholder: Scalars["String"];
-  preselectedChoices: Array<Scalars["String"]>;
-  copyAnswerFromQuestionId: Scalars["ID"];
-  copyAnswerFromAssessmentId: Scalars["ID"];
-  copyAnswerFromQuestion: QuestionInput;
-  table: QuestionTableInput;
-  tableResponse: QuestionTableInput;
-  addAndDeleteRowsEnabled: Boolean;
+  parentQuestion?: Scalars["ID"];
+  body?: Scalars["String"];
+  questionId?: Scalars["ID"];
+  additionalContent?: Scalars["String"];
+  openEndedResponse?: Scalars["String"];
+  response?: Scalars["String"];
+  fileSubmissionAsset?: Scalars["String"];
+  selectedChoice?: QuestionChoiceInput;
+  type?: Scalars["String"];
+  mustSelectAllCorrectChoices?: Scalars["Boolean"];
+  choices?: Array<QuestionChoiceInput>;
+  deleted?: Scalars["Boolean"];
+  questionCategoryId?: Scalars["ID"];
+  questionCategory?: QuestionCategoryInput;
+  displayOption?: QuestionDisplayOption;
+  preText?: Scalars["String"];
+  preTextDisplayOption?: QuestionDisplayOption;
+  postText?: Scalars["String"];
+  postTextDisplayOption?: QuestionDisplayOption;
+  preText2?: Scalars["String"];
+  preTextDisplayOption2?: QuestionDisplayOption;
+  postText2?: Scalars["String"];
+  postTextDisplayOption2?: QuestionDisplayOption;
+  placeholder?: Scalars["String"];
+  preselectedChoices?: Array<Scalars["String"]>;
+  copyAnswerFromQuestionId?: Scalars["ID"];
+  copyAnswerFromAssessmentId?: Scalars["ID"];
+  copyAnswerFromQuestion?: QuestionInput;
+  table?: QuestionTableInput;
+  tableResponse?: QuestionTableInput;
+  addAndDeleteRowsEnabled?: Boolean;
 }>;
 
 export type AssessmentAttemptInput = Exact<{
   id: Scalars["ID"];
-  timeElapsedInSeconds: Scalars["Int"];
+  timeElapsedInSeconds?: Scalars["Int"];
   status: AssessmentAttemptStatus;
-  grade: Scalars["Int"];
-  passed: Scalars["Boolean"];
-  assignmentSubmission: Scalars["ID"];
-  topicType: TopicType;
-  forgiven: Scalars["Boolean"];
-  correctQuestionsCount: Scalars["ID"];
-  answeredQuestionsCount: Scalars["ID"];
-  unansweredQuestionsCount: Scalars["ID"];
-  questionsWithChoicesCount: Scalars["ID"];
-  poolLabelByQuestionId: JSON;
-  questions: Array<QuestionInput>;
+  grade?: Scalars["Int"];
+  passed?: Scalars["Boolean"];
+  assignmentSubmission?: Scalars["ID"];
+  topicType?: TopicType;
+  forgiven?: Scalars["Boolean"];
+  correctQuestionsCount?: Scalars["ID"];
+  answeredQuestionsCount?: Scalars["ID"];
+  unansweredQuestionsCount?: Scalars["ID"];
+  questionsWithChoicesCount?: Scalars["ID"];
+  poolLabelByQuestionId?: JSON;
+  questions?: Array<QuestionInput>;
 }>;
 
 export type LoadAssessmentAttemptWithQuestionsQueryVariables = Exact<{

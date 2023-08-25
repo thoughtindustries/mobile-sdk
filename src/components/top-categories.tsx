@@ -1,14 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Link } from ".";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../types";
-
-type TopCategoriesProps = StackNavigationProp<RootStackParamList, "HomeScreen">;
+import { fonts, scaleDimension, theme } from "../utils";
 
 const TopCategories = () => {
-  const navigation = useNavigation<TopCategoriesProps>();
   const categories: string[] = [
     "Partner",
     "Enablement",
@@ -19,21 +14,18 @@ const TopCategories = () => {
 
   return (
     <View>
-      <View style={styles.topCatBox}>
-        <Text style={styles.heading}>Top Categories</Text>
-        <Link
-          title="See All"
-          onPress={() => navigation.navigate("TopCategories")}
-        />
+      <View style={styles.heading}>
+        <Text style={styles.title}>Top Categories</Text>
+        <Link title="See All" onPress={() => null} />
       </View>
       <ScrollView
         horizontal={true}
-        style={styles.catContainer}
+        style={styles.container}
         showsHorizontalScrollIndicator={false}
       >
-        {categories.map((cat, idx) => (
-          <View key={idx} style={styles.catBox}>
-            <Text style={styles.catTitle}>{cat}</Text>
+        {categories.map((category, idx) => (
+          <View key={idx} style={styles.card}>
+            <Text style={styles.category}>{category}</Text>
           </View>
         ))}
       </ScrollView>
@@ -42,42 +34,41 @@ const TopCategories = () => {
 };
 
 const styles = StyleSheet.create({
-  topCatBox: {
-    marginTop: (Dimensions.get("window").height / 440) * 8,
+  heading: {
+    marginTop: scaleDimension(8, false),
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  heading: {
-    marginTop: 15,
-    fontSize: (Dimensions.get("window").width / 400) * 16,
-    lineHeight: 24,
-    fontFamily: "Poppins_700Bold",
-    color: "#000",
+  title: {
+    marginTop: scaleDimension(16, true),
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    fontFamily: fonts.poppins.bold,
+    color: theme.text["text-primary"],
   },
-  catContainer: {
+  container: {
     display: "flex",
     flexDirection: "row",
-    padding: 5,
-    marginHorizontal: -4,
+    marginLeft: scaleDimension(-2, true),
   },
-  catTitle: {
-    color: "#1f2937",
-    fontWeight: "400",
-    fontSize: (Dimensions.get("window").width / 440) * 16,
-    lineHeight: 24,
-    paddingVertical: (Dimensions.get("window").width / 440) * 14,
-    paddingHorizontal: (Dimensions.get("window").width / 440) * 14,
+  category: {
+    color: theme.text["text-primary"],
+    fontFamily: fonts.inter.regular,
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    paddingVertical: scaleDimension(14, true),
+    paddingHorizontal: scaleDimension(14, true),
   },
-  catBox: {
-    backgroundColor: "#f9fafv",
+  card: {
+    backgroundColor: theme.surface["surface-200"],
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#d1d5db",
-    borderRadius: 8,
+    borderColor: theme.border["border-200"],
+    borderRadius: scaleDimension(8, true),
     alignItems: "center",
-    minWidth: 104,
-    margin: 4,
+    minWidth: scaleDimension(120, true),
+    margin: scaleDimension(4, true),
   },
 });
 

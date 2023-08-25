@@ -1,5 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
+import { fonts, scaleDimension, theme } from "../utils";
 
 interface LinkProps {
   title: string;
@@ -18,13 +19,13 @@ const styles = StyleSheet.create({
   link: {
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: scaleDimension(16, true),
   },
 
   linkText: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: (Dimensions.get("window").width / 440) * 18,
-    color: "#3B1FA3",
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(18, true),
+    color: theme.brand["brand-primary"],
   },
 });
 

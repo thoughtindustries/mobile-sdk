@@ -6,13 +6,14 @@ import {
   useLoadAssessmentAttemptsByTopicOrCourseQuery,
 } from "../graphql";
 import { useQuizContext } from "../context";
+import { fonts, scaleDimension, theme } from "../utils";
 
 interface CourseQuizProps {
   courseid: string;
   quiz: any;
 }
 
-const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
+const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   const [query, setQuery] = useState<boolean>(false);
   const { initQuiz, setInitQuiz, setAttemptId, result, setQuiz, setResult } =
     useQuizContext();
@@ -66,7 +67,7 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
 
   const startQuiz = () => {
     setInitQuiz(true);
-    setAttemptId(data?.LoadAssessmentAttemptWithQuestions.id);
+    setAttemptId(data?.LoadAssessmentAttemptWithQuestions.id || "");
   };
 
   useEffect(() => {
@@ -116,52 +117,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   heading: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 20,
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(12, false),
     textAlign: "center",
-    padding: 8,
+    padding: scaleDimension(6, false),
   },
   startMessage: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 16,
+    fontFamily: fonts.poppins.regular,
+    fontSize: scaleDimension(8, false),
     textAlign: "center",
-    color: "#6B7280",
-    paddingBottom: 10,
-  },
-  quizBox: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 10,
-    backgroundColor: "#FCFCFF",
-    padding: 10,
-    width: "100%",
-    marginBottom: 20,
-  },
-  quizBoxIcon: {
-    borderWidth: 1,
-    padding: 3,
-    borderColor: "#E5E7EB",
-    borderRadius: 5,
-    backgroundColor: "#F3F4F6",
-    marginRight: 5,
+    color: theme.text["text-secondary"],
+    paddingBottom: scaleDimension(6, false),
   },
   quizHeader: {
     height: "100%",
   },
   quizButton: {
     position: "absolute",
-    bottom: 10,
+    bottom: scaleDimension(10, true),
     width: "100%",
-  },
-  prenote: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 10,
-    color: "#6B7280",
-  },
-  boldnote: {
-    fontFamily: "Inter_700Bold",
-    fontSize: 14,
-    color: "#1F2937",
   },
 });
 
