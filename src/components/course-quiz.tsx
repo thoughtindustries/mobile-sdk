@@ -35,7 +35,7 @@ const CourseQuiz: FC<CourseQuizProps> = ({ quiz, courseid }) => {
   } = useLoadAssessmentAttemptsByTopicOrCourseQuery({
     variables: {
       courseId: courseid,
-      topicId: quiz.id,
+      topicId: quiz?.id,
     },
   });
 
