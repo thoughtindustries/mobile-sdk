@@ -35,7 +35,8 @@ const ExploreCourse = () => {
 
   const TextPage: FC = () => {
     const { width } = useWindowDimensions();
-    const html = pagesData?.Pages?.[0].body;
+    const html =
+      pagesData?.Pages?.[0].body || pagesData?.Pages?.[0]?.languages?.[0]?.body;
 
     return (
       <View
@@ -143,11 +144,10 @@ const ExploreCourse = () => {
         <View style={styles(progress, topicIndex, topics.length).progressBar} />
       </View>
       <View style={styles(progress, topicIndex, topics.length).topicPage}>
-        {pagesData?.Pages?.[0]?.type === "text" ? (
-          <TextPage />
-        ) : pagesData?.Pages?.[0]?.type === "video" ? (
-          <VideoPage />
-        ) : (
+        {pagesData?.Pages?.[0]?.type === "text" ||
+          (pagesData?.Pages?.[0]?.type === undefined && <TextPage />)}
+        {pagesData?.Pages?.[0]?.type === "video" && <VideoPage />}
+        {pagesData?.Pages?.[0].type === "quiz" && (
           <QuizProvider>
             <CourseQuiz quiz={pagesData?.Pages?.[0]} courseid={cid} />
           </QuizProvider>
