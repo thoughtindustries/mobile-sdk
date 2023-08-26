@@ -4,7 +4,7 @@ import { Logo, Button, Link } from "../components";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import AppStyle from "../../AppStyle";
+import { scaleDimension, fonts, theme } from "../utils";
 
 type OnboardingScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -15,7 +15,7 @@ const Onboarding = () => {
   const navigation = useNavigation<OnboardingScreenProps>();
 
   return (
-    <View style={AppStyle.container}>
+    <View style={styles.container}>
       <View style={styles.prompt}>
         <Logo />
         <Text style={styles.title}>Let's Get Started</Text>
@@ -40,6 +40,12 @@ const Onboarding = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "space-evenly",
+    padding: scaleDimension(16, false),
+    paddingTop: scaleDimension(30, false),
+  },
   prompt: {
     justifyContent: "center",
     alignItems: "center",
@@ -48,22 +54,22 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   title: {
-    fontSize: (Dimensions.get("window").width / 440) * 24,
-    lineHeight: 36,
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "center",
-    color: "#1F2937",
-    marginBottom: 10,
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    marginBottom: scaleDimension(5, false),
+    fontFamily: fonts.poppins.bold,
   },
   subtitle: {
-    fontSize: (Dimensions.get("window").width / 440) * 16,
-    lineHeight: 24,
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
     textAlign: "center",
-    color: "#6B7280",
-    fontFamily: "Poppins_400Regular",
+    color: theme.text["text-secondary"],
+    fontFamily: fonts.poppins.regular,
   },
   button: {
-    marginVertical: 20,
+    marginVertical: scaleDimension(10, false),
   },
 });
 

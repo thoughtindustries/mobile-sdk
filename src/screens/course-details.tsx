@@ -1,19 +1,21 @@
 import React, { useState, FC } from "react";
 import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Button, LoadingBanner, Hero } from "../components";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { ChevronLeft, Menu } from "lucide-react-native";
 import { useCourseByIdQuery } from "../graphql";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDataContext } from "../context";
+import { fonts, scaleDimension, theme } from "../utils";
 
-type MyLearningProps = StackNavigationProp<RootStackParamList, "MyLearning">;
+type MyLearningProps = StackNavigationProp<RootStackParamList, "CourseDetails">;
 
 const CourseDetails = () => {
   const navigation = useNavigation<MyLearningProps>();
-  const route = useRoute();
+  const route = useRoute<RouteProp<RootStackParamList, "CourseDetails">>();
   const { cid, asset, contentTypeLabel } = route.params;
   const [showPage, setShowPage] = useState<boolean>(false);
 
@@ -31,14 +33,15 @@ const CourseDetails = () => {
   const CourseDetailsBanner: FC = () => (
     <Hero asset={asset}>
       <View style={styles.bannerArea}>
-        <View style={styles.buttons}>
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={36}
-            color="#374151"
-            onPress={() => navigation.goBack()}
+        <TouchableOpacity
+          style={styles.buttons}
+          onPress={() => navigation.goBack()}
+        >
+          <ChevronLeft
+            size={scaleDimension(36, true)}
+            color={theme.text["text-primary"]}
           />
-        </View>
+        </TouchableOpacity>
         <Text style={styles.bannerTitle}>
           {courseData?.CourseById?.title || catalogCourse?.title}
         </Text>
@@ -65,7 +68,10 @@ const CourseDetails = () => {
       style={styles.courseDetailsNav}
       onPress={() => setShowPage(false)}
     >
-      <MaterialCommunityIcons name="chevron-left" size={32} color="#374151" />
+      <ChevronLeft
+        size={scaleDimension(32, true)}
+        color={theme.text["text-primary"]}
+      />
       <Text style={styles.courseDetailsNavButton}>Back</Text>
     </TouchableOpacity>
   );
@@ -81,7 +87,7 @@ const CourseDetails = () => {
           <CourseDetailsNav />
           <View style={styles.articleHeading}>
             <TouchableOpacity>
-              <MaterialCommunityIcons name="menu" size={32} color="#6B7280" />
+              <Menu size={scaleDimension(32, true)} />
             </TouchableOpacity>
             <Text style={styles.courseTitle}>
               {courseData?.CourseById.title || catalogCourse?.title}
@@ -95,10 +101,7 @@ const CourseDetails = () => {
             <CourseDetailsDescription />
             <View style={styles.divide} />
             <View style={styles.button}>
-              <Button
-                title={`View ${contentTypeLabel}`}
-                onPress={() => setShowPage(true)}
-              />
+              <Button title={`View ${contentTypeLabel}`} onPress={() => null} />
             </View>
           </View>
         </View>
@@ -121,94 +124,91 @@ const styles = StyleSheet.create({
   },
   divide: {
     borderTopWidth: 2,
-    borderTopColor: "#E5E7EB",
+    borderTopColor: theme.border["border-100"],
   },
   bannerArea: {
     flex: 1,
-    padding: 20,
+    padding: scaleDimension(20, true),
     justifyContent: "space-between",
-    fontFamily: "Poppins_400Regular",
+    fontFamily: fonts.poppins.regular,
   },
   courseDetailsDescription: {
     flex: 6,
-    padding: 30,
+    padding: scaleDimension(30, true),
   },
   courseDetailsDescriptionTitle: {
-    fontFamily: "Poppins_700Bold",
-    marginBottom: 16,
+    fontFamily: fonts.poppins.bold,
+    marginBottom: scaleDimension(16, true),
   },
   courseDetailsNav: {
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginLeft: 20,
-    marginTop: 60,
-    marginBottom: 20,
+    marginLeft: scaleDimension(20, true),
+    marginTop: scaleDimension(30, false),
+    marginBottom: scaleDimension(10, false),
   },
   courseDetailsNavButton: {
-    fontSize: 16,
-    fontFamily: "Poppins_400Regular",
+    fontSize: scaleDimension(16, true),
+    fontFamily: fonts.poppins.regular,
   },
   button: {
-    margin: 30,
+    margin: scaleDimension(30, true),
   },
   buttonContainer: {
     flex: 1.5,
   },
   loader: {
-    marginTop: 30,
-    marginHorizontal: 30,
+    marginTop: scaleDimension(16, false),
+    marginHorizontal: scaleDimension(30, true),
   },
   buttons: {
-    backgroundColor: "#F9FAFB",
-    height: 40,
-    width: 40,
-    borderRadius: 10,
+    backgroundColor: theme.interface["ui-quaternary"],
+    height: scaleDimension(20, false),
+    width: scaleDimension(45, true),
+    borderRadius: scaleDimension(10, true),
     padding: 2,
-    marginTop: 30,
+    marginTop: scaleDimension(16, false),
+    justifyContent: "center",
+    alignItems: "center",
   },
   bannerTitle: {
-    fontSize: 32,
-    lineHeight: 36,
-    fontFamily: "Poppins_700Bold",
-    color: "#D4D4D8",
+    fontSize: scaleDimension(32, true),
+    lineHeight: scaleDimension(18, false),
+    fontFamily: fonts.poppins.bold,
+    color: theme.text["text-100"],
   },
   title: {
-    fontSize: 20,
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#6B7280",
-    fontFamily: "Inter_400Regular",
+    fontSize: scaleDimension(24, true),
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   courseTitle: {
-    color: "#3B1FA3",
-    fontFamily: "Poppins_700Bold",
-    fontSize: 16,
-    lineHeight: 24,
-    paddingHorizontal: 16,
+    color: theme.brand["brand-primary"],
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    paddingHorizontal: scaleDimension(16, true),
   },
   body: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 14,
-    lineHeight: 24,
-    color: "#6B7280",
+    fontFamily: fonts.inter.regular,
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    color: theme.text["text-secondary"],
   },
   row: {
-    backgroundColor: "#fff",
-    paddingTop: 40,
+    backgroundColor: theme.surface["surface-100"],
+    paddingTop: scaleDimension(40, true),
     display: "flex",
     flexDirection: "row",
   },
   articleHeading: {
     borderTopWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FFFFFF",
+    borderColor: theme.border["border-100"],
+    backgroundColor: theme.surface["surface-100"],
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
+    padding: scaleDimension(20, true),
   },
 });
 

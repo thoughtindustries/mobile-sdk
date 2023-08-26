@@ -7,6 +7,7 @@ import {
   Recommendation,
   RecentCourses,
 } from "../components";
+import { scaleDimension } from "../utils";
 
 const Home = () => {
   return (
@@ -24,8 +25,8 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   page: {
-    marginHorizontal: 30,
-    height: Dimensions.get("window").height - 220,
+    marginHorizontal: scaleDimension(30, true),
+    height: Dimensions.get("window").height - scaleDimension(110, false),
   },
 });
 

@@ -11,10 +11,8 @@ import {
 } from "react-native";
 import { courseListType, filtersType, RootStackParamList } from "../../types";
 import { Searchbar, FilterControl, LoadingBanner } from "../components";
-import Utils from "../helpers/Utils";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import {
   useUserContentItemsQuery,
@@ -25,7 +23,8 @@ import {
 import { FilterContext } from "../context";
 import { saveContent, getContent, removeContent } from "../db/db";
 import { ContentKind } from "../graphql/global-types";
-import { placeHolderimage } from "../helpers";
+import { Download, XCircle } from "lucide-react-native";
+import { fonts, scaleDimension, theme, placeHolderImage } from "../utils";
 
 type MyLearningScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -165,10 +164,10 @@ const MyLearnings = () => {
   const CourseItem = ({ data }: { data: courseListType }) => {
     const contentLabelStyle =
       data.kind === ContentKind.Article
-        ? styles.Article
+        ? styles.articleTag
         : data.kind === ContentKind.CourseGroup
-        ? styles.Course
-        : styles.Video;
+        ? styles.courseTag
+        : styles.videoTag;
 
     return (
       <TouchableOpacity
@@ -183,7 +182,7 @@ const MyLearnings = () => {
         }}
       >
         <Image
-          source={data.asset ? { uri: data.asset } : placeHolderimage}
+          source={data.asset ? { uri: data.asset } : placeHolderImage}
           style={styles.contentImage}
         />
         <View style={styles.contentRightBox}>
@@ -211,10 +210,10 @@ const MyLearnings = () => {
       Number(percentCompleteData?.UserCourseProgress?.percentComplete) || 0;
     const contentLabelStyle =
       kind === ContentKind.Article
-        ? styles.Article
+        ? styles.articleTag
         : kind === ContentKind.CourseGroup
-        ? styles.Course
-        : styles.Video;
+        ? styles.courseTag
+        : styles.videoTag;
 
     return (
       <TouchableOpacity
@@ -234,7 +233,7 @@ const MyLearnings = () => {
               ? {
                   uri: data.asset,
                 }
-              : placeHolderimage
+              : placeHolderImage
           }
           style={styles.contentImage}
         />
@@ -251,15 +250,17 @@ const MyLearnings = () => {
                     : deleteContent(data)
                 }
               >
-                <MaterialCommunityIcons
-                  name={
-                    data.id !== offlineContent?.[index]?.id
-                      ? "download"
-                      : "close-circle-outline"
-                  }
-                  size={22}
-                  color="#232323"
-                />
+                {data.id !== offlineContent?.[index]?.id ? (
+                  <Download
+                    size={scaleDimension(24, true)}
+                    color={theme.text["text-primary"]}
+                  />
+                ) : (
+                  <XCircle
+                    size={scaleDimension(24, true)}
+                    color={theme.text["text-primary"]}
+                  />
+                )}
               </TouchableOpacity>
             )}
           </View>
@@ -357,193 +358,156 @@ const MyLearnings = () => {
   return (
     <View style={styles.page}>
       <Text style={styles.title}>My Learning</Text>
-      {Utils.isOffline() === true && <ContentList />}
-      {Utils.isOffline() !== true && (
-        <View>
-          <View style={styles.searchboxContainer}>
-            <View style={styles.searchBar}>
-              <Searchbar searchText={search} setSearch={setSearch} />
-            </View>
-            <FilterContext.Provider value={{ filters, setFilters }}>
-              <FilterControl />
-            </FilterContext.Provider>
+      <View>
+        <View style={styles.searchboxContainer}>
+          <View style={styles.searchBar}>
+            <Searchbar searchText={search} setSearch={setSearch} />
           </View>
-          {contentItemDataLoading ? (
-            <LoadingBanner />
-          ) : (
-            <View>
-              {contentItemData?.UserContentItems &&
-              contentItemData?.UserContentItems.length !== 0 ? (
-                <View>
-                  {Dimensions.get("window").height > 667 && (
-                    <View>
-                      <Text style={styles.latestTitle}>Latest Active</Text>
-                      <TouchableOpacity
-                        onPress={() =>
-                          navigation.navigate("ContentDetails", {
-                            cid:
-                              contentItemData?.UserContentItems?.[0]?.id || "",
-                            from: "My Learnings",
-                          })
-                        }
-                        style={styles.recentContent}
-                      >
-                        <Text style={styles.courseTitle}>
-                          {contentItemData?.UserContentItems?.[0].title}
-                        </Text>
-                        <Image
-                          source={
-                            contentItemData?.UserContentItems?.[0].asset
-                              ? {
-                                  uri: contentItemData?.UserContentItems?.[0]
-                                    .asset,
-                                }
-                              : placeHolderimage
-                          }
-                          style={styles.recentImage}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-
-                  <CategoryFilter />
-                  <ContentList />
-                </View>
-              ) : (
-                <RecommendedList />
-              )}
-            </View>
-          )}
+          <FilterContext.Provider value={{ filters, setFilters }}>
+            <FilterControl />
+          </FilterContext.Provider>
         </View>
-      )}
+        {contentItemDataLoading ? (
+          <LoadingBanner />
+        ) : (
+          <View>
+            {contentItemData?.UserContentItems &&
+            contentItemData?.UserContentItems.length !== 0 ? (
+              <View>
+                {Dimensions.get("window").height > 667 && (
+                  <View>
+                    <Text style={styles.latestTitle}>Latest Active</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("ContentDetails", {
+                          cid: contentItemData?.UserContentItems?.[0]?.id || "",
+                          from: "My Learnings",
+                        })
+                      }
+                      style={styles.recentContent}
+                    >
+                      <Text style={styles.courseTitle}>
+                        {contentItemData?.UserContentItems?.[0].title}
+                      </Text>
+                      <Image
+                        source={
+                          contentItemData?.UserContentItems?.[0].asset
+                            ? {
+                                uri: contentItemData?.UserContentItems?.[0]
+                                  .asset,
+                              }
+                            : placeHolderImage
+                        }
+                        style={styles.recentImage}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                <CategoryFilter />
+                <ContentList />
+              </View>
+            ) : (
+              <RecommendedList />
+            )}
+          </View>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
+    padding: scaleDimension(30, true),
   },
   title: {
-    marginVertical: 30,
-    fontSize: 20,
-    lineHeight: 36,
+    marginVertical: scaleDimension(16, false),
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "left",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   latestTitle: {
-    marginVertical: 10,
-    fontSize: 20,
-    lineHeight: 36,
+    marginVertical: scaleDimension(5, false),
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "left",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   searchboxContainer: {
-    height: 50,
+    height: scaleDimension(25, false),
     display: "flex",
     flexDirection: "row",
   },
   catContainer: {
     display: "flex",
     flexDirection: "row",
-    height: 60,
-    marginTop: 20,
+    height: scaleDimension(30, false),
+    marginTop: scaleDimension(10, false),
   },
   catBox: {
-    borderRadius: 8,
+    borderRadius: scaleDimension(8, true),
     alignItems: "center",
-    minWidth: 104,
-    margin: 4,
+    minWidth: scaleDimension(100, true),
+    margin: scaleDimension(4, true),
   },
   catBoxSelected: {
-    backgroundColor: "#3B1FA3",
+    backgroundColor: theme.brand["brand-primary"],
   },
   catBoxNormal: {
-    backgroundColor: "#f9fafv",
+    backgroundColor: theme.surface["surface-100"],
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#d1d5db",
+    borderColor: theme.border["border-200"],
   },
   catTitle: {
-    fontWeight: "400",
-    fontSize: 14,
-    lineHeight: 24,
-    padding: 4,
+    fontFamily: fonts.inter.regular,
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    padding: scaleDimension(4, true),
   },
   catTitleSelected: {
-    color: "#ffffff",
+    color: theme.text["text-inverse"],
   },
   catTitleNormal: {
-    color: "#1f2937",
-  },
-  listStyle: {
-    marginBottom: 170,
-    marginLeft: -10,
-    marginRight: -10,
-  },
-  courseRow: {
-    display: "flex",
-    flexDirection: "row",
-    padding: 15,
-    borderBottomWidth: 1,
-    paddingBottom: 10,
-    borderBottomColor: "#ccc",
-  },
-  courseLeftBox: {
-    flexGrow: 1,
+    color: theme.text["text-primary"],
   },
   courseTitle: {
-    fontSize: 16,
+    fontSize: scaleDimension(20, true),
     maxWidth: "60%",
-    lineHeight: 24,
+    lineHeight: scaleDimension(12, false),
     textAlign: "left",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
-  },
-  courseAuthor: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#6B7280",
-  },
-  courseImage: {
-    width: 75,
-    height: 75,
-    borderRadius: 15,
-  },
-  contentListStyle: {
-    height: 200,
-  },
-  contentListStyleOffline: {
-    height: "90%",
-    marginBottom: 170,
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   recentContent: {
     display: "flex",
     flexDirection: "row",
     borderWidth: 1,
-    borderRadius: 8,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FFFFFF",
+    borderRadius: scaleDimension(8, true),
+    borderColor: theme.border["border-100"],
+    backgroundColor: theme.surface["surface-100"],
     justifyContent: "space-between",
-    padding: 20,
+    padding: scaleDimension(20, true),
   },
   contentRow: {
     display: "flex",
     flexDirection: "row",
     borderWidth: 1,
-    borderRadius: 8,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#F5F5F7",
+    borderRadius: scaleDimension(8, true),
+    borderColor: theme.border["border-100"],
+    backgroundColor: theme.surface["surface-200"],
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: scaleDimension(5, false),
   },
   contentRightBox: {
     flexGrow: 1,
-    minHeight: 100,
-    margin: 20,
-    marginRight: 20,
+    minHeight: scaleDimension(50, false),
+    margin: scaleDimension(20, true),
+    marginRight: scaleDimension(20, true),
   },
   cTypeRow: {
     display: "flex",
@@ -551,113 +515,91 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   contentTag: {
-    marginLeft: -5,
-    borderRadius: 15,
-    fontSize: 12,
-    padding: 5,
-    paddingLeft: 15,
-    paddingRight: 15,
+    marginLeft: scaleDimension(-5, true),
+    borderRadius: scaleDimension(16, true),
+    fontSize: scaleDimension(14, true),
+    padding: scaleDimension(6, true),
+    paddingHorizontal: scaleDimension(16, true),
     flexGrow: 0,
-    fontFamily: "Inter_400Regular",
-    backgroundColor: "#DDD6FE",
-    marginBottom: 10,
+    fontFamily: fonts.inter.regular,
+    backgroundColor: theme.surface["surface-200"],
+    marginBottom: scaleDimension(6, false),
   },
-  Course: {
-    backgroundColor: "#FDE68A",
+  courseTag: {
+    backgroundColor: theme.surface["surface-yellow"],
   },
-  Blog: {
-    backgroundColor: "#A7F3D0",
+  blogTag: {
+    backgroundColor: theme.surface["surface-green"],
   },
-  Article: {
-    backgroundColor: "#A7F3D0",
+  articleTag: {
+    backgroundColor: theme.surface["surface-green"],
   },
-  "Learning Path": {
-    backgroundColor: "#DDD6FE",
-  },
-  Video: {
-    backgroundColor: "#DDD6FE",
+  videoTag: {
+    backgroundColor: theme.surface["surface-200"],
   },
   contentImage: {
-    width: 100,
+    width: scaleDimension(100, true),
     height: "100%",
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
+    borderTopLeftRadius: scaleDimension(8, true),
+    borderBottomLeftRadius: scaleDimension(8, true),
   },
   recentImage: {
-    width: (Dimensions.get("window").width / 440) * 100,
-    borderRadius: 8,
-    height: (Dimensions.get("window").width / 440) * 120,
-  },
-  searching: {
-    backgroundColor: "#3B1FA3",
-    borderRadius: 10,
-    marginTop: 20,
-    paddingBottom: 20,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  searchingText: {
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    color: "#ffffff",
-    fontFamily: "Poppins_700Bold",
-    padding: 20,
+    width: scaleDimension(100, true),
+    borderRadius: scaleDimension(8, true),
+    height: scaleDimension(100, true),
   },
   noRecords: {
-    paddingTop: 40,
+    paddingTop: scaleDimension(20, false),
     textAlign: "center",
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#6B7280",
-    fontFamily: "Poppins_700Bold",
+    fontSize: scaleDimension(20, true),
+    lineHeight: scaleDimension(12, false),
+    color: theme.text["text-secondary"],
+    fontFamily: fonts.poppins.bold,
   },
   note: {
-    padding: 15,
+    padding: scaleDimension(16, true),
     paddingBottom: 0,
-    lineHeight: 24,
-    color: "#6B7280",
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    lineHeight: scaleDimension(12, false),
+    color: theme.text["text-secondary"],
+    fontSize: scaleDimension(14, true),
+    fontFamily: fonts.inter.regular,
   },
   progressBar: {
-    height: 20,
+    height: scaleDimension(10, false),
     flexDirection: "row",
-    backgroundColor: "#D1D5DB",
-    borderRadius: 10,
+    backgroundColor: theme.border["border-200"],
+    borderRadius: scaleDimension(10, true),
   },
   progressStrip: {
     position: "absolute",
-    height: 20,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 10,
+    height: scaleDimension(10, false),
+    backgroundColor: theme.brand["brand-primary"],
+    borderRadius: scaleDimension(10, true),
   },
   emptyRecList: {
-    padding: 15,
+    padding: scaleDimension(16, true),
     paddingBottom: 0,
-    lineHeight: 24,
-    color: "#6B7280",
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    paddingTop: 30,
+    lineHeight: scaleDimension(12, false),
+    color: theme.text["text-secondary"],
+    fontSize: scaleDimension(14, true),
+    fontFamily: fonts.inter.regular,
+    paddingTop: scaleDimension(16, false),
   },
   recList: {
     height:
       Dimensions.get("window").height > 667
-        ? (Dimensions.get("window").height / 440) * 185
-        : (Dimensions.get("window").height / 440) * 125,
+        ? scaleDimension(185, false)
+        : scaleDimension(125, false),
   },
   contentList: {
     height:
       Dimensions.get("window").height > 667
-        ? (Dimensions.get("window").height / 440) * 150
-        : (Dimensions.get("window").height / 440) * 215,
+        ? scaleDimension(150, false)
+        : scaleDimension(215, false),
   },
   searchBar: {
     flexGrow: 1,
-    marginRight: 3,
+    marginRight: scaleDimension(3, true),
   },
 });
 

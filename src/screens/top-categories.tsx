@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import AppStyle from "../../AppStyle";
+import { fonts, scaleDimension, theme } from "../utils";
 
 const TopCategories = () => {
   return (
-    <View style={AppStyle.container}>
+    <View style={styles.container}>
       <View style={styles.section}>
         <Text style={styles.title}>Top Categories</Text>
       </View>
@@ -15,10 +15,10 @@ const TopCategories = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    flexDirection: "column",
+    justifyContent: "space-evenly",
+    padding: scaleDimension(16, false),
+    paddingTop: scaleDimension(30, false),
   },
-
   section: {
     flex: 1,
     justifyContent: "center",
@@ -28,12 +28,12 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 24,
-    lineHeight: 36,
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "center",
-    color: "#6B7280",
-    marginBottom: 10,
+    color: theme.text["text-secondary"],
+    marginBottom: scaleDimension(6, false),
   },
 });
 

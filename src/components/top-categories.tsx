@@ -16,7 +16,6 @@ const TopCategories = () => {
     <View>
       <View style={styles.heading}>
         <Text style={styles.title}>Top Categories</Text>
-        <Link title="See All" onPress={() => null} />
       </View>
       <ScrollView
         horizontal={true}
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    marginTop: scaleDimension(16, true),
+    marginVertical: scaleDimension(16, true),
     fontSize: scaleDimension(16, true),
     lineHeight: scaleDimension(12, false),
     fontFamily: fonts.poppins.bold,

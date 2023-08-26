@@ -8,8 +8,7 @@
     "android": "node src/tooling/cli/src/authenticate.js && expo start --android",
     "test": "jest",
     "ios": "node src/tooling/cli/src/authenticate.js && expo start --ios",
-    "web": "node src/tooling/cli/src/authenticate.js && expo start --web",
-    "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 graphql-codegen --config src/graphql/codegen.yml"
+    "web": "node src/tooling/cli/src/authenticate.js && expo start --web"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",

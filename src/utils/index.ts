@@ -3,5 +3,13 @@ import { placeHolderImage } from "./placeholder";
 import { scaleDimension } from "./scale-dimension";
 import { theme } from "./theme";
 import { fonts } from "./fonts";
+import { registerUser } from "./register-user";
 
-export { truncateString, placeHolderImage, scaleDimension, theme, fonts };
+export {
+  truncateString,
+  placeHolderImage,
+  scaleDimension,
+  theme,
+  fonts,
+  registerUser,
+};
