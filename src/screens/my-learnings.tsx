@@ -20,7 +20,7 @@ import {
   GlobalTypes,
   useUserCourseProgressQuery,
 } from "../graphql";
-import { FilterContext } from "../context";
+import { FilterContext, useDataContext } from "../context";
 import { saveContent, getContent, removeContent } from "../db/db";
 import { ContentKind } from "../graphql/global-types";
 import { Download, XCircle } from "lucide-react-native";
@@ -34,8 +34,9 @@ type MyLearningScreenProps = StackNavigationProp<
 const MyLearnings = () => {
   const navigation = useNavigation<MyLearningScreenProps>();
   const [offlineContent, setOfflineContent] = useState<courseListType[]>();
+  const { isConnected } = useDataContext();
   const [search, setSearch] = useState<string>("");
-  const [tab, setTab] = useState<string>("All");
+  const [tab, setTab] = useState<string>(!isConnected ? "Offline" : "All");
   const [filters, setFilters] = useState<filtersType>({
     sortBy: GlobalTypes.SortColumn.Title,
     sortDir: GlobalTypes.SortDirection.Asc,
@@ -129,7 +130,9 @@ const MyLearnings = () => {
   };
 
   const filteredContent = () => {
-    const filteredContent = filteredItems(contentItemData?.UserContentItems);
+    const filteredContent = filteredItems(
+      isConnected ? contentItemData?.UserContentItems : offlineContent
+    );
 
     return tab === "All"
       ? filteredContent.filter((item: courseListType) =>
@@ -280,7 +283,7 @@ const MyLearnings = () => {
   };
 
   const CategoryFilter = () => {
-    const events: string[] = ["All", "Offline"];
+    const events: string[] = isConnected ? ["All", "Offline"] : ["Offline"];
 
     return (
       <ScrollView horizontal={true} style={styles.catContainer}>
@@ -372,7 +375,8 @@ const MyLearnings = () => {
         ) : (
           <View>
             {contentItemData?.UserContentItems &&
-            contentItemData?.UserContentItems.length !== 0 ? (
+            contentItemData?.UserContentItems.length !== 0 &&
+            isConnected ? (
               <View>
                 {Dimensions.get("window").height > 667 && (
                   <View>
@@ -407,8 +411,44 @@ const MyLearnings = () => {
                 <CategoryFilter />
                 <ContentList />
               </View>
-            ) : (
+            ) : isConnected ? (
               <RecommendedList />
+            ) : (
+              <View>
+                {offlineContent?.length !== 0 && (
+                  <View>
+                    <View>
+                      <Text style={styles.latestTitle}>Latest Active</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("ContentDetails", {
+                            cid: offlineContent?.[0]?.id || "",
+                            from: "My Learnings",
+                          })
+                        }
+                        style={styles.recentContent}
+                      >
+                        <Text style={styles.courseTitle}>
+                          {offlineContent?.[0]?.title}
+                        </Text>
+                        <Image
+                          source={
+                            offlineContent?.[0]?.asset
+                              ? {
+                                  uri: offlineContent?.[0]?.asset,
+                                }
+                              : placeHolderImage
+                          }
+                          style={styles.recentImage}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <CategoryFilter />
+                  </View>
+                )}
+
+                <ContentList />
+              </View>
             )}
           </View>
         )}
@@ -594,7 +634,7 @@ const styles = StyleSheet.create({
   contentList: {
     height:
       Dimensions.get("window").height > 667
-        ? scaleDimension(150, false)
+        ? scaleDimension(163, false)
         : scaleDimension(215, false),
   },
   searchBar: {

@@ -42,6 +42,7 @@ const Login = () => {
     refetchCatalogData,
     refetchContentData,
     setInitialState,
+    isConnected,
   } = useDataContext();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
   const [loginMutation] = useLoginMutation();
@@ -108,6 +109,15 @@ const Login = () => {
       if (formValidated()) {
         setInitialState(false);
         setLoading(true);
+
+        if (!isConnected) {
+          setResponseError({
+            title: "Network Unavailable",
+            message: "Please enable Wi-Fi or cellular data and try again.",
+          });
+          setLoading(false);
+          return;
+        }
 
         // Login user
         const { data } = await loginMutation({

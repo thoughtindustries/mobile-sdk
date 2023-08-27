@@ -1,10 +1,11 @@
-import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { Logo, Button, Link } from "../components";
+import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Logo, Button, Link, Message } from "../components";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { scaleDimension, fonts, theme } from "../utils";
+import { useDataContext } from "../context";
 
 type OnboardingScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -13,9 +14,18 @@ type OnboardingScreenProps = StackNavigationProp<
 
 const Onboarding = () => {
   const navigation = useNavigation<OnboardingScreenProps>();
+  const { isConnected } = useDataContext();
+  const [openModal, setOpenModal] = useState<boolean>(!isConnected);
 
   return (
     <View style={styles.container}>
+      {openModal && (
+        <Message
+          title="Network Unavailable"
+          message="Please enable Wi-Fi or cellular data and try again."
+          onHide={() => setOpenModal(false)}
+        />
+      )}
       <View style={styles.prompt}>
         <Logo />
         <Text style={styles.title}>Let's Get Started</Text>

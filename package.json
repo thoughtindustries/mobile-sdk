@@ -8,7 +8,8 @@
     "android": "node src/tooling/cli/src/authenticate.js && expo start --android",
     "test": "jest",
     "ios": "node src/tooling/cli/src/authenticate.js && expo start --ios",
-    "web": "node src/tooling/cli/src/authenticate.js && expo start --web"
+    "web": "node src/tooling/cli/src/authenticate.js && expo start --web",
+    "offline": "node src/tooling/cli/src/authenticate.js && expo start --offline"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
@@ -68,7 +69,8 @@
     "striptags": "^3.2.0",
     "ts-jest": "^29.0.3",
     "validator": "^13.7.0",
-    "victory-native": "^36.6.8"
+    "victory-native": "^36.6.8",
+    "expo-network": "~5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

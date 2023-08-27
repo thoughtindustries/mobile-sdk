@@ -17,6 +17,7 @@ import LoadingBanner from "./loading-banner";
 import Hero from "./hero";
 import QuizQuestion from "./quiz-question";
 import QuizResults from "./quiz-results";
+import Offline from "./offline";
 
 export {
   Button,
@@ -38,4 +39,5 @@ export {
   Hero,
   QuizQuestion,
   QuizResults,
+  Offline,
 };

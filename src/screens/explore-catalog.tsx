@@ -9,18 +9,24 @@ import {
   Dimensions,
 } from "react-native";
 import { filtersType } from "../../types";
-import { Searchbar, FilterControl, LoadingBanner } from "../components";
+import {
+  Searchbar,
+  FilterControl,
+  LoadingBanner,
+  Offline,
+} from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
 import { GlobalTypes } from "../graphql";
-import { FilterContext } from "../context";
+import { FilterContext, useDataContext } from "../context";
 import { useCatalogContentQuery } from "../graphql";
 import { fonts, scaleDimension, theme, placeHolderImage } from "../utils";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
 const ExploreCatalog = () => {
+  const { isConnected } = useDataContext();
   const navigation = useNavigation<ExploreCatalogProps>();
   const [filters, setFilters] = useState<filtersType>({
     sortBy: GlobalTypes.SortColumn.Title,
@@ -114,6 +120,17 @@ const ExploreCatalog = () => {
             }
           />
         )}
+      {!isConnected && (
+        <View
+          style={{
+            height:
+              Dimensions.get("window").height - scaleDimension(285, false),
+            justifyContent: "center",
+          }}
+        >
+          <Offline />
+        </View>
+      )}
     </View>
   );
 };
@@ -213,7 +230,7 @@ const styles = StyleSheet.create({
   contentList: {
     height:
       Dimensions.get("window").height > 667
-        ? (Dimensions.get("window").height / 440) * 280
+        ? (Dimensions.get("window").height / 440) * 270
         : (Dimensions.get("window").height / 440) * 238,
   },
 });

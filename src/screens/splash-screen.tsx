@@ -2,10 +2,15 @@ import { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
 import * as SecureStore from "expo-secure-store";
+import * as Network from "expo-network";
+import { useDataContext } from "../context";
 
 const SplashScreen = ({ navigation }: any) => {
+  const { setIsConnected } = useDataContext();
   useEffect(() => {
     (async () => {
+      const { isConnected } = await Network.getNetworkStateAsync();
+      setIsConnected(isConnected);
       const user = await SecureStore.getItemAsync("userInfo");
       const timer = setTimeout(() => {
         user

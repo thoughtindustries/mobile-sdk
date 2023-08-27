@@ -13,6 +13,7 @@ import { useNavigation, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 import { scaleDimension, fonts, theme, registerUser } from "../utils";
+import { useDataContext } from "../context";
 
 type RegistrationScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -40,6 +41,7 @@ const Registration = () => {
     title: "",
     message: "",
   });
+  const { isConnected } = useDataContext();
   const [message, setMessage] = useState<any>("");
   const navigation = useNavigation<RegistrationScreenProps>();
   const [form, setForm] = useState<FormProps>({
@@ -113,6 +115,15 @@ const Registration = () => {
     if (formValidated()) {
       try {
         setProcessing(true);
+
+        if (!isConnected) {
+          setResponseError({
+            title: "Network Unavailable",
+            message: "Please enable Wi-Fi or cellular data and try again.",
+          });
+          setProcessing(false);
+          return;
+        }
 
         await registerUser(
           form.email.value,
