@@ -283,7 +283,7 @@ const styles = (message: string, processing: boolean) =>
       backgroundColor:
         processing || message
           ? theme.brand["brand-primary"]
-          : theme.surface["surface-100"],
+          : theme.surface["surface-primary"],
     },
     input: {
       flexDirection: "row",
@@ -311,8 +311,8 @@ const styles = (message: string, processing: boolean) =>
     },
     inlineError: {
       color: theme.border["border-error"],
-      height: scaleDimension(6, false),
-      fontSize: scaleDimension(14, true),
+      height: scaleDimension(8, false),
+      fontSize: scaleDimension(12, true),
     },
     prompt: {
       justifyContent: "center",
