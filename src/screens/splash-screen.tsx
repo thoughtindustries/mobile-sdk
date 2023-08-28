@@ -9,8 +9,9 @@ const SplashScreen = ({ navigation }: any) => {
   const { setIsConnected } = useDataContext();
   useEffect(() => {
     (async () => {
-      const { isConnected } = await Network.getNetworkStateAsync();
-      setIsConnected(isConnected);
+      const { isInternetReachable, isConnected } =
+        await Network.getNetworkStateAsync();
+      setIsConnected(isInternetReachable);
       const user = await SecureStore.getItemAsync("userInfo");
       const timer = setTimeout(() => {
         user

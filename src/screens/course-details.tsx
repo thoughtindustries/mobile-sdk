@@ -4,7 +4,6 @@ import { Button, LoadingBanner, Hero } from "../components";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { ChevronLeft, Menu } from "lucide-react-native";
 import { useCourseByIdQuery } from "../graphql";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -16,7 +15,7 @@ type MyLearningProps = StackNavigationProp<RootStackParamList, "CourseDetails">;
 const CourseDetails = () => {
   const navigation = useNavigation<MyLearningProps>();
   const route = useRoute<RouteProp<RootStackParamList, "CourseDetails">>();
-  const { cid, asset, contentTypeLabel } = route.params;
+  const { title, cid, asset, contentTypeLabel, description } = route.params;
   const [showPage, setShowPage] = useState<boolean>(false);
 
   const { data: courseData, loading: courseDataLoading } = useCourseByIdQuery({
@@ -43,7 +42,7 @@ const CourseDetails = () => {
           />
         </TouchableOpacity>
         <Text style={styles.bannerTitle}>
-          {courseData?.CourseById?.title || catalogCourse?.title}
+          {courseData?.CourseById?.title || catalogCourse?.title || title}
         </Text>
       </View>
     </Hero>
@@ -57,7 +56,8 @@ const CourseDetails = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.body}>
           {courseData?.CourseById.courseGroup?.description ||
-            catalogCourse?.description}
+            catalogCourse?.description ||
+            description}
         </Text>
       </ScrollView>
     </View>
@@ -90,7 +90,7 @@ const CourseDetails = () => {
               <Menu size={scaleDimension(32, true)} />
             </TouchableOpacity>
             <Text style={styles.courseTitle}>
-              {courseData?.CourseById.title || catalogCourse?.title}
+              {courseData?.CourseById.title || catalogCourse?.title || title}
             </Text>
           </View>
         </View>

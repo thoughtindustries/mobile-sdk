@@ -181,6 +181,7 @@ const MyLearnings = () => {
             title: data.title || "",
             asset: data.asset || "",
             contentTypeLabel: data.contentTypeLabel,
+            description: data.description || "",
           });
         }}
       >
@@ -421,9 +422,13 @@ const MyLearnings = () => {
                       <Text style={styles.latestTitle}>Latest Active</Text>
                       <TouchableOpacity
                         onPress={() =>
-                          navigation.navigate("ContentDetails", {
+                          navigation.navigate("CourseDetails", {
                             cid: offlineContent?.[0]?.id || "",
-                            from: "My Learnings",
+                            title: offlineContent?.[0]?.title || "",
+                            asset: offlineContent?.[0]?.asset || "",
+                            contentTypeLabel:
+                              offlineContent?.[0]?.contentTypeLabel,
+                            description: offlineContent?.[0]?.description || "",
                           })
                         }
                         style={styles.recentContent}

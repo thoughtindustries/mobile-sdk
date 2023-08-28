@@ -17,6 +17,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 import { useLoginMutation } from "../graphql";
 import * as SecureStore from "expo-secure-store";
+import * as Network from "expo-network";
 import { createUser, initDB } from "../db/db";
 import { useDataContext } from "../context";
 import { Eye, EyeOff } from "lucide-react-native";
@@ -42,7 +43,7 @@ const Login = () => {
     refetchCatalogData,
     refetchContentData,
     setInitialState,
-    isConnected,
+    setIsConnected,
   } = useDataContext();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
   const [loginMutation] = useLoginMutation();
@@ -110,7 +111,10 @@ const Login = () => {
         setInitialState(false);
         setLoading(true);
 
-        if (!isConnected) {
+        const { isInternetReachable } = await Network.getNetworkStateAsync();
+        if (isInternetReachable) {
+          setIsConnected(true);
+        } else {
           setResponseError({
             title: "Network Unavailable",
             message: "Please enable Wi-Fi or cellular data and try again.",

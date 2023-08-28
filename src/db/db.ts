@@ -73,6 +73,7 @@ const createContentTable = () => {
             asset TEXT,
             kind TEXT,
             contentTypeLabel TEXT,
+            description TEXT,
             progress TEXT,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
@@ -127,11 +128,12 @@ export const saveContent = ({
   kind,
   contentTypeLabel,
   progress,
+  description,
 }: courseListType) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `INSERT INTO content (id, title, asset, kind, contentTypeLabel, progress) VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO content (id, title, asset, kind, contentTypeLabel, progress, description) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           id,
           title || "",
@@ -139,6 +141,7 @@ export const saveContent = ({
           kind || "",
           contentTypeLabel || "",
           progress || 0,
+          description || "",
         ],
         (_, result) => {
           resolve(result);

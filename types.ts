@@ -14,6 +14,7 @@ export type RootStackParamList = {
     title: string;
     asset: string;
     contentTypeLabel?: string;
+    description?: string;
   };
   TopCategories: undefined;
   Explore: undefined;

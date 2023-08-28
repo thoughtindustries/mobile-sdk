@@ -14,6 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 import { scaleDimension, fonts, theme, registerUser } from "../utils";
 import { useDataContext } from "../context";
+import * as Network from "expo-network";
 
 type RegistrationScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -41,7 +42,7 @@ const Registration = () => {
     title: "",
     message: "",
   });
-  const { isConnected } = useDataContext();
+  const { setIsConnected } = useDataContext();
   const [message, setMessage] = useState<any>("");
   const navigation = useNavigation<RegistrationScreenProps>();
   const [form, setForm] = useState<FormProps>({
@@ -116,7 +117,10 @@ const Registration = () => {
       try {
         setProcessing(true);
 
-        if (!isConnected) {
+        const { isInternetReachable } = await Network.getNetworkStateAsync();
+        if (isInternetReachable) {
+          setIsConnected(true);
+        } else {
           setResponseError({
             title: "Network Unavailable",
             message: "Please enable Wi-Fi or cellular data and try again.",
