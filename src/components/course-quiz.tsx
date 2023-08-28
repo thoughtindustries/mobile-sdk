@@ -12,7 +12,6 @@ interface CourseQuizProps {
   courseid: string;
   quiz: any;
 }
-
 const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   const [query, setQuery] = useState<boolean>(false);
   const { initQuiz, setInitQuiz, setAttemptId, result, setQuiz, setResult } =
@@ -36,7 +35,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
   } = useLoadAssessmentAttemptsByTopicOrCourseQuery({
     variables: {
       courseId: courseid,
-      topicId: quiz.id,
+      topicId: quiz?.id,
     },
   });
 
