@@ -1,0 +1,13 @@
+mutation CreateAssessmentAttempt(
+  $courseId: ID!
+  $questions: [QuestionInput!]!
+  $topicId: ID!
+) {
+  CreateAssessmentAttempt(
+    courseId: $courseId
+    questions: $questions
+    topicId: $topicId
+  ) {
+    id
+  }
+}

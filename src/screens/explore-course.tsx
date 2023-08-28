@@ -12,6 +12,7 @@ import {
   useUpdateTopicAndCourseProgressMutation,
 } from "../graphql";
 import RenderHtml from "react-native-render-html";
+import { QuizProvider } from "../context";
 
 type ExploreCourseProps = StackNavigationProp<
   RootStackParamList,
@@ -34,7 +35,8 @@ const ExploreCourse = () => {
 
   const TextPage: FC = () => {
     const { width } = useWindowDimensions();
-    const html = pagesData?.Pages?.[0].body;
+    const html =
+      pagesData?.Pages?.[0].body || pagesData?.Pages?.[0]?.languages?.[0]?.body;
 
     return (
       <View
@@ -43,9 +45,11 @@ const ExploreCourse = () => {
         <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
           {pagesData?.Pages?.[0]?.title}
         </Text>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <RenderHtml source={{ html }} contentWidth={width} />
-        </ScrollView>
+        {html && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <RenderHtml source={{ html }} contentWidth={width} />
+          </ScrollView>
+        )}
       </View>
     );
   };
@@ -140,12 +144,13 @@ const ExploreCourse = () => {
         <View style={styles(progress, topicIndex, topics.length).progressBar} />
       </View>
       <View style={styles(progress, topicIndex, topics.length).topicPage}>
-        {pagesData?.Pages?.[0]?.type === "text" ? (
-          <TextPage />
-        ) : pagesData?.Pages?.[0]?.type === "video" ? (
-          <VideoPage />
-        ) : (
-          <CourseQuiz quiz={pagesData?.Pages?.[0]} courseid={cid} />
+        {pagesData?.Pages?.[0]?.type === "text" ||
+          (pagesData?.Pages?.[0]?.type === undefined && <TextPage />)}
+        {pagesData?.Pages?.[0]?.type === "video" && <VideoPage />}
+        {pagesData?.Pages?.[0].type === "quiz" && (
+          <QuizProvider>
+            <CourseQuiz quiz={pagesData?.Pages?.[0]} courseid={cid} />
+          </QuizProvider>
         )}
       </View>
     </View>
@@ -156,25 +161,16 @@ const ExploreCourse = () => {
       useUpdateTopicAndCourseProgressMutation({});
 
     const handleNext = () => {
-      if (topics.length > 1 && topics.length - 1 > topicIndex) {
+      updateTopicAndCourseProgressMutation({
+        variables: {
+          topicId: topics[topicIndex].id,
+          progress: 100,
+        },
+      });
+
+      if (topics.length - 1 > topicIndex) {
         setTopicIndex(topicIndex + 1);
-        if (pagesData?.Pages?.[0]?.type === "text") {
-          updateTopicAndCourseProgressMutation({
-            variables: {
-              topicId: topics[topicIndex].id,
-              progress: 100,
-            },
-          });
-        }
-      } else if (topics.length === 1) {
-        if (pagesData?.Pages?.[0]?.type === "text") {
-          updateTopicAndCourseProgressMutation({
-            variables: {
-              topicId: topics[topicIndex].id,
-              progress: 100,
-            },
-          });
-        }
+      } else {
         navigation.navigate("ContentDetails", {
           cid: cid,
           from: "ExploreCourse",

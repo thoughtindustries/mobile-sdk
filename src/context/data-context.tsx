@@ -1,11 +1,11 @@
 import { createContext, FC, ReactNode, useContext, useState } from "react";
-import { courseListType, filtersType } from "../types";
-import { GlobalTypes } from "./graphql";
+import { courseListType } from "../../types";
+import { GlobalTypes } from "../graphql";
 import {
   useUserRecentContentQuery,
   useUserContentItemsQuery,
   useCatalogContentQuery,
-} from "./graphql";
+} from "../graphql";
 import { FetchPolicy } from "@apollo/client";
 
 type RefetchFunction<data = any, variables = any> = (
@@ -75,18 +75,3 @@ export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
     </DataContext.Provider>
   );
 };
-
-interface FiltersProps {
-  setFilters: React.Dispatch<React.SetStateAction<filtersType>>;
-  filters: filtersType;
-}
-
-export const FilterContext = createContext<FiltersProps>({
-  setFilters: () => undefined,
-  filters: {
-    sortBy: GlobalTypes.SortColumn.Title,
-    sortDir: GlobalTypes.SortDirection.Asc,
-    labels: [],
-    values: [],
-  },
-});

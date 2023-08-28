@@ -24,6 +24,14 @@ const Banner = () => {
     ? contentData
     : catalogData;
 
+  const truncateString = (description: string, max: number) => {
+    if (description.length <= max) {
+      return description;
+    } else {
+      return description?.slice(0, max) + "...";
+    }
+  };
+
   return (
     <View>
       <TouchableOpacity
@@ -48,7 +56,11 @@ const Banner = () => {
           >
             <View style={styles.bannerArea}>
               <Text style={styles.bannerTitle}>{content?.[0].title}</Text>
-              <Text style={styles.bannerText}>{content?.[0].description}</Text>
+              {content?.[0].description && (
+                <Text style={styles.bannerText}>
+                  {truncateString(content[0].description, 65)}
+                </Text>
+              )}
             </View>
           </ImageBackground>
         </View>
