@@ -1,12 +1,17 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { StyleSheet, View, ImageBackground } from "react-native";
 import { Loader } from "../components";
-import AppStyle from "../../AppStyle";
 import * as SecureStore from "expo-secure-store";
+import * as Network from "expo-network";
+import { useDataContext } from "../context";
 
 const SplashScreen = ({ navigation }: any) => {
+  const { setIsConnected } = useDataContext();
   useEffect(() => {
     (async () => {
+      const { isInternetReachable, isConnected } =
+        await Network.getNetworkStateAsync();
+      setIsConnected(isInternetReachable);
       const user = await SecureStore.getItemAsync("userInfo");
       const timer = setTimeout(() => {
         user
@@ -19,17 +24,15 @@ const SplashScreen = ({ navigation }: any) => {
   }, []);
 
   return (
-    <View style={{ ...AppStyle.container, backgroundColor: "#3B1FA3" }}>
-      <ImageBackground
-        source={require("../../assets/start-screen.png")}
-        resizeMode="cover"
-        style={styles.image}
-      >
-        <View style={styles.loader}>
-          <Loader size={50} />
-        </View>
-      </ImageBackground>
-    </View>
+    <ImageBackground
+      source={require("../../assets/splash.png")}
+      resizeMode="cover"
+      style={styles.image}
+    >
+      <View style={styles.loader}>
+        <Loader size={50} />
+      </View>
+    </ImageBackground>
   );
 };
 
@@ -39,9 +42,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   loader: {
-    lineHeight: 4,
     textAlign: "center",
-    justifyContent: "flex-start",
     alignItems: "center",
   },
 });

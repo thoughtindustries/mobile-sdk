@@ -9,7 +9,7 @@
     "test": "jest",
     "ios": "node src/tooling/cli/src/authenticate.js && expo start --ios",
     "web": "node src/tooling/cli/src/authenticate.js && expo start --web",
-    "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 graphql-codegen --config src/graphql/codegen.yml"
+    "offline": "node src/tooling/cli/src/authenticate.js && expo start --offline"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",
@@ -44,6 +44,7 @@
     "expo-sqlite": "~11.1.1",
     "expo-status-bar": "~1.4.2",
     "lodash": "^4.17.21",
+    "lucide-react-native": "^0.268.0",
     "path": "^0.12.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -68,7 +69,8 @@
     "striptags": "^3.2.0",
     "ts-jest": "^29.0.3",
     "validator": "^13.7.0",
-    "victory-native": "^36.6.8"
+    "victory-native": "^36.6.8",
+    "expo-network": "~5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

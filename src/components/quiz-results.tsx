@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { VictoryPie } from "victory-native";
 import { useQuizContext } from "../context";
+import { fonts, scaleDimension, theme } from "../utils";
 
 const QuizResults = () => {
   const { result, quiz } = useQuizContext();
@@ -13,64 +14,70 @@ const QuizResults = () => {
         <VictoryPie
           data={[
             {
-              y: Math.round((result?.correct * 100) / quiz?.questions?.length),
+              y: Math.round(
+                ((result?.correct || 0) * 100) / quiz?.questions?.length
+              ),
             },
             {
               y: Math.round(
-                ((result?.answered - result?.correct) * 100) /
+                (((result?.answered || 0) - (result?.correct || 0)) * 100) /
                   quiz?.questions?.length
               ),
             },
             {
               y: Math.round(
-                ((quiz?.questions?.length - result?.answered) * 100) /
+                ((quiz?.questions?.length - (result?.answered || 0)) * 100) /
                   quiz?.questions?.length
               ),
             },
           ]}
-          width={250}
-          height={250}
+          width={scaleDimension(275, true)}
+          height={scaleDimension(275, true)}
           innerRadius={87}
-          colorScale={["#326D3C", "#DC2626", "#D1D5DB"]}
+          colorScale={[
+            theme.border["border-success"],
+            theme.border["border-error"],
+            theme.border["border-200"],
+          ]}
           style={{
             labels: {
               display: "none",
             },
           }}
         />
-        <View
-          style={{
-            position: "absolute",
-            width: "100%",
-            top: "33%",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.midTextTitle}>{result.grade}%</Text>
+        <View style={styles.grade}>
+          <Text style={styles.midTextTitle}>{result?.grade}%</Text>
           <Text style={styles.midTextNote}>
-            {result.correct}/{quiz?.questions?.length} Correct
+            {result?.correct}/{quiz?.questions?.length} Correct
           </Text>
         </View>
 
-        <View
-          style={{
-            ...styles.row,
-            width: "100%",
-            justifyContent: "space-between",
-            padding: 10,
-            paddingBottom: 20,
-          }}
-        >
+        <View style={styles.legend}>
           <View style={styles.row}>
-            <View style={{ ...styles.dot, backgroundColor: "#326D3C" }} />
+            <View
+              style={[
+                styles.dot,
+                { backgroundColor: theme.border["border-success"] },
+              ]}
+            />
             <Text>Correct</Text>
           </View>
           <View style={styles.row}>
-            <View style={{ ...styles.dot, backgroundColor: "#DC2626" }} />
+            <View
+              style={[
+                styles.dot,
+                { backgroundColor: theme.border["border-error"] },
+              ]}
+            />
             <Text>Incorrect</Text>
           </View>
           <View style={styles.row}>
-            <View style={{ ...styles.dot, backgroundColor: "#D1D5DB" }} />
+            <View
+              style={[
+                styles.dot,
+                { backgroundColor: theme.border["border-200"] },
+              ]}
+            />
             <Text>Unanswered</Text>
           </View>
         </View>
@@ -81,27 +88,27 @@ const QuizResults = () => {
 
 const styles = StyleSheet.create({
   heading: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 20,
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(24, true),
     textAlign: "center",
-    padding: 8,
+    padding: scaleDimension(8, true),
   },
   chartBox: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
-    borderColor: "#ccc",
+    borderRadius: scaleDimension(10, true),
+    borderColor: theme.border["border-200"],
     borderWidth: 1,
   },
   midTextTitle: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 24,
-    color: "#1F2937",
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(24, true),
+    color: theme.text["text-primary"],
   },
   midTextNote: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 14,
-    color: "#000000aa",
+    fontFamily: fonts.inter.regular,
+    fontSize: scaleDimension(16, true),
+    color: theme.text["text-secondary"],
   },
   row: {
     display: "flex",
@@ -110,31 +117,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dot: {
-    borderRadius: 10,
-    width: 10,
-    height: 10,
-    marginLeft: 10,
-    marginRight: 5,
+    borderRadius: scaleDimension(10, true),
+    width: scaleDimension(10, true),
+    height: scaleDimension(10, true),
+    marginLeft: scaleDimension(10, true),
+    marginRight: scaleDimension(5, true),
   },
-  resultBox: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 10,
-    backgroundColor: "#FCFCFF",
-    padding: 5,
-    width: "50%",
-    margin: 5,
+  grade: {
+    position: "absolute",
+    width: "100%",
+    top: "33%",
+    alignItems: "center",
   },
-  resultNote: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 10,
-    color: "#6B7280",
-    flexGrow: 0,
-  },
-  essayText: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 14,
-    color: "#1F2937",
+  legend: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    padding: scaleDimension(10, true),
+    paddingBottom: scaleDimension(20, true),
   },
 });
 

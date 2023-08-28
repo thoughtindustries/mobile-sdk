@@ -9,18 +9,24 @@ import {
   Dimensions,
 } from "react-native";
 import { filtersType } from "../../types";
-import { Searchbar, FilterControl, LoadingBanner } from "../components";
+import {
+  Searchbar,
+  FilterControl,
+  LoadingBanner,
+  Offline,
+} from "../components";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
 import { GlobalTypes } from "../graphql";
 import { FilterContext, useDataContext } from "../context";
 import { useCatalogContentQuery } from "../graphql";
-import { placeHolderimage } from "../helpers";
+import { fonts, scaleDimension, theme, placeHolderImage } from "../utils";
 
 type ExploreCatalogProps = StackNavigationProp<RootStackParamList, "Explore">;
 
 const ExploreCatalog = () => {
+  const { isConnected } = useDataContext();
   const navigation = useNavigation<ExploreCatalogProps>();
   const [filters, setFilters] = useState<filtersType>({
     sortBy: GlobalTypes.SortColumn.Title,
@@ -50,7 +56,7 @@ const ExploreCatalog = () => {
     return filteredCourses || [];
   };
 
-  const CourseItem = ({ item }: { item: GlobalTypes.Content }) => {
+  const CourseItem = ({ item }: { item: any }) => {
     return (
       <TouchableOpacity
         onPress={() =>
@@ -68,7 +74,7 @@ const ExploreCatalog = () => {
             </Text>
           </View>
           <Image
-            source={item.asset ? { uri: item.asset } : placeHolderimage}
+            source={item.asset ? { uri: item.asset } : placeHolderImage}
             style={styles.courseImage}
           />
         </View>
@@ -80,7 +86,7 @@ const ExploreCatalog = () => {
     <View>
       <Text style={styles.title}>Explore The Catalog</Text>
       <View style={styles.searchboxContainer}>
-        <View style={{ flexGrow: 1, marginRight: 3 }}>
+        <View style={styles.searchBar}>
           <Searchbar searchText={search} setSearch={setSearch} />
         </View>
         <FilterContext.Provider value={{ filters, setFilters }}>
@@ -93,14 +99,7 @@ const ExploreCatalog = () => {
         </View>
       )}
       {!loading && (
-        <Text
-          style={{
-            ...styles.courseTitle,
-            marginTop: 15,
-            marginLeft: 30,
-            paddingBottom: 10,
-          }}
-        >
+        <Text style={styles.results}>
           {`Results (${filteredCourses().length})`}
         </Text>
       )}
@@ -108,12 +107,7 @@ const ExploreCatalog = () => {
         data?.CatalogContent?.contentItems &&
         data?.CatalogContent?.contentItems?.length > 0 && (
           <FlatList
-            style={{
-              height:
-                Dimensions.get("window").height > 667
-                  ? (Dimensions.get("window").height / 440) * 280
-                  : (Dimensions.get("window").height / 440) * 238,
-            }}
+            style={styles.contentList}
             data={filteredCourses()}
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
@@ -126,94 +120,118 @@ const ExploreCatalog = () => {
             }
           />
         )}
+      {!isConnected && (
+        <View
+          style={{
+            height:
+              Dimensions.get("window").height - scaleDimension(285, false),
+            justifyContent: "center",
+          }}
+        >
+          <Offline />
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   title: {
-    marginTop: 60,
-    marginBottom: 30,
-    marginLeft: 30,
-    fontSize: 20,
-    lineHeight: 36,
+    marginTop: scaleDimension(30, false),
+    marginBottom: scaleDimension(30, true),
+    marginLeft: scaleDimension(30, true),
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "left",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   loader: {
-    marginHorizontal: 30,
+    marginHorizontal: scaleDimension(30, true),
   },
   searchboxContainer: {
-    height: 50,
+    height: scaleDimension(25, false),
     display: "flex",
     flexDirection: "row",
-    marginHorizontal: 30,
+    marginHorizontal: scaleDimension(30, true),
   },
-
   courseRow: {
     display: "flex",
     flexDirection: "row",
-    paddingHorizontal: 30,
-    paddingVertical: 15,
+    paddingHorizontal: scaleDimension(30, true),
+    paddingVertical: scaleDimension(8, false),
     borderBottomWidth: 1,
-    paddingBottom: 10,
-    borderBottomColor: "#ccc",
+    paddingBottom: scaleDimension(5, false),
+    borderBottomColor: theme.border["border-200"],
   },
-
   courseLeftBox: {
     flexGrow: 1,
   },
-
   courseTitle: {
-    fontSize: 16,
+    fontSize: scaleDimension(18, true),
     maxWidth: "80%",
-    lineHeight: 24,
+    lineHeight: scaleDimension(12, false),
     textAlign: "left",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
-
   courseAuthor: {
-    fontSize: 12,
-    fontFamily: "Inter_400Regular",
-    color: "#6B7280",
+    fontSize: scaleDimension(14, true),
+    fontFamily: fonts.inter.regular,
+    color: theme.text["text-secondary"],
   },
-
   courseImage: {
-    width: (Dimensions.get("window").width / 400) * 75,
-    height: (Dimensions.get("window").width / 400) * 75,
-    borderRadius: 15,
+    width: scaleDimension(75, true),
+    height: scaleDimension(75, true),
+    borderRadius: scaleDimension(16, true),
   },
-
   searching: {
-    marginTop: 20,
-    marginHorizontal: 20,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 10,
-    paddingBottom: 20,
+    marginTop: scaleDimension(10, false),
+    marginHorizontal: scaleDimension(20, true),
+    backgroundColor: theme.brand["brand-primary"],
+    borderRadius: scaleDimension(10, true),
+    paddingBottom: scaleDimension(10, false),
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
   },
-
   searchingText: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: scaleDimension(18, true),
+    lineHeight: scaleDimension(12, false),
     textAlign: "center",
-    color: "#ffffff",
-    fontFamily: "Poppins_700Bold",
-    padding: 20,
+    color: theme.text["text-inverse"],
+    fontFamily: fonts.poppins.bold,
+    padding: scaleDimension(20, true),
   },
-
   noRecords: {
-    paddingTop: 40,
+    paddingTop: scaleDimension(20, false),
     textAlign: "center",
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#6B7280",
-    fontFamily: "Poppins_700Bold",
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    color: theme.text["text-secondary"],
+    fontFamily: fonts.poppins.bold,
+  },
+  searchBar: {
+    flexGrow: 1,
+    marginRight: scaleDimension(3, true),
+  },
+  results: {
+    fontSize: scaleDimension(20, true),
+    maxWidth: "80%",
+    lineHeight: scaleDimension(12, false),
+    textAlign: "left",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
+    marginTop: scaleDimension(10, false),
+    marginLeft: scaleDimension(30, true),
+    paddingBottom: scaleDimension(6, false),
+  },
+  contentList: {
+    height:
+      Dimensions.get("window").height > 667
+        ? (Dimensions.get("window").height / 440) * 270
+        : (Dimensions.get("window").height / 440) * 238,
   },
 });
 

@@ -1,5 +1,6 @@
 import React from "react";
-import { Image, Dimensions, StyleSheet } from "react-native";
+import { Image, StyleSheet } from "react-native";
+import { scaleDimension } from "../utils";
 
 const Logo = () => (
   <Image source={require("../../assets/logo.png")} style={style.logo} />
@@ -9,9 +10,9 @@ const style = StyleSheet.create({
   logo: {
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: (Dimensions.get("window").height / 440) * 10,
-    height: (Dimensions.get("window").width / 440) * 70,
-    width: (Dimensions.get("window").width / 440) * 80,
+    marginBottom: scaleDimension(10, true),
+    height: scaleDimension(70, true),
+    width: scaleDimension(80, true),
   },
 });
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Animated } from "react-native";
+import { theme } from "../utils";
 
 interface LoaderProps {
   size: number;
@@ -20,30 +21,37 @@ const Loader = ({ size }: LoaderProps) => {
     })();
   }, []);
 
-  const style = StyleSheet.create({
-    container: {
-      width: size,
-      height: size,
-      backgroundColor: "#cccccc55",
-      borderRadius: size,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-  });
-
   return (
-    <View style={style.container}>
+    <View
+      style={[
+        style.container,
+        { height: size, width: size, borderRadius: size },
+      ]}
+    >
       <Animated.View
-        style={{
-          height: init,
-          width: init,
-          borderRadius: size,
-          backgroundColor: "#cccccc33",
-        }}
+        style={[
+          style.loader,
+          {
+            height: init,
+            width: init,
+            borderRadius: size,
+          },
+        ]}
       />
     </View>
   );
 };
+
+const style = StyleSheet.create({
+  container: {
+    backgroundColor: theme.surface["surface-300"],
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loader: {
+    backgroundColor: theme.surface["surface-400"],
+  },
+});
 
 export default Loader;

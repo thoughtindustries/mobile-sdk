@@ -4,7 +4,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { CourseQuiz, LoadingBanner } from "../components";
 import { RootStackParamList } from "../../types";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { WebView } from "react-native-webview";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import {
@@ -13,6 +12,8 @@ import {
 } from "../graphql";
 import RenderHtml from "react-native-render-html";
 import { QuizProvider } from "../context";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
+import { fonts, scaleDimension, theme } from "../utils";
 
 type ExploreCourseProps = StackNavigationProp<
   RootStackParamList,
@@ -57,11 +58,7 @@ const ExploreCourse = () => {
   const VideoPage: FC = () => {
     const [videoLoading, setVideoLoading] = useState<boolean>(false);
     return (
-      <View
-        style={{
-          flex: 1,
-        }}
-      >
+      <View style={styles(progress, topicIndex, topics.length).container}>
         {pagesData?.Pages?.[0]?.title && (
           <Text style={styles(progress, topicIndex, topics.length).topicTitle}>
             {pagesData.Pages[0].title}
@@ -108,11 +105,9 @@ const ExploreCourse = () => {
       onPress={() => navigation.goBack()}
       style={styles(progress, topicIndex, topics.length).pageNav}
     >
-      <MaterialCommunityIcons
-        name="chevron-left"
-        size={36}
-        color="#374151"
-        onPress={() => navigation.goBack()}
+      <ChevronLeft
+        size={scaleDimension(36, true)}
+        color={theme.text["text-primary"]}
       />
       <Text style={styles(progress, topicIndex, topics.length).pageNavButton}>
         Back
@@ -188,20 +183,18 @@ const ExploreCourse = () => {
           style={styles(progress, topicIndex, topics.length).topicBackButton}
           onPress={() => handlePrevious()}
         >
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={36}
-            color={"#FFFFFF"}
+          <ChevronLeft
+            size={scaleDimension(36, true)}
+            color={theme.text["text-inverse"]}
           />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles(progress, topicIndex, topics.length).topicForwardButton}
           onPress={() => handleNext()}
         >
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={36}
-            color={"#3B1FA3"}
+          <ChevronRight
+            size={scaleDimension(36, true)}
+            color={theme.brand["brand-primary"]}
           />
         </TouchableOpacity>
       </View>
@@ -237,119 +230,109 @@ const styles = (progress: number, topicIndex: number, topics: number) =>
       flex: 1,
     },
     row: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.surface["surface-100"],
       display: "flex",
       flexDirection: "row",
     },
     pageNav: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.surface["surface-100"],
       display: "flex",
       flexDirection: "row",
-      padding: 8,
-      paddingTop: 40,
+      padding: scaleDimension(8, true),
+      paddingTop: scaleDimension(24, false),
       alignItems: "center",
     },
     pageNavButton: {
-      fontSize: 16,
-      fontFamily: "Poppins_400Regular",
+      fontSize: scaleDimension(20, true),
+      fontFamily: fonts.poppins.regular,
     },
     courseNav: {
       display: "flex",
       flexDirection: "row",
-      backgroundColor: "#3B1FA3",
-      padding: 24,
+      backgroundColor: theme.brand["brand-primary"],
+      padding: scaleDimension(24, true),
       justifyContent: "space-between",
     },
     progressBar: {
-      backgroundColor: "#3B1FA3",
+      backgroundColor: theme.brand["brand-primary"],
       width: `${progress}%`,
-      borderRadius: 16,
+      borderRadius: scaleDimension(16, true),
     },
     loader: {
-      marginTop: 30,
-      marginHorizontal: 30,
+      marginTop: scaleDimension(16, false),
+      marginHorizontal: scaleDimension(30, true),
       flex: 1,
     },
     courseHeading: {
       borderBottomWidth: 1,
       borderTopWidth: 1,
-      borderColor: "#E5E7EB",
-      backgroundColor: "#FFFFFF",
+      borderColor: theme.border["border-100"],
+      backgroundColor: theme.surface["surface-100"],
     },
     courseTitle: {
-      color: "#3B1FA3",
-      fontFamily: "Poppins_700Bold",
-      fontSize: 16,
-      lineHeight: 24,
-      padding: 16,
-      paddingLeft: 24,
-      paddingRight: 24,
+      color: theme.brand["brand-primary"],
+      fontFamily: fonts.poppins.bold,
+      fontSize: scaleDimension(20, true),
+      lineHeight: scaleDimension(12, false),
+      padding: scaleDimension(16, true),
+      paddingLeft: scaleDimension(24, true),
+      paddingRight: scaleDimension(24, true),
     },
     slide: {
       flex: 1,
-      marginTop: 16,
-      backgroundColor: "#FFFFFF",
-      padding: 24,
+      marginTop: scaleDimension(8, false),
+      backgroundColor: theme.surface["surface-100"],
+      padding: scaleDimension(24, true),
     },
     sectionTitle: {
-      color: "#1F2937",
-      fontFamily: "Inter_700Bold",
-      fontSize: 14,
-      paddingRight: 5,
+      color: theme.text["text-primary"],
+      fontFamily: fonts.inter.bold,
+      fontSize: scaleDimension(16, true),
+      paddingRight: scaleDimension(5, true),
     },
     lessonTitle: {
-      color: "#3B1FA3",
-      fontFamily: "Inter_700Bold",
-      fontSize: 14,
+      color: theme.brand["brand-primary"],
+      fontFamily: fonts.inter.bold,
+      fontSize: scaleDimension(16, true),
     },
     sectionProgress: {
-      marginTop: 15,
-      marginBottom: 15,
-      height: 8,
+      marginTop: scaleDimension(8, false),
+      marginBottom: scaleDimension(8, false),
+      height: scaleDimension(4, false),
       flexDirection: "row",
-      backgroundColor: "#D1D5DB",
-      borderRadius: 16,
-    },
-    searching: {
-      margin: 32,
-      backgroundColor: "#3B1FA3",
-      borderRadius: 10,
-      paddingBottom: 20,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
+      borderRadius: scaleDimension(16, true),
+      backgroundColor: theme.border["border-200"],
     },
     topicPage: {
-      padding: 8,
+      padding: scaleDimension(8, true),
       flex: 1,
     },
     topicTitle: {
-      color: "#1F2937",
-      fontFamily: "Inter_700Bold",
-      fontSize: 14,
-      paddingRight: 5,
-      marginBottom: 16,
+      color: theme.text["text-primary"],
+      fontFamily: fonts.inter.bold,
+      fontSize: scaleDimension(16, true),
+      paddingRight: scaleDimension(6, true),
+      marginBottom: scaleDimension(8, false),
     },
     topicText: {
-      fontFamily: "Inter_400Regular",
-      fontSize: 16,
-      lineHeight: 24,
-      color: "#6B7280",
+      fontFamily: fonts.inter.regular,
+      fontSize: scaleDimension(16, true),
+      lineHeight: scaleDimension(12, false),
+      color: theme.text["text-secondary"],
     },
     topicBackButton: {
-      borderRadius: 5,
+      borderRadius: scaleDimension(6, true),
       borderWidth: 1,
-      borderColor: "#FFFFFF",
-      backgroundColor: "#3B1FA3",
-      padding: 5,
+      borderColor: theme.border["border-100"],
+      backgroundColor: theme.brand["brand-primary"],
+      padding: scaleDimension(6, true),
     },
     topicForwardButton: {
-      borderRadius: 5,
+      borderRadius: scaleDimension(6, true),
       borderWidth: 1,
-      borderColor: "#FFFFFF",
-      backgroundColor: "#FFFFFF",
-      padding: 5,
+      borderColor: theme.border["border-100"],
+      backgroundColor: theme.surface["surface-100"],
+      padding: scaleDimension(6, true),
     },
     videoPageContainer: {
       flex: 1,

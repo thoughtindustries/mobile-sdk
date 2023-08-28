@@ -14,6 +14,7 @@ export type RootStackParamList = {
     title: string;
     asset: string;
     contentTypeLabel?: string;
+    description?: string;
   };
   TopCategories: undefined;
   Explore: undefined;
@@ -110,3 +111,8 @@ export type ErrorMessageType = {
   title: string;
   message: string;
 };
+
+export enum Screens {
+  ContentDetails = "ContentDetails",
+  Home = "Home",
+}

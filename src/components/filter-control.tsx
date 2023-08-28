@@ -4,14 +4,15 @@ import {
   Text,
   Modal,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
   ScrollView,
   Dimensions,
 } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { ListFilter } from "lucide-react-native";
 import Checkbox from "./checkbox";
 import { FilterContext } from "../context";
 import { GlobalTypes } from "../graphql";
+import { fonts, scaleDimension, theme } from "../utils";
 
 const FilterControl = () => {
   const [show, setShow] = useState<boolean>(false);
@@ -112,7 +113,6 @@ const FilterControl = () => {
     return (
       <Modal transparent={false} visible={show}>
         <View style={styles.filterContainer}>
-          <Text style={styles.filterHeading}>Filters</Text>
           <View style={styles.filterBox}>
             <Text style={styles.filterTitle}>Sort By</Text>
             <View style={styles.row}>
@@ -199,14 +199,14 @@ const FilterControl = () => {
             </View>
           </ScrollView>
 
-          <View style={styles.row}>
-            <Pressable style={styles.clearbtn} onPress={clearFilter}>
+          <View style={styles.filterButtons}>
+            <TouchableOpacity style={styles.clearbtn} onPress={clearFilter}>
               <Text style={styles.clearbtntxt}>Clear All</Text>
-            </Pressable>
+            </TouchableOpacity>
 
-            <Pressable style={styles.applybtn} onPress={applyFilter}>
+            <TouchableOpacity style={styles.applybtn} onPress={applyFilter}>
               <Text style={styles.applybtntxt}>Apply Filter</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -215,13 +215,9 @@ const FilterControl = () => {
 
   return (
     <View>
-      <Pressable style={styles.filterbtn} onPress={() => setShow(true)}>
-        <MaterialCommunityIcons
-          name="filter-variant"
-          size={25}
-          color="#232323"
-        />
-      </Pressable>
+      <TouchableOpacity style={styles.filterbtn} onPress={() => setShow(true)}>
+        <ListFilter size={25} color={theme.text["text-primary"]} />
+      </TouchableOpacity>
       <CourseFilter />
     </View>
   );
@@ -231,113 +227,86 @@ const styles = StyleSheet.create({
   filterbtn: {
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#E5E7EB",
-    borderRadius: 5,
-    padding: 10,
-    width: 50,
-    height: 50,
-    marginLeft: 5,
+    borderColor: theme.border["border-100"],
+    backgroundColor: theme.interface["ui-quaternary"],
+    borderRadius: scaleDimension(10, true),
+    width: scaleDimension(56, true),
+    height: scaleDimension(56, true),
+    marginLeft: scaleDimension(12, true),
     alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
-
   filterContainer: {
-    backgroundColor: "#fff",
-    height: "99%",
-    paddingTop: 10,
-    borderRadius: 20,
+    backgroundColor: theme.surface["surface-100"],
+    height: "100%",
+    paddingTop: scaleDimension(30, true),
   },
-
   row: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    padding: Dimensions.get("window").height < 700 ? 10 : 20,
+    paddingTop: scaleDimension(20, false),
   },
-
-  filterHeading: {
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: "center",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
-  },
-
   filterBox: {
     borderBottomWidth: 1,
-    padding: 20,
-    paddingTop: 0,
-    borderBottomColor: "#D1D5DB",
+    borderBottomColor: theme.border["border-200"],
+    padding: scaleDimension(12, false),
   },
-
   filterTitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    paddingTop: 16,
-    color: "#1F2937",
-    fontFamily: "Poppins_400Regular",
+    fontSize: scaleDimension(20, true),
+    lineHeight: scaleDimension(28, true),
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.regular,
   },
-
   clearbtn: {
     flexGrow: 1,
     margin: 2,
   },
-
   clearbtntxt: {
-    color: "#3B1FA3",
+    color: theme.brand["brand-primary"],
     textAlign: "center",
-    lineHeight: 40,
-    fontFamily: "Inter_700Bold",
+    lineHeight: scaleDimension(40, true),
+    fontFamily: fonts.inter.bold,
+    fontSize: scaleDimension(16, true),
   },
-
   applybtn: {
     flexGrow: 1,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 4,
-    margin: 2,
-    marginRight: 15,
+    backgroundColor: theme.brand["brand-primary"],
+    borderRadius: scaleDimension(4, true),
+    padding: scaleDimension(6, true),
   },
-
   applybtntxt: {
-    color: "#fff",
+    color: theme.text["text-inverse"],
     textAlign: "center",
-    lineHeight: 40,
-    fontFamily: "Inter_700Bold",
+    lineHeight: scaleDimension(40, true),
+    fontFamily: fonts.inter.bold,
+    fontSize: scaleDimension(16, true),
   },
-
   sortDir: {
     width: "50%",
-    margin: 2,
-    lineHeight: 30,
+    lineHeight: scaleDimension(30, true),
     textAlign: "center",
   },
   sortDirSelected: {
-    fontSize: 14,
+    fontSize: scaleDimension(16, true),
     width: "50%",
-    margin: 2,
-    lineHeight: 30,
+    lineHeight: scaleDimension(30, true),
     textAlign: "center",
-    backgroundColor: "#3B1FA3",
-    color: "#fff",
-    fontFamily: "Inter_700Bold",
-    borderRadius: 5,
+    backgroundColor: theme.brand["brand-primary"],
+    color: theme.text["text-inverse"],
+    fontFamily: fonts.inter.bold,
+    borderRadius: scaleDimension(5, true),
+    padding: scaleDimension(6, true),
   },
-
-  hasFilter: {
-    height: 24,
-    width: 24,
-    borderRadius: 24,
-    backgroundColor: "#3B1FA3",
-    marginLeft: -15,
-    marginTop: -5,
-  },
-
-  filterCount: {
-    textAlign: "center",
-    fontFamily: "Inter_700Bold",
-    fontSize: 10,
-    lineHeight: 24,
-    color: "#ffffff",
+  filterButtons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: scaleDimension(20, false),
+    paddingHorizontal: scaleDimension(12, false),
   },
 });
 

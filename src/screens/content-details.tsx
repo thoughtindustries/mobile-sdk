@@ -15,10 +15,17 @@ import {
   useNavigation,
   useRoute,
   useIsFocused,
+  RouteProp,
 } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, contentListType } from "../../types";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  CheckCircle2,
+  Lock,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+} from "lucide-react-native";
 import {
   Collapse,
   CollapseHeader,
@@ -26,6 +33,7 @@ import {
 } from "accordion-collapse-react-native";
 import { useCourseByIdQuery, usePagesCompletedByCourseQuery } from "../graphql";
 import { useDataContext } from "../context";
+import { fonts, scaleDimension, theme } from "../utils";
 
 type ContentDetailsScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -33,7 +41,7 @@ type ContentDetailsScreenProps = StackNavigationProp<
 >;
 
 const ContentDetails = () => {
-  const route = useRoute();
+  const route = useRoute<RouteProp<RootStackParamList, "ContentDetails">>();
   const { catalogData } = useDataContext();
   const isFocused = useIsFocused();
   const { cid, from } = route.params;
@@ -176,11 +184,7 @@ const ContentDetails = () => {
   const SectionProgress: FC<{ percent: number }> = ({ percent }) => (
     <View style={styles(courseData).sectionProgress}>
       <Animated.View
-        style={{
-          backgroundColor: "#3B1FA3",
-          width: `${percent}%`,
-          borderRadius: 16,
-        }}
+        style={[styles(courseData).progressBar, { width: `${percent}%` }]}
       />
     </View>
   );
@@ -214,11 +218,17 @@ const ContentDetails = () => {
         <View style={styles(courseData).lessonBox}>
           <Text style={styles(courseData).lessonTitle}>{lesson.title}</Text>
           <View style={styles(courseData).lessonStatus}>
-            <MaterialCommunityIcons
-              name={`${lessonRead ? "check-circle-outline" : "lock-outline"}`}
-              size={20}
-              color={`${lessonRead ? "#008463" : "#000000"}`}
-            />
+            {lessonRead ? (
+              <CheckCircle2
+                size={scaleDimension(24, true)}
+                color={theme.border["border-success"]}
+              />
+            ) : (
+              <Lock
+                size={scaleDimension(24, true)}
+                color={theme.border["border-primary"]}
+              />
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -246,7 +256,7 @@ const ContentDetails = () => {
       >
         <CollapseHeader>
           <View style={styles(courseData).sectionContainer}>
-            <View style={{ width: "85%" }}>
+            <View style={styles(courseData).sectionHeader}>
               <Text style={styles(courseData).sectionTitle}>{title}</Text>
               {lessons.length > 0 && (
                 <View>
@@ -267,11 +277,17 @@ const ContentDetails = () => {
                 </View>
               )}
             </View>
-            <MaterialCommunityIcons
-              name={activeSection === id ? "chevron-up" : "chevron-down"}
-              size={36}
-              color="#374151"
-            />
+            {activeSection === id ? (
+              <ChevronUp
+                size={scaleDimension(36, true)}
+                color={theme.border["border-primary"]}
+              />
+            ) : (
+              <ChevronDown
+                size={scaleDimension(36, true)}
+                color={theme.border["border-primary"]}
+              />
+            )}
           </View>
         </CollapseHeader>
         <CollapseBody>
@@ -310,22 +326,14 @@ const ContentDetails = () => {
   );
 
   const Nav: FC = () => (
-    <TouchableOpacity style={styles(courseData).row}>
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#374151",
-          borderRadius: 8,
-          width: 36,
-          height: 36,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="chevron-left"
-          size={32}
-          color="#FFFFFF"
-          onPress={() => navigation.goBack()}
+    <TouchableOpacity
+      style={styles(courseData).backButtonContainer}
+      onPress={() => navigation.goBack()}
+    >
+      <View style={styles(courseData).backButton}>
+        <ChevronLeft
+          size={scaleDimension(32, true)}
+          color={theme.text["text-inverse"]}
         />
       </View>
       <Text
@@ -338,13 +346,13 @@ const ContentDetails = () => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles(courseData).container}>
       {courseDataLoading || pagesCompletedDataLoading || loading ? (
         <View style={styles(courseData).loader}>
           <LoadingBanner />
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={styles(courseData).container}>
           <Nav />
           <CustomReport />
           <AboutCourse />
@@ -360,38 +368,41 @@ const styles = (data: any) =>
     sectionList: {
       flex: data ? 4 : 0,
     },
+    container: {
+      flex: 1,
+    },
     loader: {
-      marginHorizontal: 30,
-      marginTop: 60,
+      marginHorizontal: scaleDimension(30, true),
+      marginTop: scaleDimension(30, false),
     },
     collapse: {
-      backgroundColor: "#FAFAFA",
+      backgroundColor: theme.surface["surface-200"],
     },
     sectionContainer: {
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
       borderBottomWidth: 1,
-      borderBottomColor: "#D1D5DB",
-      padding: 16,
-      paddingLeft: 32,
-      paddingRight: 32,
+      borderBottomColor: theme.border["border-200"],
+      padding: scaleDimension(16, true),
+      paddingLeft: scaleDimension(32, true),
+      paddingRight: scaleDimension(32, true),
     },
     sectionTitle: {
-      fontSize: 16,
-      fontFamily: "Poppins_700Bold",
+      fontSize: scaleDimension(16, true),
+      fontFamily: fonts.poppins.bold,
     },
     sectionCount: {
-      color: "#6B7280",
-      fontSize: 12,
-      fontFamily: "Inter_400Regular",
-      paddingVertical: 4,
+      color: theme.text["text-secondary"],
+      fontSize: scaleDimension(12, true),
+      fontFamily: fonts.inter.regular,
+      paddingBottom: scaleDimension(6, true),
     },
     sectionProgress: {
-      height: 8,
+      height: scaleDimension(4, false),
       flexDirection: "row",
-      backgroundColor: "#D1D5DB",
-      borderRadius: 16,
+      borderRadius: scaleDimension(16, true),
+      backgroundColor: theme.border["border-200"],
     },
     lessonContainer: {
       display: "flex",
@@ -399,187 +410,134 @@ const styles = (data: any) =>
       justifyContent: "space-between",
       width: "100%",
       flexWrap: "wrap",
-      backgroundColor: "#ffffff",
-      paddingTop: 16,
-      paddingLeft: 32,
-      paddingRight: 32,
+      backgroundColor: theme.surface["surface-100"],
+      paddingTop: scaleDimension(16, true),
+      paddingLeft: scaleDimension(32, true),
+      paddingRight: scaleDimension(32, true),
     },
     lessonBox: {
-      minWidth: "48.5%",
-      borderColor: "#E5E7EB",
-      backgroundColor: "#fafafa",
+      width: scaleDimension(180, true),
+      borderColor: theme.border["border-100"],
+      backgroundColor: theme.surface["surface-200"],
       borderWidth: 1,
-      padding: 10,
-      marginBottom: 10,
-      borderRadius: 4,
-      minHeight: 70,
+      padding: scaleDimension(10, true),
+      marginBottom: scaleDimension(10, true),
+      borderRadius: scaleDimension(4, true),
+      minHeight: scaleDimension(35, false),
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
     },
     lessonTitle: {
-      fontSize: 14,
-      fontFamily: "Inter_700Bold",
+      fontSize: scaleDimension(16, true),
+      fontFamily: fonts.inter.bold,
     },
     lessonStatus: {
       alignItems: "flex-end",
     },
-    page: {
-      marginTop: 32,
-      paddingLeft: 32,
-      paddingRight: 32,
-      backgroundColor: "#F5F5F7",
-    },
     row: {
-      marginTop: 60,
-      marginLeft: 30,
-      marginBottom: 30,
+      marginTop: scaleDimension(30, false),
+      marginLeft: scaleDimension(30, true),
+      marginBottom: scaleDimension(30, true),
       alignItems: "center",
-      paddingTop: 0,
       display: "flex",
       flexDirection: "row",
     },
+    backButtonContainer: {
+      marginTop: scaleDimension(30, false),
+      marginLeft: scaleDimension(30, true),
+      marginBottom: scaleDimension(30, true),
+      alignItems: "center",
+      display: "flex",
+      flexDirection: "row",
+      maxWidth: "33%",
+    },
     backBtn: {
       paddingTop: 2,
-      marginLeft: 10,
-      fontSize: 20,
+      marginLeft: scaleDimension(10, true),
+      fontSize: scaleDimension(24, true),
+      fontFamily: fonts.inter.regular,
     },
     reportRow: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
-      borderBottomColor: "#D1D5DB",
+      borderBottomColor: theme.border["border-200"],
       borderBottomWidth: 1,
-      marginBottom: 20,
-      marginHorizontal: 30,
+      marginBottom: scaleDimension(10, false),
+      marginHorizontal: scaleDimension(30, true),
     },
     reportRightBox: {
-      flexGrow: 0,
-      paddingTop: 30,
-      paddingBottom: 30,
+      paddingTop: scaleDimension(16, false),
+      paddingBottom: scaleDimension(16, false),
       width: "70%",
     },
     courseTitle: {
-      fontSize: 20,
-      lineHeight: 24,
+      fontSize: scaleDimension(24, true),
+      lineHeight: scaleDimension(12, false),
       textAlign: "left",
-      color: "#1F2937",
-      fontFamily: "Poppins_700Bold",
+      color: theme.text["text-primary"],
+      fontFamily: fonts.poppins.bold,
     },
     courseAuthor: {
-      fontSize: 12,
-      lineHeight: 15,
+      fontSize: scaleDimension(14, true),
+      lineHeight: scaleDimension(8, false),
       textAlign: "left",
-      color: "#6B7280",
-      fontFamily: "Inter_400Regular",
+      color: theme.text["text-secondary"],
+      fontFamily: fonts.inter.regular,
     },
     recentImage: {
-      width: (Dimensions.get("window").width / 440) * 80,
-      height: (Dimensions.get("window").width / 440) * 80,
-      borderRadius: 8,
-      margin: (Dimensions.get("window").width / 440) * 20,
+      width: scaleDimension(80, true),
+      height: scaleDimension(80, true),
+      borderRadius: scaleDimension(8, true),
+      margin: scaleDimension(20, true),
       marginRight: 0,
     },
     aboutSection: {
-      marginHorizontal: 30,
+      marginHorizontal: scaleDimension(30, true),
       flex: data ? 2 : 5,
     },
     courseSubTitle: {
-      fontSize: 12,
-      paddingBottom: 12,
-      lineHeight: 15,
+      fontSize: scaleDimension(16, true),
+      paddingBottom: scaleDimension(6, false),
+      lineHeight: scaleDimension(8, false),
       textAlign: "left",
-      color: "#1F2937",
-      fontFamily: "Inter_700Bold",
+      color: theme.text["text-primary"],
+      fontFamily: fonts.inter.bold,
     },
     courseDesc: {
-      fontSize: 15,
-      lineHeight: 24,
-      paddingBottom: 20,
+      fontSize: scaleDimension(16, true),
+      lineHeight: scaleDimension(12, false),
+      paddingBottom: scaleDimension(10, false),
       textAlign: "left",
-      paddingTop: 10,
-      color: "#6B7280",
-      fontFamily: "Poppins_400Regular",
-    },
-
-    searching: {
-      margin: 32,
-      backgroundColor: "#3B1FA3",
-      borderRadius: 10,
-      paddingBottom: 20,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-
-    searchingText: {
-      fontSize: 16,
-      lineHeight: 24,
-      textAlign: "center",
-      color: "#ffffff",
-      fontFamily: "Poppins_700Bold",
-      padding: 20,
-    },
-    floatingFooter: {
-      position: "absolute",
-      height: 120,
-      alignItems: "center",
-      right: 16,
-      left: 16,
-      bottom: 30,
-      backgroundColor: "#3B1FA3",
-      borderColor: "#D1D5DB",
-      borderRadius: 8,
-      borderWidth: 1,
-      display: "flex",
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-    FlotingText: {
-      color: "#ffffff",
-      textAlign: "Center",
-      alignContent: "flex-start",
-      paddingLeft: 20,
-    },
-    ftextItem: {
-      color: "#D4D4D8",
-      fontSize: 12,
-      lineHeight: 12,
-      fontFamily: "Inter_700Bold",
-    },
-    fsection: {
-      fontSize: 12,
-      lineHeight: 16,
-      fontFamily: "Inter_700Bold",
-      color: "#ffffff",
-    },
-    ftopic: {
-      fontSize: 16,
-      lineHeight: 24,
-      color: "#ffffff",
-      fontFamily: "Poppins_400Regular",
+      paddingTop: scaleDimension(5, false),
+      color: theme.text["text-secondary"],
+      fontFamily: fonts.poppins.regular,
     },
     button: {
-      marginTop: 60,
-      marginRight: 20,
+      marginTop: scaleDimension(30, false),
+      marginRight: scaleDimension(20, true),
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "#FFFFFF",
-      borderRadius: 4,
-      width: 60,
-      height: 60,
+      backgroundColor: theme.surface["surface-100"],
+      borderRadius: scaleDimension(4, true),
+      width: scaleDimension(60, true),
+      height: scaleDimension(60, true),
     },
-    buttonText: {
-      fontFamily: "Inter_700Bold",
-      fontSize: 14,
+    progressBar: {
+      backgroundColor: theme.brand["brand-primary"],
+      borderRadius: scaleDimension(16, true),
     },
-    floatingBox: {
-      display: "flex",
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
+    sectionHeader: {
+      width: "85%",
+    },
+    backButton: {
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.surface["surface-500"],
+      borderRadius: scaleDimension(8, true),
+      width: scaleDimension(36, true),
+      height: scaleDimension(36, true),
     },
   });
 

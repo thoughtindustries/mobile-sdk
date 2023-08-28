@@ -11,13 +11,14 @@ import {
 } from "react-native";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { EyeOff, ChevronRight } from "lucide-react-native";
 import { TI_API_INSTANCE } from "@env";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList, UserDetailType } from "../../types";
 import * as SecureStore from "expo-secure-store";
 import { useDataContext } from "../context";
 import { useApolloClient } from "@apollo/client";
 import { closeDB } from "../db/db";
+import { fonts, scaleDimension, theme } from "../utils";
 
 type AccountScreenProps = StackNavigationProp<RootStackParamList, "Account">;
 
@@ -97,18 +98,15 @@ const Account = () => {
           style={styles.resetButton}
         >
           <View style={styles.resetBtn}>
-            <MaterialCommunityIcons
-              name={"eye-off-outline"}
-              size={22}
-              color="#3B1FA3"
-              style={styles.eyeIcon}
+            <EyeOff
+              size={scaleDimension(24, true)}
+              color={theme.brand["brand-primary"]}
             />
             <Text style={styles.resetField}>Reset Password</Text>
-            <MaterialCommunityIcons
-              style={styles.settingIcon}
-              name={"chevron-right"}
-              size={25}
-              color="#232323"
+
+            <ChevronRight
+              size={scaleDimension(24, true)}
+              color={theme.text["text-secondary"]}
             />
           </View>
         </TouchableOpacity>
@@ -133,89 +131,81 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   settingInfo: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.surface["surface-100"],
     width: "100%",
-    padding: 24,
+    padding: scaleDimension(24, true),
     alignItems: "flex-start",
     flex: 1,
   },
   resetBtn: {
-    borderRadius: 8,
-    paddingTop: 16,
-    paddingLeft: 15,
-    paddingRight: 15,
+    borderRadius: scaleDimension(8, true),
+    paddingTop: scaleDimension(16, true),
+    paddingLeft: scaleDimension(16, true),
+    paddingRight: scaleDimension(16, true),
     display: "flex",
     flexDirection: "row",
-    backgroundColor: "#F5F5F7",
-    height: 50,
+    backgroundColor: theme.surface["surface-200"],
+    height: scaleDimension(25, false),
     width: "100%",
   },
-  eyeIcon: {
-    width: 22,
-    marginTop: -1,
-  },
   resetField: {
-    paddingLeft: 10,
+    paddingLeft: scaleDimension(10, true),
     flexGrow: 1,
     textAlign: "left",
   },
-  settingIcon: {
-    width: 22,
-    marginTop: -3,
-  },
   title: {
     marginBottom: Dimensions.get("window").height < 667 ? 20 : 0,
-    marginTop: 60,
-    marginLeft: 30,
-    fontSize: 20,
-    lineHeight: 36,
+    marginTop: scaleDimension(30, false),
+    marginLeft: scaleDimension(30, true),
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "left",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   profileImage: {
-    marginBottom: (Dimensions.get("window").height / 440) * 16,
-    height: (Dimensions.get("window").height / 440) * 80,
-    width: (Dimensions.get("window").height / 440) * 80,
-    borderRadius: 132,
+    marginBottom: scaleDimension(16, false),
+    height: scaleDimension(80, false),
+    width: scaleDimension(80, false),
+    borderRadius: scaleDimension(130, true),
   },
   subtitle: {
-    fontSize: (Dimensions.get("window").width / 440) * 24,
-    lineHeight: 36,
-    marginBottom: (Dimensions.get("window").height / 440) * 6,
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
+    marginBottom: scaleDimension(6, true),
     textAlign: "center",
-    color: "#1F2937",
-    fontFamily: "Poppins_700Bold",
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
   },
   userEmail: {
-    fontSize: (Dimensions.get("window").width / 440) * 16,
-    lineHeight: 24,
-    color: "#6B7280",
-    fontFamily: "Poppins_400Regular",
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(12, false),
+    color: theme.text["text-secondary"],
+    fontFamily: fonts.poppins.regular,
   },
   profileEdit: {
-    color: "#3B1FA3",
-    fontFamily: "Inter_700Bold",
-    fontSize: (Dimensions.get("window").width / 440) * 16,
-    lineHeight: 17,
-    backgroundColor: "#F9FAFB",
+    color: theme.brand["brand-primary"],
+    fontFamily: fonts.inter.bold,
+    fontSize: scaleDimension(16, true),
+    lineHeight: scaleDimension(17, true),
+    backgroundColor: theme.interface["ui-quaternary"],
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#D1D5DB",
+    borderColor: theme.border["border-200"],
     borderRadius: 4,
-    paddingVertical: (Dimensions.get("window").height / 440) * 10,
-    paddingHorizontal: (Dimensions.get("window").height / 440) * 24,
-    marginTop: (Dimensions.get("window").height / 440) * 12,
-    marginBottom: (Dimensions.get("window").height / 440) * 20,
+    paddingVertical: scaleDimension(10, false),
+    paddingHorizontal: scaleDimension(24, false),
+    marginTop: scaleDimension(12, false),
+    marginBottom: scaleDimension(20, false),
   },
   settingTitle: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: (Dimensions.get("window").height / 440) * 14,
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(20, true),
+    lineHeight: scaleDimension(16, false),
+    marginBottom: scaleDimension(14, false),
   },
   resetButton: {
-    marginBottom: (Dimensions.get("window").height / 440) * 6,
+    marginBottom: scaleDimension(6, false),
   },
 });
 

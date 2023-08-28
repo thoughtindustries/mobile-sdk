@@ -5,16 +5,16 @@ import {
   TextInput,
   StyleSheet,
   KeyboardAvoidingView,
-  Dimensions,
 } from "react-native";
 import { Logo, Button, Message } from "../components";
 import Success from "./success";
-import AppStyle from "../../AppStyle";
-import tiApiObj from "../helpers/TIApi";
 import { TI_INSTANCE_NAME } from "@env";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
+import { scaleDimension, fonts, theme, registerUser } from "../utils";
+import { useDataContext } from "../context";
+import * as Network from "expo-network";
 
 type RegistrationScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -42,6 +42,7 @@ const Registration = () => {
     title: "",
     message: "",
   });
+  const { setIsConnected } = useDataContext();
   const [message, setMessage] = useState<any>("");
   const navigation = useNavigation<RegistrationScreenProps>();
   const [form, setForm] = useState<FormProps>({
@@ -116,11 +117,23 @@ const Registration = () => {
       try {
         setProcessing(true);
 
-        await tiApiObj.createUser({
-          email: form.email.value,
-          firstName: form.firstName.value,
-          lastName: form.lastName.value,
-        });
+        const { isInternetReachable } = await Network.getNetworkStateAsync();
+        if (isInternetReachable) {
+          setIsConnected(true);
+        } else {
+          setResponseError({
+            title: "Network Unavailable",
+            message: "Please enable Wi-Fi or cellular data and try again.",
+          });
+          setProcessing(false);
+          return;
+        }
+
+        await registerUser(
+          form.email.value,
+          form.firstName.value,
+          form.lastName.value
+        );
 
         setMessage(
           `Welcome to ${TI_INSTANCE_NAME}!\nPlease check you email to complete your registration`
@@ -135,11 +148,10 @@ const Registration = () => {
             })
           );
         }, 3000);
-      } catch (error) {
-        console.log("Registration Error: ", error);
+      } catch (error: any) {
         setProcessing(false);
         if (
-          error ===
+          error.message ===
           "A user already exists with the external customer ID provided."
         ) {
           setResponseError({
@@ -161,7 +173,7 @@ const Registration = () => {
   return (
     <View style={styles(message, processing).container}>
       {processing && (
-        <Success title="" message="Registration going on, Please wait.. " />
+        <Success title="" message="Registration in progress! Please wait.. " />
       )}
 
       {!processing && message !== "" && (
@@ -193,7 +205,7 @@ const Registration = () => {
               </Text>
             </View>
             <View>
-              <Text style={AppStyle.label}>Email</Text>
+              <Text style={styles(message, processing).label}>Email</Text>
               <TextInput
                 textContentType="emailAddress"
                 placeholder="example@email.com"
@@ -202,14 +214,19 @@ const Registration = () => {
                 defaultValue={form.email.value}
                 style={
                   form.email.error !== ""
-                    ? { ...AppStyle.input, ...AppStyle.errorField }
-                    : AppStyle.input
+                    ? {
+                        ...styles(message, processing).input,
+                        ...styles(message, processing).errorInput,
+                      }
+                    : styles(message, processing).input
                 }
                 autoCorrect={false}
                 autoCapitalize="none"
               />
-              <Text style={AppStyle.inlineError}>{form.email.error}</Text>
-              <Text style={AppStyle.label}>First Name</Text>
+              <Text style={styles(message, processing).inlineError}>
+                {form.email.error}
+              </Text>
+              <Text style={styles(message, processing).label}>First Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="First Name"
@@ -217,12 +234,17 @@ const Registration = () => {
                 defaultValue={form.firstName.value}
                 style={
                   form.firstName.error !== ""
-                    ? { ...AppStyle.input, ...AppStyle.errorField }
-                    : AppStyle.input
+                    ? {
+                        ...styles(message, processing).input,
+                        ...styles(message, processing).errorInput,
+                      }
+                    : styles(message, processing).input
                 }
               />
-              <Text style={AppStyle.inlineError}>{form.firstName.error}</Text>
-              <Text style={AppStyle.label}>Last Name</Text>
+              <Text style={styles(message, processing).inlineError}>
+                {form.firstName.error}
+              </Text>
+              <Text style={styles(message, processing).label}>Last Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="Last Name"
@@ -230,11 +252,16 @@ const Registration = () => {
                 defaultValue={form.lastName.value}
                 style={
                   form.lastName.error !== ""
-                    ? { ...AppStyle.input, ...AppStyle.errorField }
-                    : AppStyle.input
+                    ? {
+                        ...styles(message, processing).input,
+                        ...styles(message, processing).errorInput,
+                      }
+                    : styles(message, processing).input
                 }
               />
-              <Text style={AppStyle.inlineError}>{form.lastName.error}</Text>
+              <Text style={styles(message, processing).inlineError}>
+                {form.lastName.error}
+              </Text>
               <View style={styles(message, processing).button}>
                 <Button title="Sign up" onPress={Register} />
               </View>
@@ -249,8 +276,43 @@ const Registration = () => {
 const styles = (message: string, processing: boolean) =>
   StyleSheet.create({
     container: {
-      ...AppStyle.container,
-      backgroundColor: processing || message !== "" ? "#3B1FA3" : "#FFFFFF",
+      flex: 1,
+      justifyContent: "space-evenly",
+      padding: scaleDimension(16, false),
+      paddingTop: scaleDimension(30, false),
+      backgroundColor:
+        processing || message
+          ? theme.brand["brand-primary"]
+          : theme.surface["surface-100"],
+    },
+    input: {
+      flexDirection: "row",
+      fontFamily: fonts.poppins.regular,
+      padding: scaleDimension(10, false),
+      paddingLeft: scaleDimension(10, false),
+      paddingRight: scaleDimension(10, false),
+      borderColor: theme.border["border-200"],
+      borderWidth: 1,
+      borderRadius: scaleDimension(6, true),
+      backgroundColor: theme.surface["surface-100"],
+      marginBottom: scaleDimension(2, false),
+      fontSize: scaleDimension(16, true),
+    },
+    label: {
+      fontFamily: fonts.poppins.bold,
+      color: theme.text["text-primary"],
+      marginTop: scaleDimension(10, false),
+      marginBottom: scaleDimension(3, false),
+      fontSize: scaleDimension(18, true),
+    },
+    errorInput: {
+      borderColor: theme.border["border-error"],
+      color: theme.border["border-error"],
+    },
+    inlineError: {
+      color: theme.border["border-error"],
+      height: scaleDimension(6, false),
+      fontSize: scaleDimension(14, true),
     },
     prompt: {
       justifyContent: "center",
@@ -260,15 +322,15 @@ const styles = (message: string, processing: boolean) =>
       width: "100%",
     },
     title: {
-      fontSize: (Dimensions.get("window").width / 440) * 24,
-      lineHeight: 36,
+      fontSize: scaleDimension(24, true),
+      lineHeight: scaleDimension(18, false),
       textAlign: "center",
-      color: "#1F2937",
-      marginBottom: 10,
-      fontFamily: "Poppins_700Bold",
+      color: theme.text["text-primary"],
+      marginBottom: scaleDimension(10, true),
+      fontFamily: fonts.poppins.bold,
     },
     button: {
-      marginVertical: 20,
+      marginVertical: scaleDimension(10, false),
     },
   });
 

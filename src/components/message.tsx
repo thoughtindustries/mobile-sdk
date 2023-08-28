@@ -1,11 +1,19 @@
 import React from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  GestureResponderEvent,
+} from "react-native";
+import { fonts, scaleDimension, theme } from "../utils";
 
 interface MessageProps {
   title?: string;
   message?: string;
   extraJSX?: JSX.Element;
-  onHide?: Function;
+  onHide?: (event: GestureResponderEvent) => void;
 }
 
 const Message = ({
@@ -35,36 +43,32 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#18242Ebb",
+    backgroundColor: theme.surface["surface-blurred"],
     height: "100%",
   },
-
   modalDialog: {
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    margin: 40,
-    padding: 40,
+    backgroundColor: theme.surface["surface-100"],
+    borderRadius: scaleDimension(5, true),
+    margin: scaleDimension(50, true),
+    padding: scaleDimension(50, true),
   },
-
   modalTitle: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 16,
-    lineHeight: 24,
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(20, true),
+    lineHeight: scaleDimension(12, false),
   },
-
   modalMessage: {
-    fontFamily: "Inter_400Regular",
-    paddingTop: 16,
-    fontSize: 12,
-    color: "#6B7280",
-    lineHeight: 15,
+    fontFamily: fonts.inter.regular,
+    paddingTop: scaleDimension(16, true),
+    fontSize: scaleDimension(16, true),
+    color: theme.text["text-secondary"],
+    lineHeight: scaleDimension(8, false),
     textAlign: "left",
   },
-
   closeBtn: {
-    marginTop: 20,
-    color: "#6B7280",
-    fontSize: 14,
+    marginTop: scaleDimension(20, true),
+    color: theme.text["text-secondary"],
+    fontSize: scaleDimension(16, true),
     alignSelf: "center",
   },
 });

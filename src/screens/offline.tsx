@@ -1,15 +1,16 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Button } from "../components";
-import AppStyle from "../../AppStyle";
+import { WifiOff } from "lucide-react-native";
+import { fonts, scaleDimension, theme } from "../utils";
 
 const Offline = () => {
   return (
-    <View style={AppStyle.container}>
+    <View style={styles.container}>
       <View style={styles.prompt}>
-        <Image
-          source={require("../../assets/wifix.png")}
-          style={styles.networkOff}
+        <WifiOff
+          size={scaleDimension(96, true)}
+          color={theme.text["text-secondary"]}
         />
         <Text style={styles.title}>You are currently offline</Text>
         <Text style={styles.subtitle}>Get all your offline files here.</Text>
@@ -22,6 +23,12 @@ const Offline = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "space-evenly",
+    padding: scaleDimension(16, false),
+    paddingTop: scaleDimension(30, false),
+  },
   prompt: {
     flex: 1,
     justifyContent: "center",
@@ -29,34 +36,24 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     marginRight: "auto",
   },
-
   offlineButton: {
     width: "100%",
     marginBottom: "45%",
   },
-
   title: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 24,
-    lineHeight: 36,
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(28, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "center",
-    color: "#6B7280",
-    marginBottom: 10,
+    color: theme.text["text-secondary"],
+    marginBottom: scaleDimension(6, false),
   },
-
   subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: scaleDimension(20, true),
+    lineHeight: scaleDimension(12, false),
     textAlign: "center",
-    color: "#6B7280",
-    fontFamily: "Poppins_400Regular",
-  },
-
-  networkOff: {
-    textAlign: "center",
-    fontWeight: "700",
-    color: "#3B1FA3",
-    paddingTop: 25,
+    color: theme.text["text-secondary"],
+    fontFamily: fonts.poppins.regular,
   },
 });
 

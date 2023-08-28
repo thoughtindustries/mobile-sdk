@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Loader } from "../components";
+import { scaleDimension, theme } from "../utils";
 
 interface SuccessProps {
   title: string;
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "#3B1FA3",
+    backgroundColor: theme.brand["brand-primary"],
   },
 
   section1: {
@@ -42,40 +43,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: "auto",
     marginRight: "auto",
-    marginTop: 100,
-    marginBottom: 100,
+    marginVertical: scaleDimension(50, false),
   },
 
   section2: {
     flex: 3,
     justifyContent: "flex-start",
     alignItems: "center",
-    marginLeft: 22,
-    marginRight: 22,
+    marginHorizontal: scaleDimension(22, true),
   },
 
   logo: {
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: scaleDimension(10, false),
   },
 
   title: {
-    fontSize: 24,
-    lineHeight: 36,
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "center",
-    color: "#ffffff",
-    marginBottom: 10,
+    color: theme.text["text-inverse"],
+    marginBottom: scaleDimension(6, false),
   },
 
   message: {
     textAlign: "center",
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#ffffff",
-    margin: 60,
-    marginTop: 10,
-    marginBottom: 10,
+    fontSize: scaleDimension(18, true),
+    lineHeight: scaleDimension(14, false),
+    color: theme.text["text-inverse"],
+    margin: scaleDimension(60, true),
+    marginVertical: scaleDimension(6, false),
   },
 });
 

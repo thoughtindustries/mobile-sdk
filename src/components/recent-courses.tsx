@@ -5,13 +5,19 @@ import {
   ScrollView,
   Image,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { useDataContext } from "../context";
-import { placeHolderimage } from "../helpers";
+import {
+  fonts,
+  placeHolderImage,
+  scaleDimension,
+  theme,
+  truncateString,
+} from "../utils";
 
 type HomeScreenProps = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -19,11 +25,18 @@ const RecentCourses = () => {
   const navigation = useNavigation<HomeScreenProps>();
   const { contentData } = useDataContext();
 
+  const handleNav = (courseId: string) => {
+    navigation.navigate("ContentDetails", {
+      cid: courseId,
+      from: "Home",
+    });
+  };
+
   return (
     <View>
       {contentData?.length !== 0 && (
         <View>
-          <View style={styles.courseBox}>
+          <View style={styles.sectionName}>
             <Text style={styles.heading}>Recently Launched Courses</Text>
           </View>
           <ScrollView
@@ -32,31 +45,29 @@ const RecentCourses = () => {
             showsHorizontalScrollIndicator={false}
           >
             {contentData?.map((course, idx) => (
-              <Pressable
+              <TouchableOpacity
+                style={styles.recContentBox}
                 key={idx}
-                onPress={() =>
-                  navigation.navigate("ContentDetails", {
-                    cid: course.id,
-                    from: "Home",
-                  })
-                }
+                onPress={() => handleNav(course.id)}
               >
-                <View key={idx} style={styles.recContentBox}>
+                <View key={idx}>
                   <View style={styles.courseThumbnail}>
                     <Image
                       key={idx}
                       source={
-                        course.asset ? { uri: course.asset } : placeHolderimage
+                        course.asset ? { uri: course.asset } : placeHolderImage
                       }
                       style={styles.image}
                     />
                   </View>
                   <View style={styles.contentArea}>
                     <Text style={styles.recCourseTitle}>{course.title}</Text>
-                    <Text style={styles.courseDes}>{course.description}</Text>
+                    <Text style={styles.courseDes}>
+                      {truncateString(course.description || "", 30)}
+                    </Text>
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
@@ -66,63 +77,57 @@ const RecentCourses = () => {
 };
 
 const styles = StyleSheet.create({
-  courseBox: {
-    marginTop: 5,
+  sectionName: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   heading: {
-    marginTop: 15,
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: "Poppins_700Bold",
-    color: "#000",
+    marginTop: scaleDimension(16, true),
+    fontSize: scaleDimension(8, false),
+    lineHeight: scaleDimension(14, false),
+    fontFamily: fonts.poppins.bold,
+    color: theme.text["text-primary"],
   },
   courseContainer: {
     display: "flex",
     flexDirection: "row",
-    padding: 5,
+    padding: scaleDimension(5, true),
+    marginLeft: scaleDimension(-12, true),
   },
   recContentBox: {
-    backgroundColor: "#FAFAFA",
+    backgroundColor: theme.surface["surface-200"],
     borderStyle: "solid",
-    borderColor: "#E5E7EB",
-    width: 260,
-    margin: 12,
-    height: 300,
-  },
-  courseTitle: {
-    color: "#D4D4D8",
-    fontWeight: "700",
-    fontSize: 16,
-    justifyContent: "flex-start",
-    lineHeight: 50,
+    borderColor: theme.border["border-100"],
+    margin: scaleDimension(12, true),
+    height: scaleDimension(150, false),
+    width: scaleDimension(300, true),
   },
   courseThumbnail: {
-    width: 260,
-    height: 150,
+    width: "100%",
+    height: "50%",
   },
   contentArea: {
-    padding: 32,
-    fontFamily: "Poppins_400Regular",
+    padding: scaleDimension(32, true),
+    fontFamily: fonts.poppins.regular,
   },
   recCourseTitle: {
-    color: "#1F2937",
-    fontWeight: "700",
-    fontSize: 16,
-    paddingBottom: 10,
+    color: theme.text["text-primary"],
+    fontFamily: fonts.poppins.bold,
+    fontSize: scaleDimension(8, false),
+    paddingBottom: scaleDimension(5, false),
   },
   courseDes: {
-    color: "#6B7280",
-    fontSize: 12,
-    fontWeight: "400",
-    lineHeight: 18,
+    color: theme.text["text-secondary"],
+    fontSize: scaleDimension(7, false),
+    fontFamily: fonts.inter.regular,
+    lineHeight: scaleDimension(9, false),
   },
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 5,
+    borderTopLeftRadius: scaleDimension(6, true),
+    borderTopRightRadius: scaleDimension(6, true),
   },
 });
 

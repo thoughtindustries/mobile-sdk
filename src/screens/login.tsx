@@ -4,15 +4,12 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Pressable,
+  TouchableOpacity,
   Linking,
   KeyboardAvoidingView,
-  Dimensions,
   Platform,
 } from "react-native";
 import { Logo, Button, Link, Message } from "../components";
-import AppStyle from "../../AppStyle";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
 import Success from "./success";
 import { useNavigation } from "@react-navigation/native";
@@ -20,8 +17,11 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList, ErrorMessageType } from "../../types";
 import { useLoginMutation } from "../graphql";
 import * as SecureStore from "expo-secure-store";
+import * as Network from "expo-network";
 import { createUser, initDB } from "../db/db";
 import { useDataContext } from "../context";
+import { Eye, EyeOff } from "lucide-react-native";
+import { fonts, scaleDimension, theme } from "../utils";
 
 type LoginScreenProps = StackNavigationProp<RootStackParamList, "Login">;
 
@@ -43,6 +43,7 @@ const Login = () => {
     refetchCatalogData,
     refetchContentData,
     setInitialState,
+    setIsConnected,
   } = useDataContext();
   const [showPassword, setShowpPassword] = useState<boolean>(false);
   const [loginMutation] = useLoginMutation();
@@ -109,6 +110,18 @@ const Login = () => {
       if (formValidated()) {
         setInitialState(false);
         setLoading(true);
+
+        const { isInternetReachable } = await Network.getNetworkStateAsync();
+        if (isInternetReachable) {
+          setIsConnected(true);
+        } else {
+          setResponseError({
+            title: "Network Unavailable",
+            message: "Please enable Wi-Fi or cellular data and try again.",
+          });
+          setLoading(false);
+          return;
+        }
 
         // Login user
         const { data } = await loginMutation({
@@ -236,33 +249,29 @@ const Login = () => {
               <Text style={styles(loading).title}>Sign In</Text>
             </View>
             <View>
-              <Text style={AppStyle.label}>Email</Text>
+              <Text style={styles(loading).label}>Email</Text>
               <TextInput
                 textContentType="emailAddress"
                 onChangeText={(value) => handleChange("email", value)}
                 placeholder="example@email.com"
                 defaultValue={form.email.value}
-                style={
-                  form.email.error !== ""
-                    ? { ...AppStyle.input, ...AppStyle.errorField }
-                    : AppStyle.input
-                }
+                style={[
+                  styles(loading).input,
+                  form.email.error ? styles(loading).errorInput : null,
+                ]}
                 keyboardType="email-address"
                 autoCorrect={false}
                 autoCapitalize="none"
               />
-              <Text style={AppStyle.inlineError}>{form.email.error}</Text>
-              <Text style={AppStyle.label}>Password</Text>
+              <Text style={styles(loading).inlineError}>
+                {form.email.error}
+              </Text>
+              <Text style={styles(loading).label}>Password</Text>
               <View
-                style={
-                  form.password.error !== ""
-                    ? {
-                        ...AppStyle.input,
-                        ...AppStyle.errorField,
-                        flexDirection: "row",
-                      }
-                    : { ...AppStyle.input, flexDirection: "row" }
-                }
+                style={[
+                  styles(loading).input,
+                  form.password.error ? styles(loading).errorInput : null,
+                ]}
               >
                 <TextInput
                   secureTextEntry={!showPassword}
@@ -271,18 +280,26 @@ const Login = () => {
                   style={styles(loading).textInput}
                   placeholder="Enter your password here"
                 />
-                <Pressable
+                <TouchableOpacity
                   onPress={() => setShowpPassword(!showPassword)}
-                  style={{ justifyContent: "center" }}
+                  style={styles(loading).showPassword}
                 >
-                  <MaterialCommunityIcons
-                    name={!showPassword ? "eye-off" : "eye"}
-                    size={22}
-                    color="#232323"
-                  />
-                </Pressable>
+                  {showPassword ? (
+                    <Eye
+                      size={scaleDimension(24, true)}
+                      color={theme.text["text-primary"]}
+                    />
+                  ) : (
+                    <EyeOff
+                      size={scaleDimension(24, true)}
+                      color={theme.text["text-primary"]}
+                    />
+                  )}
+                </TouchableOpacity>
               </View>
-              <Text style={AppStyle.inlineError}>{form.password.error}</Text>
+              <Text style={styles(loading).inlineError}>
+                {form.password.error}
+              </Text>
               <View style={styles(loading).button}>
                 <Button title="Sign In" onPress={onSignIn} />
               </View>
@@ -303,28 +320,65 @@ const Login = () => {
 const styles = (loading: boolean) =>
   StyleSheet.create({
     container: {
-      ...AppStyle.container,
-      backgroundColor: loading ? "#3B1FA3" : "#FFFFFF",
+      flex: 1,
+      justifyContent: "space-evenly",
+      padding: scaleDimension(16, false),
+      paddingTop: scaleDimension(30, false),
+      backgroundColor: loading
+        ? theme.brand["brand-primary"]
+        : theme.surface["surface-100"],
     },
     prompt: {
       justifyContent: "center",
       alignItems: "center",
     },
     title: {
-      fontSize: (Dimensions.get("window").width / 440) * 24,
-      lineHeight: 36,
+      fontSize: scaleDimension(24, true),
+      lineHeight: scaleDimension(18, false),
       textAlign: "center",
-      color: "#1F2937",
-      marginBottom: 10,
-      fontFamily: "Poppins_700Bold",
+      color: theme.text["text-primary"],
+      marginBottom: scaleDimension(6, false),
+      fontFamily: fonts.poppins.bold,
     },
     button: {
-      marginVertical: 20,
+      marginVertical: scaleDimension(10, false),
     },
     textInput: {
       margin: 0,
       padding: 0,
       width: "93%",
+    },
+    showPassword: {
+      justifyContent: "center",
+    },
+    input: {
+      flexDirection: "row",
+      fontFamily: fonts.poppins.regular,
+      padding: scaleDimension(10, false),
+      paddingLeft: scaleDimension(10, false),
+      paddingRight: scaleDimension(10, false),
+      borderColor: theme.border["border-200"],
+      borderWidth: 1,
+      borderRadius: scaleDimension(6, true),
+      backgroundColor: theme.surface["surface-100"],
+      marginBottom: scaleDimension(2, false),
+      fontSize: scaleDimension(16, true),
+    },
+    label: {
+      fontFamily: fonts.poppins.bold,
+      color: theme.text["text-primary"],
+      marginTop: scaleDimension(10, false),
+      marginBottom: scaleDimension(3, false),
+      fontSize: scaleDimension(18, true),
+    },
+    errorInput: {
+      borderColor: theme.border["border-error"],
+      color: theme.border["border-error"],
+    },
+    inlineError: {
+      color: theme.border["border-error"],
+      height: scaleDimension(6, false),
+      fontSize: scaleDimension(14, true),
     },
   });
 

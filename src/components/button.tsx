@@ -1,5 +1,6 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, Dimensions } from "react-native";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { scaleDimension, theme, fonts } from "../utils";
 
 interface ButtonProps {
   title: string;
@@ -26,32 +27,29 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: "center",
     alignItems: "center",
-    padding: (Dimensions.get("window").height / 440) * 10,
-    backgroundColor: "#3B1FA3",
-    borderRadius: 4,
+    padding: scaleDimension(10, false),
+    backgroundColor: theme.brand["brand-primary"],
+    borderRadius: scaleDimension(2, false),
   },
-
   buttonText: {
-    fontFamily: "Inter_700Bold",
-    color: "#ffffff",
-    fontSize: (Dimensions.get("window").width / 440) * 20,
+    fontFamily: fonts.inter.bold,
+    color: theme.text["text-inverse"],
+    fontSize: scaleDimension(20, true),
   },
-
   button2: {
-    marginTop: (Dimensions.get("window").height / 440) * 30,
-    marginBottom: (Dimensions.get("window").height / 440) * 16,
+    marginTop: scaleDimension(30, false),
+    marginBottom: scaleDimension(16, false),
     justifyContent: "center",
     alignItems: "center",
-    padding: (Dimensions.get("window").height / 440) * 10,
-    backgroundColor: "#FAFAFA",
-    borderColor: "#D1D5DB",
-    borderWidth: 1,
-    borderRadius: 4,
+    padding: scaleDimension(10, false),
+    backgroundColor: theme.surface["surface-200"],
+    borderColor: theme.border["border-200"],
+    borderWidth: scaleDimension(1, false),
+    borderRadius: scaleDimension(2, false),
   },
-
   buttonText2: {
-    fontFamily: "Inter_700Bold",
-    color: "#1F2937",
+    fontFamily: fonts.inter.bold,
+    color: theme.text["text-primary"],
   },
 });
 

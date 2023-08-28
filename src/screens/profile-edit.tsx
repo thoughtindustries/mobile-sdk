@@ -8,13 +8,13 @@ import {
 } from "react-native";
 import { Logo, Button, Message } from "../components";
 import Success from "./success";
-import AppStyle from "../../AppStyle";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../types";
 import { UserDetailType, ErrorMessageType } from "../../types";
 import * as SecureStore from "expo-secure-store";
 import { TI_API_INSTANCE, TI_API_KEY } from "@env";
+import { scaleDimension, fonts, theme } from "../utils";
 
 type ProfileEditScreenProps = StackNavigationProp<
   RootStackParamList,
@@ -97,7 +97,7 @@ const ProfileEdit = () => {
       )}
 
       {!processing && (
-        <View style={AppStyle.container}>
+        <View style={styles.container}>
           {(message.title !== "" || message.message !== "") && (
             <Message
               title={message.title}
@@ -116,7 +116,7 @@ const ProfileEdit = () => {
               <Text style={styles.title}>Edit Profile</Text>
             </View>
             <View>
-              <Text style={AppStyle.label}>First Name</Text>
+              <Text style={styles.label}>First Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="First Name"
@@ -124,9 +124,9 @@ const ProfileEdit = () => {
                   setUserInfo({ ...userInfo, firstName: text });
                 }}
                 defaultValue={userInfo.firstName}
-                style={AppStyle.input}
+                style={styles.input}
               />
-              <Text style={AppStyle.label}>Last Name</Text>
+              <Text style={styles.label}>Last Name</Text>
               <TextInput
                 textContentType="name"
                 placeholder="Last Name"
@@ -134,7 +134,7 @@ const ProfileEdit = () => {
                   setUserInfo({ ...userInfo, lastName: text });
                 }}
                 defaultValue={userInfo.lastName}
-                style={AppStyle.input}
+                style={styles.input}
               />
               <View style={styles.button}>
                 <Button title="Update" onPress={updateProfile} />
@@ -148,24 +148,50 @@ const ProfileEdit = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "space-evenly",
+    padding: scaleDimension(16, false),
+    paddingTop: scaleDimension(30, false),
+  },
+  input: {
+    flexDirection: "row",
+    fontFamily: fonts.poppins.regular,
+    padding: scaleDimension(10, false),
+    paddingLeft: scaleDimension(10, false),
+    paddingRight: scaleDimension(10, false),
+    borderColor: theme.border["border-200"],
+    borderWidth: 1,
+    borderRadius: scaleDimension(6, true),
+    backgroundColor: theme.surface["surface-100"],
+    marginBottom: scaleDimension(2, false),
+    fontSize: scaleDimension(16, true),
+  },
+  label: {
+    fontFamily: fonts.poppins.bold,
+    color: theme.text["text-primary"],
+    marginTop: scaleDimension(10, false),
+    marginBottom: scaleDimension(3, false),
+    fontSize: scaleDimension(18, true),
+  },
   prompt: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 100,
+    marginTop: scaleDimension(50, false),
   },
   keyboardOffset: {
     width: "100%",
   },
   title: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 24,
-    lineHeight: 36,
+    fontFamily: fonts.poppins.regular,
+    fontSize: scaleDimension(24, true),
+    lineHeight: scaleDimension(18, false),
     textAlign: "center",
-    color: "#1F2937",
-    marginBottom: 10,
+    color: theme.text["text-primary"],
+    marginBottom: scaleDimension(10, true),
   },
   button: {
-    marginVertical: 100,
+    marginVertical: scaleDimension(50, false),
   },
 });
 

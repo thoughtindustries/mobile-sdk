@@ -22,6 +22,8 @@ interface DataContextProps {
   refetchContentData: RefetchFunction;
   setInitialState: (initialState: boolean) => void;
   initialState: boolean;
+  setIsConnected: (isConnected: boolean | undefined) => void;
+  isConnected: boolean | undefined;
 }
 const DataContext = createContext<DataContextProps>({
   recentContent: [],
@@ -32,12 +34,17 @@ const DataContext = createContext<DataContextProps>({
   refetchContentData: () => new Promise<any>(() => {}),
   setInitialState: () => undefined,
   initialState: false,
+  setIsConnected: () => undefined,
+  isConnected: false,
 });
 
 export const useDataContext = () => useContext(DataContext);
 
 export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [initialState, setInitialState] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean | undefined>(
+    undefined
+  );
 
   const { data: recentContent, refetch: refetchRecentContent } =
     useUserRecentContentQuery({
@@ -62,13 +69,15 @@ export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
         recentContent: !initialState
           ? recentContent?.UserRecentContent
           : undefined,
-        refetchRecentContent: refetchRecentContent,
+        refetchRecentContent,
         contentData: !initialState ? contentData?.UserContentItems : undefined,
-        refetchContentData: refetchContentData,
+        refetchContentData,
         catalogData: catalogData?.CatalogContent.contentItems,
-        refetchCatalogData: refetchCatalogData,
-        setInitialState: setInitialState,
-        initialState: initialState,
+        refetchCatalogData,
+        setInitialState,
+        initialState,
+        setIsConnected,
+        isConnected,
       }}
     >
       {children}
