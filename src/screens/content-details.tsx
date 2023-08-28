@@ -344,8 +344,6 @@ const ContentDetails = () => {
     </TouchableOpacity>
   );
 
-  console.log(courseDataLoading, pagesCompletedDataLoading, loading);
-
   return (
     <View style={styles(courseData).container}>
       {courseDataLoading || pagesCompletedDataLoading || loading ? (

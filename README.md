@@ -1,5 +1,5 @@
 <p align="center" style="padding: 100px 50px 50px 50px">
-    <a href="https://developer.thoughtindustries.com/build/developer-guide/"><img src="./.github/images/helium-mobile.svg" alt="Helium Logo"/></a>
+    <a href="https://developer.thoughtindustries.com/build/developer-guide/"><img src="./.github/images/mobile-sdk.svg" alt="Helium Logo"/></a>
     <div align="center">
         <a href="https://developer.thoughtindustries.com/build/developer-guide/">📚 Thought Industries Developer Site</a> |
         <a href="https://discord.gg/cTJBX4muVn">🗣 Discord</a> |
@@ -44,7 +44,7 @@ Documentation to [setup Android Emulator](https://docs.expo.dev/workflow/android
 After cloning the repo, run the following commands:
 
 ```bash
-cd helium-mobile
+cd mobile-sdk
 ```
 
 ```bash

@@ -50,9 +50,9 @@ export const DataProvider: FC<{ children: ReactNode }> = ({ children }) => {
     useUserRecentContentQuery({
       variables: { limit: 5 },
     });
-  const { data: contentData, refetch: refetchCatalogData } =
+  const { data: contentData, refetch: refetchContentData } =
     useUserContentItemsQuery();
-  const { data: catalogData, refetch: refetchContentData } =
+  const { data: catalogData, refetch: refetchCatalogData } =
     useCatalogContentQuery({
       variables: {
         sortColumn: GlobalTypes.SortColumn.Title,

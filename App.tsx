@@ -19,7 +19,7 @@ import {
 } from "@expo-google-fonts/poppins";
 import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
 import { ApolloProvider } from "@apollo/client";
-import { makeApolloClient } from "./src/tooling/helium-mobile-server/src";
+import { makeApolloClient } from "./src/tooling/mobile-sdk-server/src";
 import { PageWrapper, StackNavigation } from "./src/tooling/renderer/src";
 import { DataProvider } from "./src/context";
 import { theme } from "./src/utils";
