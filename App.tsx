@@ -22,9 +22,10 @@ import { ApolloProvider } from "@apollo/client";
 import { makeApolloClient } from "./src/tooling/helium-mobile-server/src";
 import { PageWrapper, StackNavigation } from "./src/tooling/renderer/src";
 import { DataProvider } from "./src/context";
+import { theme } from "./src/utils";
 
 const App = () => {
-  LogBox.ignoreLogs(["Require cycle:"]);
+  LogBox.ignoreLogs(["Require cycle:", "Constants.platform"]);
 
   let [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -44,11 +45,13 @@ const App = () => {
     <ApolloProvider client={apolloClient}>
       <PageWrapper
         styles={{
-          backgroundColor: "#F3F4F6",
+          backgroundColor: theme.surface["surface-primary"],
         }}
       >
         <DataProvider>
-          <StackNavigation styles={{ backgroundColor: "#F3F4F6" }}>
+          <StackNavigation
+            styles={{ backgroundColor: theme.surface["surface-primary"] }}
+          >
             <Stack.Screen name="SplashScreen" component={SplashScreen} />
             <Stack.Screen
               name="Onboarding"

@@ -1,8 +1,11 @@
 <p align="center" style="padding: 50px">
     <a href="https://developer.thoughtindustries.com/build/developer-guide/"><img src="./.github/images/helium-mobile.svg" alt="Helium Logo"/></a>
+    <div align="center">
+        <a href="https://developer.thoughtindustries.com/build/developer-guide/">📚 Thought Industries Developer Site</a> |
+        <a href="https://developer.thoughtindustries.com/build/developer-guide/">🗣 Discord</a> |
+        <a href="https://developer.thoughtindustries.com/build/developer-guide/">📝 GraphQL Docs</a>
+    </div>
 </p>
-
-📚 [Thought Industries Developer Site](https://developer.thoughtindustries.com/build/developer-guide/) | 🗣 [Discord](https://discord.gg/cTJBX4muVn) | 📝 [GraphQL Docs](https://thoughtindustries.github.io/helium-graphql/)
 
 ## About
 

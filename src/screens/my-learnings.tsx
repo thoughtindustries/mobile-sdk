@@ -52,13 +52,14 @@ const MyLearnings = () => {
       },
     });
 
-  const { data: catalogData } = useCatalogContentQuery({
-    variables: {
-      sortColumn: filters.sortBy,
-      sortDirection: filters.sortDir,
-      page: 1,
-    },
-  });
+  const { data: catalogData, loading: catalogDataLoading } =
+    useCatalogContentQuery({
+      variables: {
+        sortColumn: filters.sortBy,
+        sortDirection: filters.sortDir,
+        page: 1,
+      },
+    });
 
   useEffect(() => {
     (async () => {
@@ -371,7 +372,7 @@ const MyLearnings = () => {
             <FilterControl />
           </FilterContext.Provider>
         </View>
-        {contentItemDataLoading ? (
+        {contentItemDataLoading || catalogDataLoading ? (
           <LoadingBanner />
         ) : (
           <View>
@@ -412,7 +413,7 @@ const MyLearnings = () => {
                 <CategoryFilter />
                 <ContentList />
               </View>
-            ) : isConnected ? (
+            ) : isConnected && !catalogDataLoading ? (
               <RecommendedList />
             ) : (
               <View>

@@ -7,7 +7,6 @@ import {
   Animated,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
 } from "react-native";
 import { get, last } from "lodash";
 import { LoadingBanner } from "../components";
@@ -344,6 +343,8 @@ const ContentDetails = () => {
       </Text>
     </TouchableOpacity>
   );
+
+  console.log(courseDataLoading, pagesCompletedDataLoading, loading);
 
   return (
     <View style={styles(courseData).container}>
