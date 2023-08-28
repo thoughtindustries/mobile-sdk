@@ -1,31 +1,25 @@
-import * as Types from "../global-types";
+import * as Types from '../global-types';
 
-import { gql } from "@apollo/client";
-import * as Apollo from "@apollo/client";
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type UserCourseProgressQueryVariables = Types.Exact<{
-  id: Types.Scalars["ID"];
+  id: Types.Scalars['ID'];
 }>;
 
-export type UserCourseProgressQuery = {
-  __typename?: "Query";
-  UserCourseProgress?: {
-    __typename?: "UserProgress";
-    totalViews?: number;
-    totalTime?: number;
-    percentComplete?: number;
-  };
-};
+
+export type UserCourseProgressQuery = { __typename?: 'Query', UserCourseProgress?: { __typename?: 'UserProgress', totalViews?: number, totalTime?: number, percentComplete?: number } };
+
 
 export const UserCourseProgressDocument = gql`
-  query UserCourseProgress($id: ID!) {
-    UserCourseProgress(id: $id) {
-      totalViews
-      totalTime
-      percentComplete
-    }
+    query UserCourseProgress($id: ID!) {
+  UserCourseProgress(id: $id) {
+    totalViews
+    totalTime
+    percentComplete
   }
-`;
+}
+    `;
 
 /**
  * __useUserCourseProgressQuery__
@@ -43,37 +37,14 @@ export const UserCourseProgressDocument = gql`
  *   },
  * });
  */
-export function useUserCourseProgressQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    UserCourseProgressQuery,
-    UserCourseProgressQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    UserCourseProgressQuery,
-    UserCourseProgressQueryVariables
-  >(UserCourseProgressDocument, options);
-}
-export function useUserCourseProgressLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    UserCourseProgressQuery,
-    UserCourseProgressQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    UserCourseProgressQuery,
-    UserCourseProgressQueryVariables
-  >(UserCourseProgressDocument, options);
-}
-export type UserCourseProgressQueryHookResult = ReturnType<
-  typeof useUserCourseProgressQuery
->;
-export type UserCourseProgressLazyQueryHookResult = ReturnType<
-  typeof useUserCourseProgressLazyQuery
->;
-export type UserCourseProgressQueryResult = Apollo.QueryResult<
-  UserCourseProgressQuery,
-  UserCourseProgressQueryVariables
->;
+export function useUserCourseProgressQuery(baseOptions: Apollo.QueryHookOptions<UserCourseProgressQuery, UserCourseProgressQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserCourseProgressQuery, UserCourseProgressQueryVariables>(UserCourseProgressDocument, options);
+      }
+export function useUserCourseProgressLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserCourseProgressQuery, UserCourseProgressQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserCourseProgressQuery, UserCourseProgressQueryVariables>(UserCourseProgressDocument, options);
+        }
+export type UserCourseProgressQueryHookResult = ReturnType<typeof useUserCourseProgressQuery>;
+export type UserCourseProgressLazyQueryHookResult = ReturnType<typeof useUserCourseProgressLazyQuery>;
+export type UserCourseProgressQueryResult = Apollo.QueryResult<UserCourseProgressQuery, UserCourseProgressQueryVariables>;

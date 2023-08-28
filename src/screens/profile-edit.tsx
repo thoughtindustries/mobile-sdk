@@ -7,7 +7,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { Logo, Button, Message } from "../components";
-import Success from "./Success";
+import Success from "./success";
 import AppStyle from "../../AppStyle";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";

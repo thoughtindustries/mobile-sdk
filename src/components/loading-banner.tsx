@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Loader from "./Loader";
+import Loader from "./loader";
 
 interface LoadingBannerProps {}
 

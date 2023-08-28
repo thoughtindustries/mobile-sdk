@@ -5,13 +5,15 @@ interface ButtonProps {
   title: string;
   mode?: number;
   onPress(): void;
+  disabled?: boolean;
 }
 
-const Button = ({ title, onPress, mode }: ButtonProps) => {
+const Button = ({ title, onPress, mode, disabled }: ButtonProps) => {
   return (
     <TouchableOpacity
       style={mode !== 2 ? styles.button : styles.button2}
       onPress={onPress}
+      disabled={disabled}
     >
       <Text style={mode !== 2 ? styles.buttonText : styles.buttonText2}>
         {title}

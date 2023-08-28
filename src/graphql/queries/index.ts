@@ -6,3 +6,4 @@ export * from "./CourseById.generated";
 export * from "./UserCourseProgress.generated";
 export * from "./Pages.generated";
 export * from "./PagesCompletedByCourse.generated";
+export * from "./LoadAssessmentAttemptsByTopicOrCourse.generated";

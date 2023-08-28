@@ -1,22 +1,23 @@
-import Button from "./Button";
-import Link from "./Link";
-import Logo from "./Logo";
-import Message from "./Message";
-import Loader from "./Loader";
-import FooterMenu from "./FooterMenu";
-import UserHeader from "./UserHeader";
-import Checkbox from "./Checkbox";
-import Searchbar from "./Searchbar";
-import FilterControl from "./FilterControl";
-import Banner from "./Banner";
-import TopCategories from "./TopCategories";
-import Recommendation from "./Recommendation";
-import RecentCourses from "./RecentCourses";
-import ResourceControl from "./ResourceControl";
-import CourseQuiz from "./CourseQuiz";
-import LoadingBanner from "./LoadingBanner";
-import Hero from "./Hero";
-import QuizQuestion from "./QuizQuestion";
+import Button from "./button";
+import Link from "./link";
+import Logo from "./logo";
+import Message from "./message";
+import Loader from "./loader";
+import FooterMenu from "./footer-menu";
+import UserHeader from "./user-header";
+import Checkbox from "./checkbox";
+import Searchbar from "./search-bar";
+import FilterControl from "./filter-control";
+import Banner from "./banner";
+import TopCategories from "./top-categories";
+import Recommendation from "./recommendation";
+import RecentCourses from "./recent-courses";
+import ResourceControl from "./resource-control";
+import CourseQuiz from "./course-quiz";
+import LoadingBanner from "./loading-banner";
+import Hero from "./hero";
+import QuizQuestion from "./quiz-question";
+import QuizResults from "./quiz-results";
 
 export {
   Button,
@@ -38,4 +39,5 @@ export {
   LoadingBanner,
   Hero,
   QuizQuestion,
+  QuizResults,
 };
