@@ -5,6 +5,7 @@ import {
   useLoadAssessmentAttemptWithQuestionsQuery,
   useLoadAssessmentAttemptsByTopicOrCourseQuery,
 } from "../graphql";
+import { AssessmentAttemptStatus } from "../graphql/global-types";
 import { useQuizContext } from "../context";
 import { fonts, scaleDimension, theme } from "../utils";
 
@@ -48,7 +49,7 @@ const CourseQuiz = ({ quiz, courseid }: CourseQuizProps) => {
       assessmentData.LoadAssessmentAttemptsByTopicOrCourse.length > 0
     ) {
       assessmentData.LoadAssessmentAttemptsByTopicOrCourse.every((item) => {
-        if (item.status === "finished") {
+        if (item.status === AssessmentAttemptStatus.finished) {
           setResult({
             grade: item.grade,
             answered: item.answeredQuestionsCount,

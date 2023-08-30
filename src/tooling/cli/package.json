@@ -1,5 +1,5 @@
 {
-  "name": "@thoughtindustries/helium-mobile",
+  "name": "@thoughtindustries/mobile-sdk",
   "version": "1.0.0",
   "description": "Helium Mobile CLI",
   "main": "src/index.ts",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thoughtindustries/helium-mobile.git"
+    "url": "git+https://github.com/thoughtindustries/mobile-sdk.git"
   },
   "author": "Blake Reimer",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/thoughtindustries/helium-mobile/issues"
+    "url": "https://github.com/thoughtindustries/mobile-sdk/issues"
   },
-  "homepage": "https://github.com/thoughtindustries/helium-mobile#readme",
+  "homepage": "https://github.com/thoughtindustries/mobile-sdk#readme",
   "dependencies": {
     "@types/inquirer": "^9.0.3",
     "inquirer": "^9.2.6"

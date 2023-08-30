@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "helium-mobile",
-    "slug": "helium-mobile",
+    "name": "mobile-sdk",
+    "slug": "mobile-sdk",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/expo-icon.png",

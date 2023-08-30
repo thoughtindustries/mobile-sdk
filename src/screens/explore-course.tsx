@@ -139,8 +139,8 @@ const ExploreCourse = () => {
         <View style={styles(progress, topicIndex, topics.length).progressBar} />
       </View>
       <View style={styles(progress, topicIndex, topics.length).topicPage}>
-        {pagesData?.Pages?.[0]?.type === "text" ||
-          (pagesData?.Pages?.[0]?.type === undefined && <TextPage />)}
+        {(pagesData?.Pages?.[0]?.type === "text" ||
+          pagesData?.Pages?.[0]?.type === undefined) && <TextPage />}
         {pagesData?.Pages?.[0]?.type === "video" && <VideoPage />}
         {pagesData?.Pages?.[0].type === "quiz" && (
           <QuizProvider>
